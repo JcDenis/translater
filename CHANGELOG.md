@@ -1,6 +1,29 @@
 x.x xxxxxxxx
  - help translation
  - source translation
+ - settings page
+
+2021.08.19
+ * Fixed PSR-2 Coding Style
+
+2018.10.26 - Pierre Van Glabeke
+ * Bug avec php 7.2 (https://forum.dotclear.org/viewtopic.php?pid=342810#p342810)
+
+2018.10.18 - Pierre Van Glabeke
+ * Modifs localisation
+
+2018.02.14 - Pierre Van Glabeke
+ * Suppression ?> en fin de lang.php
+
+2017.05.10 - Pierre Van Glabeke
+ * Suppression ligne 614 de "continue" dans \inc\class.dc.translater.php
+
+2016.08.20 - Pierre Van Glabeke
+ * Ajout Pluriel dans po
+ * Ajout favori
+
+2016.07.08 - Pierre Van Glabeke
+ * Modifs localisation
 
 2013.05.11
  * Rewrited proposal tools

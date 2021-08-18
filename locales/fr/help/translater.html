@@ -1,23 +1,17 @@
-﻿<html>
+<html>
 <head>
   <title>Translater</title>
 </head>
 
 <body>
 
-<h3>Paramètres</h3>
+<h4>Paramètres</h4>
 <dl>
   <dt>Activer l'interface simple</dt>
   <dd>Permet de n'avoir que l'essentiel sous les yeux.</dd>
 
-  <dt>Utiliser deux colonnes sur la page d'administrations</dt>
+  <dt>Utiliser deux colonnes sur la page d'administration</dt>
   <dd>Permet d'avoir un affichage sur deux colonnes.</dd>
-  
-  <dt>Activer le menu de la page des extensions</dt>
-  <dd>Ajoute un onglet sur la page de gestion des extensions.</dd>
-  
-  <dt>Activer le menu de la page des thèmes</dt>
-  <dd>Ajoute un lien sur les details du thème sélectionné sur le pages de gestion des thèmes.</dd>
   
   <dt>Ecrire les fichier .po</dt>
   <dd>C'est le format par défaut des fichiers de langue de Dotclear.</dd>
@@ -39,13 +33,13 @@
   <dt>Ecrire les informations à propos de l'auteur</dt>
   <dd>Ajoute aux fichiers de langue <em>(si les commentaires sont actifs)</em> des informations à propos de l'auteur de la traduction. 
   Ces informations peuvent ne pas être présentes pour un auteur elles seront alors ignorées. Il accepte les masques suivants:
-   <ul>
-    <li>displayname : pseudo de l'auteur</li>
-    <li>firstname : prénom de l'auteur</li>
-	<li>name : nom de l'auteur</li>
-	<li>email : email de l'auteur</li>
-	<li>url : site de l'auteur</li>
-   </ul>
+    <ul>
+      <li>displayname : pseudo de l'auteur</li>
+      <li>firstname : prénom de l'auteur</li>
+    	<li>name : nom de l'auteur</li>
+    	<li>email : email de l'auteur</li>
+      <li>url : site de l'auteur</li>
+    </ul>
   </dd>
 
   <dt>Utiliser un outil d'aide à la traduction</dt>
@@ -53,7 +47,7 @@
   une alerte javascript avec la traduction apparait.</dd>
 
   <dt>Langue par default des sources l10n</dt>
-  <dd>Langue des textes présents dans les fonctions:<br/>__('...') et {{tpl:lang ...}.</dd>
+  <dd>Langue des textes présents dans les fonctions:<br />__('...') et {{tpl:lang ...}}.</dd>
 
   <dt>Ecraser les langages existants</dt>
   <dd>Lors de l'import d'un paquetage de langue, si cette option est activé, une langue présente dans l'extension sera remplacé par celle venant du paquetage.</dd>
@@ -61,13 +55,13 @@
   <dt>Nom du paquetage exporté</dt>
   <dd>C'est le nom par défaut du fichier zip lorsque vous exportez des sauvegardes.</dd>
   <dd>Il accepte les masques suivants:
-   <ul>
-    <li>type : plugin ou thème</li>
-	<li>module : nom du module</li>
-	<li>version : la version du module</li>
-	<li>timestamp : le temps unix</li>
-	<li>%Y%m%D.... : les masques de date Dotclear</li>
-   </ul>
+    <ul>
+      <li>type : plugin ou thème</li>
+    	<li>module : nom du module</li>
+    	<li>version : la version du module</li>
+    	<li>timestamp : le temps unix</li>
+    	<li>%Y%m%D.... : les masques de date Dotclear</li>
+    </ul>
   </dd>
 
   <dt>Faire des sauvegardes lors de modifications</dt>
@@ -79,23 +73,23 @@
   
   <dt>Stoquer les sauvegardes dans un dossier particulier</dt>
   <dd>Plusieurs choix de lieu de sauvegarde s'offrent:
-   <ul>
+  <ul>
     <li>Repertoires <em>locales</em> de chaque module</li>
-	<li>Repertoire racine des extensions</li>
-	<li>Repertoire publique <em>(du blog en cours)</em></li>
-	<li>Repertoire <em>cache</em> de Dotclear</li>
-	<li>Repertoire unique du module <em>translater</em></li>
-   </ul>
+  	<li>Repertoire racine des extensions</li>
+  	<li>Repertoire publique <em>(du blog en cours)</em></li>
+  	<li>Repertoire <em>cache</em> de Dotclear</li>
+  	<li>Repertoire unique du module <em>translater</em></li>
+  </ul>
   </dd>
   <dd>Pour ne pas tous mélanger il est préférable de stoquer les sauvegardes dans chaque module associé.</dd>
 </dl>
 
-<h3>Ajout/Supression/Modification</h3>
+<h4>Ajout/Supression/Modification</h4>
 <p>Cet onglet permet d'ajouter, de supprimer ou d'étider des langues d'une extension. 
 Il est possible de copier la traduction d'une langue à une autre lors de sa création. 
 La supression d'une langue ne supprimera pas les éventuelles sauvegardes associées à cette langue.</p>
 
-<h3>Edition d'une langue</h3>
+<h4>Edition d'une langue</h4>
 <dl>
   <dt>Groupe</dt>
   <dd>Cette option est uniquement présente en mode avancé. 
@@ -121,7 +115,32 @@ La supression d'une langue ne supprimera pas les éventuelles sauvegardes associ
   <dd>Indique la traduction et l'extension qui utilise cette chaine le cas échéant.</dd>
 </dl>
 
-<h3>Sauvegardes</h3>
+<h4>Import/Export</h4>
+<dl>
+  <dt>Importer</dt>
+  <dd>Il est possible d'importer des paquetages de langue.
+  Le format de ces paquetages est le <em>zip</em> et la structure pour chaque fichier doit obligatoirement avoir:
+  <ul>
+   <li>le nom du module</li>
+   <li>le repertoire <em>locales</em></li>
+   <li>le code de la langue</li>
+   <li>le nom du fichier de langue</li>
+  </ul>
+  Ce qui donne par exemple pour le plugin <em>translater</em>:
+  <ul>
+    <li>translater/locales/fr/main.po</li>
+    <li>translater/locales/fr/main.lang.php</li>
+    <li>translater/locales/fr/error.po</li>
+    <li>...</li>
+  </ul>
+  Seuls les fichiers .po et .lang.php sont reconnus.
+  Un paquetage peut contenir plusieurs langues et plusieurs extensions.
+  Si l'import se fait depuis la page d'une extension, seule cette extension sera importée.
+  Si l'import se fait depuis la page général, toutes les extensions seront importées.
+  Si l'option <em>Ecraser les fichier lors de l'import</em> est activée dans les paramètres alors les fichiers exsitant seront remplacés.</dd>
+</dl>
+
+<h4>Sauvegardes</h4>
 <dl>
   <dt>Créer une sauvegarde</dt>
   <dd>Si des traductions existent, une partie "Créer une sauvegarde" apparait. 
@@ -133,41 +152,25 @@ La supression d'une langue ne supprimera pas les éventuelles sauvegardes associ
   Il suffit de selectionner les sauvegardes puis de choisir "Restaurer les sauvegardes". Elles seront restaurées par ordre chronologique. 
   C'est à dire que la plus ancienne sauvegarde sera restaurée en premier puis les plus récentes. 
   Dans cette même liste on peut supprimer des sauvegardes. La date, la langue et la taille de la sauvegarde sont affichées dans cette liste.</dd>
-
 </dl>
 
-<h3>Import/Export</h3>
+<h4>Comportements</h4>
 <dl>
-  <dt>Importer</dt>
-  <dd>Il est possible d'importer des paquetages de langue. 
-  Le format de ces paquetages est le <em>zip</em> et la structure pour chaque fichier doit obligatoirement avoir:
-  <ul>
-   <li>le nom du module</li>
-   <li>le repertoire <em>locales</em></li>
-   <li>le code de la langue</li>
-   <li>le nom du fichier de langue</li>
-  </ul>
-  Ce qui donne par exemple pour l'extension <em>translater</em>:
-  <ul>
-   <li>translater/locales/fr/main.po</li>
-   <li>translater/locales/fr/main.lang.php</li>
-   <li>translater/locales/fr/error.po</li>
-   <li>...</li>
-  </ul>
-  Seuls les fichiers .po et .lang.php sont reconnus. 
-  Un paquetage peut contenir plusieurs langues et plusieurs extensions. 
-  Si l'import se fait depuis la page d'une extension, seule cette extension sera importée.
-  Si l'import se fait depuis la page général, toutes les extensions seront importées. 
-  Si l'option <em>Ecraser les fichier lors de l'import</em> est activée dans les paramètres alors les fichiers exsitant seront remplacés.</dd>
+  <dt>Menu de départ par défaut</dt>
+  <dd>Permet de choisir quelle page apparaît lors de l'accès au présent plugin.</dd>
 
+  <dt>Activer le menu de la page des plugins</dt>
+  <dd>Ajoute un onglet sur la page de gestion des plugins.</dd>
+
+  <dt>Activer le menu de la page des thèmes</dt>
+  <dd>Ajoute un lien sur les details du thème sélectionné sur le pages de gestion des thèmes.</dd>
 </dl>
 
-<h3>Support</h3>
-<p>Si vous souhaitez plus d'aide ou apporter votre contribution à cette extension, voici quelques liens utiles.</p>
+<h4>Support</h4>
+<p>Si vous souhaitez plus d'aide ou apporter votre contribution à ce plugin, voici quelques liens utiles.</p>
 <ul>
   <li><a href="http://forum.dotclear.net/viewtopic.php?id=39220">Sujet sur le forum Dotclear</a></li>
-  <li><a href="http://lab.dotclear.org/wiki/plugin/translater">Page dédiée du lab Dotclear</a></li>
-  <li><a href="http://jcd.lv/?q=translater">Blog de l'auteur</a></li>
+  <li><a href="http://plugins.dotaddict.org/dc2/details/translater">Fiche du plugin sur dotaddict</a></li>
 </ul>
 
 </body>

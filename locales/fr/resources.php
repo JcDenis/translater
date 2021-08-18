@@ -10,7 +10,8 @@
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 # -- END LICENSE BLOCK ------------------------------------
 
-if (!defined('DC_RC_PATH')) { return; }
+if (!defined('DC_RC_PATH')) {
+    return;
+}
 
-$__resources['help']['translater'] = dirname(__FILE__).'/help/help.html';
-?>
+$__resources['help']['translater'] = dirname(__FILE__) . '/help/translater.html';

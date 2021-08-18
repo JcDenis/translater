@@ -1,531 +1,556 @@
 # Language: Français
-# Module: translater - 2013.05.11
-# Date: 2013-05-12 23:35:00
-# Translated with translater 2013.05.11
+# Module: translater - 2018.02.14
+# Date: 2018-10-18 09:43:01
+# Translated with translater 2018.02.14
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: translater 2013.05.11\n"
+"Project-Id-Version: translater 2018.02.14\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2013-05-12T23:35:00+00:00\n"
-"Last-Translator: Jean-Christian Denis\n"
+"PO-Revision-Date: 2018-10-18T09:43:01+00:00\n"
+"Last-Translator: brol\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: _admin.php:26
-#: index.php:537
-#: index.php:570
-#: index.php:1384
+#: _admin.php:25
+#: _admin.php:112
+#: index.php:536
+#: index.php:569
+#: index.php:1383
 msgid "Translater"
 msgstr "Traducteur"
 
-#: _admin.php:44
-msgid "Translate extensions"
-msgstr "Traduire les extensions"
+#: _admin.php:43
+msgid "Translate plugins"
+msgstr "Traduire les plugins"
 
-#: _admin.php:48
-#: index.php:670
-msgid "Name"
-msgstr "Nom"
-
-#: _admin.php:62
+#: _admin.php:61
 msgid "Translate this plugin"
-msgstr "Traduire cette extension"
+msgstr "Traduire ce plugin"
 
-#: _admin.php:85
+#: _admin.php:84
 msgid "Translate this theme"
 msgstr "Traduire ce thème"
 
-#: inc/class.dc.translater.php:434
+#: _uninstall.php:20
+msgid "delete all settings"
+msgstr "effacer tous les paramètres"
+
+#: _uninstall.php:27
+msgid "delete plugin files"
+msgstr "effacer les fichiers du plugin"
+
+#: _uninstall.php:34
+msgid "delete the version number"
+msgstr "effacer le n° de version"
+
+#: _uninstall.php:42
+msgid "delete all %s settings"
+msgstr "effacer tous les paramètres de %s"
+
+#: _uninstall.php:49
+msgid "delete %s plugin files"
+msgstr "effacer les fichiers du plugin %s"
+
+#: _uninstall.php:56
+msgid "delete %s version number"
+msgstr "effacer la version de %s"
+
+#: inc/class.dc.translater.php:359
+msgid "Cannot find module %s"
+msgstr "Impossible de trouver le module %s"
+
+#: inc/class.dc.translater.php:437
 msgid "Cannot find backups folder for module %s"
 msgstr "Impossible de trouver le dossier de sauvegarde du module %s"
 
-#: inc/class.dc.translater.php:450
+#: inc/class.dc.translater.php:453
 msgid "Cannot find languages folder for module %s"
 msgstr "Impossible de trouver le dossier de langue du module %s"
 
-#: inc/class.dc.translater.php:470
+#: inc/class.dc.translater.php:473
 msgid "Cannot find root folder for module %s"
 msgstr "Impossible de trouver le dossier racine du module %s"
 
-#: inc/class.dc.translater.php:499
+#: inc/class.dc.translater.php:502
 msgid "Limit of %s backups for module %s exceed"
 msgstr "La limite de %s sauvegardes pour le module % est dépassée"
 
-#: inc/class.dc.translater.php:561
-#: inc/class.dc.translater.php:951
-#: inc/class.dc.translater.php:1028
+#: inc/class.dc.translater.php:564
+#: inc/class.dc.translater.php:954
+#: inc/class.dc.translater.php:1031
 msgid "Cannot find language folder %s for module %s"
 msgstr "Impossible de trouver le dossier de langue %s pour le module %s"
 
-#: inc/class.dc.translater.php:616
+#: inc/class.dc.translater.php:619
 msgid "Cannot delete backup file %s"
 msgstr "Impossible d'effacer le fichier de sauvegarde %s"
 
-#: inc/class.dc.translater.php:634
+#: inc/class.dc.translater.php:637
 msgid "Cannot find backup file %s"
 msgstr "Impossible de trouver le fichier de sauvegarde %s"
 
-#: inc/class.dc.translater.php:660
+#: inc/class.dc.translater.php:663
 msgid "Wrong export query"
 msgstr "Mauvaise requète d'exportation"
 
-#: inc/class.dc.translater.php:671
+#: inc/class.dc.translater.php:674
 msgid "Cannot use export mask %s"
 msgstr "Impossible d'utiliser le masque d'exportation %s"
 
-#: inc/class.dc.translater.php:759
+#: inc/class.dc.translater.php:762
 msgid "Wrong import query"
 msgstr "Mauvaise requète d'importation"
 
-#: inc/class.dc.translater.php:808
+#: inc/class.dc.translater.php:811
 msgid "Nothing to import for these modules in pack %s"
 msgstr "Rien à importer pour ces modules dans le paquetage %s"
 
-#: inc/class.dc.translater.php:837
+#: inc/class.dc.translater.php:840
 msgid "Zip file %s is not in translater format"
 msgstr "Le fichier zip n'est pas au format de translater"
 
-#: inc/class.dc.translater.php:897
+#: inc/class.dc.translater.php:900
 msgid "Language %s already exists for module %s"
 msgstr "La langue %s existe dèjà pour le module %s"
 
-#: inc/class.dc.translater.php:908
+#: inc/class.dc.translater.php:911
 msgid "Cannot copy file from language %s for module %s"
 msgstr "Impossible de copier le fichier depuis le langage %s pour le module %s"
 
-#: inc/class.dc.translater.php:1000
+#: inc/class.dc.translater.php:1003
 msgid "No string to write, language %s deleted for module %s"
 msgstr "Aucune chaine à écrire, la langue %s a été effacée pour le module %s"
 
-#: inc/class.dc.translater.php:1264
+#: inc/class.dc.translater.php:1267
 msgid "Cannot grant write acces on lang file %s"
 msgstr "Impossible d'avoir les droits en écriture sur le fichier de langue %s"
 
-#: inc/class.dc.translater.php:1275
+#: inc/class.dc.translater.php:1278
 msgid "Cannot write lang file %s"
 msgstr "Impossible d'écrire le fichier de langue %s"
 
-#: inc/class.dc.translater.php:1579
+#: inc/class.dc.translater.php:1583
 msgid "Cannot find language for code %s"
 msgstr "Impossible de trouver de langue pour le code %s"
 
-#: inc/class.translater.rest.php:42
+#: inc/class.translater.rest.php:41
 msgid "Missing params"
 msgstr "Paramètres manquants"
 
-#: inc/class.translater.rest.php:51
+#: inc/class.translater.rest.php:50
 msgid "Failed to get translation tool"
 msgstr "Impossible de trouver l'outil de traduction"
 
-#: inc/class.translater.rest.php:55
+#: inc/class.translater.rest.php:54
 msgid "Translation tool is not configured"
 msgstr "L'outil de traduction n'est pas configuré"
 
-#: inc/lib.translater.google.php:44
+#: inc/lib.translater.google.php:43
 msgid "You must have on Google API console:"
 msgstr "Vous devez avoir sur la console des API Google :"
 
-#: inc/lib.translater.google.php:80
-msgid "Failed to query service."
-msgstr "Impossible d'interoger le service."
+#: inc/lib.translater.google.php:46
+msgid "Activate the \"translate API\" service"
+msgstr "Activer le service \"translate API\""
 
-#: inc/lib.translater.microsoft.php:49
+#: inc/lib.translater.google.php:79
+msgid "Failed to query service."
+msgstr "Impossible d'interroger le service."
+
+#: inc/lib.translater.microsoft.php:48
 msgid "You must have:"
 msgstr "Vous devez avoir :"
 
-#: index.php:26
-#: index.php:526
-#: index.php:1382
+#: index.php:25
+#: index.php:525
+#: index.php:1381
 msgid "Settings"
 msgstr "Paramètres"
 
-#: index.php:42
+#: index.php:27
+#: index.php:426
+#: index.php:462
+#: index.php:500
+#: index.php:571
+msgid "Themes"
+msgstr "Thèmes"
+
+#: index.php:41
 msgid "locales folders of each module"
 msgstr "le répertoire locales de chaque module"
 
-#: index.php:43
+#: index.php:42
 msgid "plugins folder root"
-msgstr "le répertoire racine des extensions"
+msgstr "le répertoire racine des plugins"
 
-#: index.php:44
+#: index.php:43
 msgid "public folder root"
 msgstr "le répertoire public du blog"
 
-#: index.php:45
+#: index.php:44
 msgid "cache folder of Dotclear"
 msgstr "le répertoire cache de Dotclear"
 
-#: index.php:46
+#: index.php:45
 msgid "locales folder of translater"
-msgstr "le répertoire locales de l'extension translater"
+msgstr "le répertoire locales du plugin translater"
 
-#: index.php:51
+#: index.php:50
 msgid "Translation successfully updated"
 msgstr "Traduction mise à jour avec succès"
 
-#: index.php:52
+#: index.php:51
 msgid "Translation successfully created"
-msgstr "Traduction crée avec succès"
+msgstr "Traduction créée avec succès"
 
-#: index.php:53
+#: index.php:52
 msgid "Translation successfully deleted"
 msgstr "Traduction effacée avec succès"
 
-#: index.php:54
+#: index.php:53
 msgid "Backups successfully create"
-msgstr "Sauvegardes crées avec succès"
+msgstr "Sauvegardes créées avec succès"
 
-#: index.php:55
+#: index.php:54
 msgid "Backups successfully restored"
 msgstr "Sauvegardes effectuées avec succès"
 
-#: index.php:56
+#: index.php:55
 msgid "Backups successfully deleted"
 msgstr "Sauvegardes effacées avec succès"
 
-#: index.php:57
+#: index.php:56
 msgid "Package successfully imported"
 msgstr "Paquetage importé avec succès"
 
-#: index.php:58
+#: index.php:57
 msgid "Package successfully exported"
 msgstr "Paquetage exporté avec succès"
 
-#: index.php:62
+#: index.php:61
 msgid "Failed to update settings: %s"
 msgstr "Impossible de mettre à jour les paramètres : %s"
 
-#: index.php:63
+#: index.php:62
 msgid "Failed to update translation: %s"
 msgstr "Impossible de mettre à jour la traduction : %s"
 
-#: index.php:64
+#: index.php:63
 msgid "Failed to create translation: %s"
 msgstr "Impossible de créer la traduction : %s"
 
-#: index.php:65
+#: index.php:64
 msgid "Failed to delete translation: %s"
 msgstr "Impossible d'effacer la traduction : %s"
 
-#: index.php:66
+#: index.php:65
 msgid "Failed to create backups: %s"
 msgstr "Impossible de créer les sauvegardes : %s"
 
-#: index.php:67
+#: index.php:66
 msgid "Failed to restore backups: %s"
 msgstr "Impossible de restaurer les sauvegardes : %s"
 
-#: index.php:68
+#: index.php:67
 msgid "Failed to delete backups: %s"
 msgstr "Impossible d'effacer les sauvegardes : %s"
 
-#: index.php:69
+#: index.php:68
 msgid "Failed to import package: %s"
 msgstr "Impossible d'importer le paquetage : %s"
 
-#: index.php:70
+#: index.php:69
 msgid "Failed to export package: %s"
 msgstr "Impossible d'exporter le paquetage : %s"
 
-#: index.php:112
+#: index.php:111
 msgid "No lang to create"
 msgstr "Pas de langue à créer"
 
-#: index.php:134
+#: index.php:133
 msgid "No lang to delete"
 msgstr "Pas de langue à effacer"
 
-#: index.php:156
+#: index.php:155
 msgid "No lang to backup"
 msgstr "Pas de langue à sauvegarder"
 
-#: index.php:189
+#: index.php:188
 msgid "No blackup to restore"
 msgstr "Pas de langue à restaurer"
 
-#: index.php:208
+#: index.php:207
 msgid "No bakcup to to restore"
 msgstr "Pas de sauvegarde à restaurer"
 
-#: index.php:229
-#: index.php:247
+#: index.php:228
+#: index.php:246
 msgid "No backup to delete"
 msgstr "Pas de sauvegarde à effacer"
 
-#: index.php:290
-#: index.php:364
+#: index.php:289
+#: index.php:363
 msgid "Nothing to export"
 msgstr "Rien à exporter"
 
-#: index.php:312
+#: index.php:311
 msgid "No language to update"
 msgstr "Pas de langue à mettre à jour"
 
-#: index.php:443
-#: index.php:490
+#: index.php:442
+#: index.php:489
 msgid "Failed to launch translater: %s"
 msgstr "Impossible de démarrer translater : %s"
 
-#: index.php:556
+#: index.php:555
 msgid "Use this %s translation:"
 msgstr "Utiliser la traduction de %s :"
 
-#: index.php:557
+#: index.php:556
 msgid "Translate this text with %s"
 msgstr "Traduire ce texte avec %s"
 
-#: index.php:558
+#: index.php:557
 msgid "Use this text"
 msgstr "Utiliser ce texte"
 
-#: index.php:606
+#: index.php:605
 msgid "Translate theme \"%s\" (by %s)"
 msgstr "Traduire le thème \"%s\" (de %s)"
 
-#: index.php:607
+#: index.php:606
 msgid "Translate plugin \"%s\" (by %s)"
-msgstr "Traduire l'extension \"%s\" (de %s)"
+msgstr "Traduire le plugin \"%s\" (de %s)"
 
-#: index.php:627
-#: index.php:741
+#: index.php:626
+#: index.php:740
 msgid "Edit translation"
 msgstr "Modifier la traduction"
 
-#: index.php:639
+#: index.php:638
 msgid "Id"
 msgstr "Id"
 
-#: index.php:649
+#: index.php:648
 msgid "There is no editable modules"
 msgstr "Il n'y a pas de modules modifiables."
 
-#: index.php:665
+#: index.php:664
 msgid "Summary"
 msgstr "Résumé"
 
-#: index.php:666
+#: index.php:665
 msgid "Module"
 msgstr "Module"
 
-#: index.php:668
+#: index.php:667
 msgid "About"
 msgstr "À propos"
 
-#: index.php:678
+#: index.php:677
 msgid "Root"
 msgstr "Racine"
 
-#: index.php:680
-#: index.php:694
-#: index.php:811
-#: index.php:1342
+#: index.php:679
+#: index.php:693
+#: index.php:810
+#: index.php:1341
 msgid "Backups"
 msgstr "Sauvegardes"
 
-#: index.php:695
+#: index.php:694
 msgid "Last backup"
 msgstr "Dernière sauvegarde"
 
-#: index.php:722
+#: index.php:721
 msgid "no backup"
 msgstr "Aucune sauvegarde"
 
-#: index.php:731
-msgid "Translations"
-msgstr "Traductions"
-
-#: index.php:737
+#: index.php:736
 msgid "Edit language"
 msgstr "Modifier une langue"
 
-#: index.php:757
+#: index.php:756
 msgid "Add language"
 msgstr "Ajouter une langue"
 
-#: index.php:764
+#: index.php:763
 msgid "Copy from language:"
 msgstr "Copier depuis la langue :"
 
-#: index.php:766
+#: index.php:765
 msgid "Optionnal"
 msgstr "Optionnel"
 
-#: index.php:773
+#: index.php:772
 msgid "Add translation"
 msgstr "Ajouter la traduction"
 
-#: index.php:790
+#: index.php:789
 msgid "Delete language"
 msgstr "Effacer une langue"
 
-#: index.php:794
+#: index.php:793
 msgid "Delete translation"
 msgstr "Effacer la traduction"
 
-#: index.php:816
+#: index.php:815
 msgid "Create backups"
 msgstr "Créer une sauvegarde"
 
-#: index.php:818
+#: index.php:817
 msgid "Choose languages to backup"
 msgstr "Choisir la langue à sauvegarder"
 
-#: index.php:839
-msgid "Backup"
-msgstr "Sauvegarde"
-
-#: index.php:856
+#: index.php:855
 msgid "List of backups"
 msgstr "Liste des sauvegardes"
 
-#: index.php:860
-#: index.php:1066
+#: index.php:859
+#: index.php:1065
 msgid "File"
 msgstr "Fichier"
 
-#: index.php:863
-msgid "Size"
-msgstr "Taille"
-
-#: index.php:887
+#: index.php:886
 msgid "Selected backups action:"
 msgstr "Action sur les sauvegardes sélectionnées :"
 
-#: index.php:889
+#: index.php:888
 msgid "Restore backups"
 msgstr "Restaurer les sauvegardes"
 
-#: index.php:890
+#: index.php:889
 msgid "Delete backups"
 msgstr "Effacer les sauvegardes"
 
-#: index.php:916
-#: index.php:1183
+#: index.php:915
+#: index.php:1182
 msgid "Choose language package to import"
 msgstr "Choisir le paquetage de langue à importer"
 
-#: index.php:938
-#: index.php:1240
+#: index.php:937
+#: index.php:1239
 msgid "Choose languages to export"
 msgstr "Choisir les langues à exporter"
 
-#: index.php:1059
+#: index.php:1058
 msgid "Group"
 msgstr "Groupe"
 
-#: index.php:1061
+#: index.php:1060
 msgid "String"
 msgstr "Chaîne"
 
-#: index.php:1063
-#: index.php:1284
+#: index.php:1062
+#: index.php:1283
 msgid "Translation"
 msgstr "Traduction"
 
-#: index.php:1064
+#: index.php:1063
 msgid "Existing"
 msgstr "Existant"
 
-#: index.php:1127
+#: index.php:1126
 msgid "%s occurrences"
 msgstr "%s occurrences"
 
-#: index.php:1153
+#: index.php:1152
 msgid "Total of %s strings."
 msgstr "Total de %s chaînes."
 
-#: index.php:1155
+#: index.php:1154
 msgid "Change the group of the selected entries to:"
 msgstr "Changer le groupe des entrées sélectionnées vers :"
 
-#: index.php:1212
+#: index.php:1211
 msgid "Choose modules to export"
 msgstr "Choisir les modules à exporter"
 
-#: index.php:1214
+#: index.php:1213
 msgid "Modules"
 msgstr "Modules"
 
-#: index.php:1287
+#: index.php:1286
 msgid "Write .po files"
-msgstr "Écrire les fichier .po"
+msgstr "Écrire les fichiers .po"
 
-#: index.php:1290
+#: index.php:1289
 msgid "Write .lang.php files"
-msgstr "Écrire les fichier .lang.php"
+msgstr "Écrire les fichiers .lang.php"
 
-#: index.php:1293
+#: index.php:1292
 msgid "Translate also strings of template files"
 msgstr "Traduire également les chaînes des fichiers de template"
 
-#: index.php:1296
+#: index.php:1295
 msgid "Translate only unknow strings"
 msgstr "Traduire uniquement les chaînes inconnues"
 
-#: index.php:1299
+#: index.php:1298
 msgid "Hide default modules of Dotclear"
 msgstr "Cacher les modules d'origine de Dotclear"
 
-#: index.php:1302
+#: index.php:1301
 msgid "Write comments in files"
 msgstr "Écrire les commentaires dans les fichiers"
 
-#: index.php:1305
+#: index.php:1304
 msgid "Write informations about author in files"
 msgstr "Écrire les informations à propos de l'auteur dans les fichiers"
 
-#: index.php:1309
+#: index.php:1308
 msgid "Tools"
 msgstr "Outils"
 
-#: index.php:1310
+#: index.php:1309
 msgid "Default language of l10n source:"
 msgstr "Langue par défaut des sources l10n :"
 
-#: index.php:1314
+#: index.php:1313
 msgid "Select and configure the tool to use to translate strings:"
 msgstr "Sélectionner et configurer un outil de traduction :"
 
-#: index.php:1326
+#: index.php:1325
 msgid "Nothing to configure for %s tool."
 msgstr "Rien à configurer pour l'outil %s."
 
-#: index.php:1337
+#: index.php:1336
 msgid "Overwrite existing languages"
 msgstr "Écraser les langages existants"
 
-#: index.php:1338
+#: index.php:1337
 msgid "Name of exported package"
 msgstr "Nom du paquetage exporté"
 
-#: index.php:1345
+#: index.php:1344
 msgid "Make backups when changes are made"
 msgstr "Faire des sauvegardes lors des modifications"
 
-#: index.php:1346
+#: index.php:1345
 msgid "Limit backups to %s files per module"
 msgstr "Limiter les sauvegardes à %s fichiers par module"
 
-#: index.php:1349
+#: index.php:1348
 msgid "Store backups in %s"
 msgstr "Stocker les sauvegardes dans %s"
 
-#: index.php:1354
+#: index.php:1353
 msgid "Behaviors"
 msgstr "Comportements"
 
-#: index.php:1355
+#: index.php:1354
 msgid "Default start menu:"
 msgstr "Menu de départ par défaut :"
 
-#: index.php:1360
+#: index.php:1359
 msgid "Enable menu on extensions page"
-msgstr "Activer le menu sur la page des extensions"
+msgstr "Activer le menu sur la page des plugins"
 
-#: index.php:1363
+#: index.php:1362
 msgid "Enable menu on themes page"
 msgstr "Activer le menu sur la page des thèmes"
 
@@ -533,5 +558,5 @@ msgid "translater"
 msgstr "Traducteur"
 
 msgid "Translate your Dotclear plugins and themes"
-msgstr "Traduire vos extensions et thèmes pour Dotclear"
+msgstr "Traduire vos plugins et thèmes pour Dotclear"
 

@@ -19,11 +19,11 @@ $this->registerModule(
     'translater',
     'Translate your Dotclear plugins and themes',
     'Jean-Christian Denis & contributors',
-    '2021.08.15',
+    '2021.08.18',
     [
         'permissions' => 'usage,contentadmin,admin',
         'type' => 'plugin',
-        'dc_min' => '2.19',
+        'dc_min' => '2.18',
         'support' => 'http://forum.dotclear.org/viewtopic.php?id=39220',
         'details' => 'https://plugins.dotaddict.org/dc2/details/translater'
     ]

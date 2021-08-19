@@ -262,7 +262,8 @@ class dcTranslater
             $v,
             $this->default_settings[$k]['type'],
             $this->default_settings[$k]['label'],
-            true,true
+            true,
+            true
         );
         return true;
     }
@@ -327,7 +328,7 @@ class dcTranslater
     }
 
     # Return array of modules infos by type of modules
-    public function listModules($type='')
+    public function listModules($type = '')
     {
         return in_array($type, array('plugin', 'theme')) ? 
             $this->modules[$type] : 

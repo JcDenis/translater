@@ -1,10 +1,10 @@
 x.x xxxxxxxx
  - help translation
  - source translation
- - settings page
 
-2021.08.19
+2021.08.18
  * Fixed PSR-2 Coding Style
+ * Move settings to _config file
 
 2018.10.26 - Pierre Van Glabeke
  * Bug avec php 7.2 (https://forum.dotclear.org/viewtopic.php?pid=342810#p342810)

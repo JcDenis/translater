@@ -42,11 +42,35 @@ $combo_backup_folder = [
 ];
 
 $combo_start_page = [
-    'setting' => __('Settings'),
     'modules_plugin' => __('Plugins'),
     'modules_theme' => __('Themes'),
     'pack' => __('Import/Export')
 ];
+
+# -- Set settings --
+if (!empty($_POST['save'])) {
+        try {
+            if (empty($_POST['translater_write_po'])
+             && empty($_POST['translater_write_langphp'])) {
+                throw new Exception('You must choose one file format at least');
+            }
+            foreach($translater->getDefaultSettings() as $k => $v) {
+                $translater->set($k, (isset($_POST['translater_' . $k]) ? $_POST['translater_' . $k] : ''));
+            }
+            foreach($translater->proposal->getTools() AS $k => $v) {
+                $v->save();
+            }
+            dcPage::addSuccessNotice(
+                __('Configuration has been successfully updated.')
+            );
+            http::redirect(
+                $list->getURL('module=translater&conf=1&redir=' .
+                $list->getRedir())
+            );
+        } catch (Exception $e) {
+            $core->error->add(sprintf($errors[$action], $e->getMessage()));
+        }
+}
 
 # -- Display form --
 echo '

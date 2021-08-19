@@ -415,10 +415,17 @@ $core->callBehavior('translaterAdminHeaders');
 
 echo 
 '</head>
-<body><h2>' . __('Translater') . ' &rsaquo; ' . $title .
-' - <a class="button" href="' . $p_url . '&amp;part=modules&amp;type=plugin">' . __('Plugins') . '</a>' .
-' - <a class="button" href="' . $p_url . '&amp;part=modules&amp;type=theme">' . __('Themes') . '</a>' .
-' - <a class="button" href="' . $p_url . '&amp;part=pack">' . __('Import/Export') . '</a>' .
+<body><h2>' . __('Translater') . ' &rsaquo; ' . $title;
+if ($part == 'pack' || $type != 'plugin') {
+    echo ' / <a href="' . $p_url . '&amp;part=modules&amp;type=plugin">' . __('Plugins') . '</a>';
+}
+if ($part == 'pack' || $type != 'theme') {
+    echo ' / <a href="' . $p_url . '&amp;part=modules&amp;type=theme">' . __('Themes') . '</a>';
+}
+if ($part != 'pack') {
+    echo ' / <a href="' . $p_url . '&amp;part=pack">' . __('Import/Export') . '</a>';
+}
+echo
 '</h2>';
 
 if (isset($succes[$msg])) {

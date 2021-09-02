@@ -1,15 +1,15 @@
 <?php
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of translater, a plugin for Dotclear 2.
-# 
-# Copyright (c) 2009-2021 Jean-Christian Denis and contributors
-# 
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief translater, a plugin for Dotclear 2
+ * 
+ * @package Dotclear
+ * @subpackage Plugin
+ * 
+ * @author Jean-Christian Denis & contributors
+ * 
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 if (!defined('DC_CONTEXT_ADMIN')) {
     return;
@@ -259,7 +259,7 @@ switch ($action) {
                 throw new Exception(__('Nothing to import'));
             }
             $translater->importPack($_POST['modules'], $_FILES['packfile']);
-            
+
             http::redirect($p_url . '&part=pack&msg=' . $action . '&tab=pack-import');
         } catch (Exception $e) {
             $core->error->add(sprintf($errors[$action], $e->getMessage()));
@@ -533,7 +533,7 @@ switch ($part) {
             '<th>' . __('Backups') . '</th>' . 
             '<th>' . __('Last backup') . '</th>' . 
             '</tr>';
-            
+
             foreach($M->langs AS $lang => $name) {
                 echo 
                 '<tr class="line">' . 
@@ -541,7 +541,7 @@ switch ($part) {
                 '<a href="' . $p_url . '&amp;part=lang&amp;type=' . $type . '&amp;module=' . $module . '&amp;lang=' . $lang . '">' . $name . '</a>' . 
                 '</td>' . 
                 '<td class="nowrap"> ' . $lang . '</td>';
-                
+
                 if (isset($M->backups[$lang])) {
                     foreach($M->backups[$lang] AS $file => $info) {
                         $time[$lang] = isset($time[$lang]) && $time[$lang] > $info['time'] ? 

@@ -1,15 +1,15 @@
 <?php
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of translater, a plugin for Dotclear 2.
-# 
-# Copyright (c) 2009-2021 Jean-Christian Denis and contributors
-# 
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief translater, a plugin for Dotclear 2
+ * 
+ * @package Dotclear
+ * @subpackage Plugin
+ * 
+ * @author Jean-Christian Denis & contributors
+ * 
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 if (!defined('DC_CONTEXT_ADMIN')) {
     return;
@@ -39,7 +39,7 @@ class translaterAdminBehaviors
         if (!$core->blog->settings->translater->translater_plugin_menu || !$core->auth->isSuperAdmin()) {
             return;
         }
-        
+
         echo 
         '<div class="multi-part" id="translater" title="' .
         __('Translate plugins') .
@@ -51,9 +51,9 @@ class translaterAdminBehaviors
         '<th class="nowrap">' . __('Details') . '</th>' .
         '<th class="nowrap">' . __('Author') . '</th>' .
         '</tr>';
-        
+
         $modules = $core->plugins->getModules();
-        
+
         foreach ($modules as $name => $plugin) {
             echo
             '<tr class="line">' .
@@ -69,35 +69,35 @@ class translaterAdminBehaviors
         echo 
         '</table></div>';
     }
-    
+
     # Themes menu
     public static function adminCurrentThemeDetails($core, $id, $infos)
     {
         if (!$core->blog->settings->translater->translater_theme_menu || !$core->auth->isSuperAdmin()) {
             return;
         }
-        
+
         $root = path::real($infos['root']);
-        
+
         if ($id != 'default' && is_dir($root.'/locales')) {
             return 
             '<p><a href="plugin.php?p=translater&amp;part=module&amp;type=theme&amp;module=' . $id . '"' .
             ' class="button">' . __('Translate this theme') . '</a></p>';
         }
     }
-    
+
     # Google Translater tools
     public static function addGoogleProposalTool($proposal)
     {
         $proposal->addTool('googleProposalTool');
     }
-    
+
     # Yahoo Babelfish tools
     public static function addYahooProposalTool($proposal)
     {
         $proposal->addTool('yahooProposalTool');
     }
-    
+
     # Microsoft Bing tools
     public static function addMicrosoftProposalTool($proposal)
     {

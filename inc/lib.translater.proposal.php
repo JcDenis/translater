@@ -1,15 +1,15 @@
 <?php
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of translater, a plugin for Dotclear 2.
-# 
-# Copyright (c) 2009-2021 Jean-Christian Denis and contributors
-# 
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief translater, a plugin for Dotclear 2
+ * 
+ * @package Dotclear
+ * @subpackage Plugin
+ * 
+ * @author Jean-Christian Denis & contributors
+ * 
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 /**
  * Translater proposal tool.
@@ -35,7 +35,7 @@ abstract class translaterProposalTool
 
     /**
     Set name of this tool
-    
+
     @param  string  Tool's name
     */
     final protected function setName($name)
@@ -45,7 +45,7 @@ abstract class translaterProposalTool
 
     /**
     Get name of this tool
-    
+
     @return string  Tool's name
     */
     final public function getName()
@@ -55,7 +55,7 @@ abstract class translaterProposalTool
 
     /**
     Set description of this tool
-    
+
     @param  string  Tool's description
     */
     final protected function setDesc($desc)
@@ -65,7 +65,7 @@ abstract class translaterProposalTool
 
     /**
     Get description of this tool
-    
+
     @return string  Tool's description
     */
     final public function getDesc()
@@ -75,7 +75,7 @@ abstract class translaterProposalTool
 
     /**
     Set tool as (un)active
-    
+
     @param  boolean $active True to set it as active
     */
     final protected function setActive($active)
@@ -85,7 +85,7 @@ abstract class translaterProposalTool
 
     /**
     Check if this tool is active
-    
+
     @return boolean True if it is active
     */
     final public function isActive()
@@ -100,7 +100,7 @@ abstract class translaterProposalTool
 
     /**
     Get configuration interface
-    
+
     @return Form field
     */
     abstract public function form();
@@ -112,7 +112,7 @@ abstract class translaterProposalTool
 
     /**
     Translate a string from a language to another
-    
+
     @param  string  $str    Trimed UTF-8 string to translate
     @param  string  $from   Source language code
     @param  string  to  Destination language code

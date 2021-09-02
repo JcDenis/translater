@@ -1,15 +1,15 @@
 <?php
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of translater, a plugin for Dotclear 2.
-# 
-# Copyright (c) 2009-2021 Jean-Christian Denis and contributors
-# 
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief translater, a plugin for Dotclear 2
+ * 
+ * @package Dotclear
+ * @subpackage Plugin
+ * 
+ * @author Jean-Christian Denis & contributors
+ * 
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 if (!defined('DC_RC_PATH')) {
     return;
@@ -21,10 +21,11 @@ $this->registerModule(
     'Jean-Christian Denis & contributors',
     '2021.08.18',
     [
+        'requires' => [['core', '2.19']],
         'permissions' => 'usage,contentadmin,admin',
         'type' => 'plugin',
-        'dc_min' => '2.18',
         'support' => 'http://forum.dotclear.org/viewtopic.php?id=39220',
-        'details' => 'https://plugins.dotaddict.org/dc2/details/translater'
+        'details' => 'https://plugins.dotaddict.org/dc2/details/translater',
+        'repository' => 'https://raw.githubusercontent.com/JcDenis/translater/master/dcstore.xml'
     ]
 );

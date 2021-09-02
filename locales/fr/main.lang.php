@@ -417,4 +417,3 @@ $GLOBALS['__l10n']['Enable menu on themes page'] = 'Activer le menu sur la page 
 $GLOBALS['__l10n']['translater'] = 'Traducteur';
 
 $GLOBALS['__l10n']['Translate your Dotclear plugins and themes'] = 'Traduire vos plugins et thèmes pour Dotclear';
-

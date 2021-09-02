@@ -19,7 +19,7 @@ $this->registerModule(
     'translater',
     'Translate your Dotclear plugins and themes',
     'Jean-Christian Denis & contributors',
-    '2021.08.18',
+    '2021.09.02',
     [
         'requires' => [['core', '2.19']],
         'permissions' => 'usage,contentadmin,admin',

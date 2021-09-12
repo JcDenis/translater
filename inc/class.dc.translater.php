@@ -162,37 +162,7 @@ class dcTranslater
         )
     );
     # List of default modules of Dotclear
-    public static $default_dotclear_modules = array(
-        'plugin' => array(
-            'aboutConfig',
-            'akismet',
-            'antispam',
-            'attachments',
-            'blogroll',
-            'blowupConfig',
-            'breadcrumb',
-            'dcCKEditor',
-            'dclegacy',
-            'dcLegacyEditor',
-            'fairTrackbacks',
-            'importExport',
-            'maintenance',
-            'pages',
-            'pings',
-            'simpleMenu',
-            'tags',
-            'themeEditor',
-            'userPref',
-            'widgets'
-        ),
-        'theme' => array(
-            'default',
-            'berlin',
-            'blueSilence',
-            'customCSS',
-            'ductile'
-        )
-    );
+    public static $default_dotclear_modules = ['plugin' => [], 'theme' => []];
 
     # List of modules (from plugins,thems, by dcModule::getModules)
     private $modules = array();
@@ -202,6 +172,10 @@ class dcTranslater
     # Construtor
     function __construct($core)
     {
+        self::$default_dotclear_modules = [
+            'plugin' => explode(',', DC_DISTRIB_PLUGINS), 
+            'theme' => explode(',', DC_DISTRIB_THEMES)
+        ];
         $this->core =& $core;
         $core->blog->settings->addNamespace('translater');
         $this->loadModules();

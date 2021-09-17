@@ -16,8 +16,9 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 }
 
 $core->blog->settings->addNamespace('translater');
-$core->addBehavior('pluginsToolsTabs', ['translaterAdminBehaviors', 'pluginsToolsTabs']);
-$core->addBehavior('adminCurrentThemeDetails', ['translaterAdminBehaviors', 'adminCurrentThemeDetails']);
+$core->addBehavior('adminModulesListGetActions', ['translaterAdminBehaviors', 'adminModulesGetActions']);
+$core->addBehavior('adminModulesListDoActions', ['translaterAdminBehaviors', 'adminModulesDoActions']);
+$core->addBehavior('adminDashboardFavorites', ['translaterAdminBehaviors', 'adminDashboardFavorites']);
 $core->addBehavior('addTranslaterProposalTool', ['translaterAdminBehaviors', 'addGoogleProposalTool']);
 $core->addBehavior('addTranslaterProposalTool', ['translaterAdminBehaviors', 'addYahooProposalTool']);
 $core->addBehavior('addTranslaterProposalTool', ['translaterAdminBehaviors', 'addMicrosoftProposalTool']);
@@ -25,95 +26,104 @@ $core->rest->addFunction('getProposal', ['translaterRest', 'getProposal']);
 
 $_menu['Plugins']->addItem(
     __('Translater'),
-    'plugin.php?p=translater',
-    'index.php?pf=translater/icon.png',
-    preg_match('/plugin.php\?p=translater(&.*)?$/', $_SERVER['REQUEST_URI']),
+    $core->adminurl->get('admin.plugin.translater'),
+    dcPage::getPF('translater/icon.png'),
+    preg_match(
+        '/' . preg_quote($core->adminurl->get('admin.plugin.translater')) . '(&.*)?$/', 
+        $_SERVER['REQUEST_URI']
+    ),
     $core->auth->isSuperAdmin()
 );
 
 class translaterAdminBehaviors
 {
-    # Plugins tab
-    public static function pluginsToolsTabs($core)
+    /**
+     * Add button to go to module translation
+     * 
+     * @param  object $list     adminModulesList instance
+     * @param  string $id       Module id
+     * @param  arrray $prop     Module properties
+     * @return string           HTML submit button
+     */
+    public static function adminModulesGetActions(adminModulesList $list, string $id, array $prop): ?string
     {
-        if (!$core->blog->settings->translater->translater_plugin_menu || !$core->auth->isSuperAdmin()) {
-            return;
+        if ($list->getList() != $prop['type'] . '-activate' 
+            || !$list->core->blog->settings->translater->get('translater_' . $prop['type'] . '_menu')
+            || !$list->core->auth->isSuperAdmin()
+        ) {
+            return null;
         }
 
-        echo 
-        '<div class="multi-part" id="translater" title="' .
-        __('Translate plugins') .
-        '">' .
-        '<table class="clear"><tr>' .
-        '<th>&nbsp;</th>' .
-        '<th>' . __('Name') . '</th>' .
-        '<th class="nowrap">' . __('Version') . '</th>' .
-        '<th class="nowrap">' . __('Details') . '</th>' .
-        '<th class="nowrap">' . __('Author') . '</th>' .
-        '</tr>';
-
-        $modules = $core->plugins->getModules();
-
-        foreach ($modules as $name => $plugin) {
-            echo
-            '<tr class="line">' .
-            '<td class="nowrap">' .
-            '<a href="plugin.php?p=translater&amp;part=module&amp;type=plugin&amp;module=' . $name . '"' .
-            ' title="' . __('Translate this plugin') . '">' . __($plugin['name']) . '</a></td>' .
-            '<td class="nowrap">' . $name . '</td>' .
-            '<td class="nowrap">' . $plugin['version'] . '</td>' .
-            '<td class="maximal">' . $plugin['desc'] . '</td>' .
-            '<td class="nowrap">' . $plugin['author'] . '</td>' .
-            '</tr>';
-        }
-        echo 
-        '</table></div>';
+        return 
+            ' <input type="submit" name="translater[' . 
+            html::escapeHTML($id) . 
+            ']" value="' . _('Translate') . '" /> ';
     }
 
-    # Themes menu
-    public static function adminCurrentThemeDetails($core, $id, $infos)
+    /**
+     * Redirect to module translation
+     * 
+     * @param  adminModulesList     $list       adminModulesList instance
+     * @param  array                $modules    Selected modules ids
+     * @param  string               $type       List type (plugin|theme)
+     */
+    public static function adminModulesDoActions(adminModulesList $list, array $modules, string $type)
     {
-        if (!$core->blog->settings->translater->translater_theme_menu || !$core->auth->isSuperAdmin()) {
-            return;
+        if (empty($_POST['translater']) || !is_array($_POST['translater'])) {
+            return null;
         }
 
-        $root = path::real($infos['root']);
-
-        if ($id != 'default' && is_dir($root.'/locales')) {
-            return 
-            '<p><a href="plugin.php?p=translater&amp;part=module&amp;type=theme&amp;module=' . $id . '"' .
-            ' class="button">' . __('Translate this theme') . '</a></p>';
-        }
+        $list->core->adminurl->redirect(
+            'admin.plugin.translater', 
+            ['part' => 'module', 'type' => $type, 'module' => key($_POST['translater'])],
+            '#module-lang'
+        );
     }
 
-    # Google Translater tools
-    public static function addGoogleProposalTool($proposal)
+    /**
+     * Add dashboard favorites icon
+     * 
+     * @param  dcCore       $core   dcCore instance
+     * @param  dcFavorites  $favs   dcFavorites instance
+     */
+    public static function adminDashboardFavorites(dcCore $core, dcFavorites$favs)
+    {
+        $favs->register('translater', [
+            'title'       => __('Translater'),
+            'url'         => $core->adminurl->get('admin.plugin.translater'),
+            'small-icon'  => urldecode(dcPage::getPF('translater/icon.png')),
+            'large-icon'  => urldecode(dcPage::getPF('translater/icon-big.png')),
+            'permissions' => $core->auth->isSuperAdmin()
+        ]);
+    }
+
+    /**
+     * Register Google Translater tools in translate
+     * 
+     * @param translaterProposals $proposal translaterProposals instance
+     */
+    public static function addGoogleProposalTool(translaterProposals $proposal)
     {
         $proposal->addTool('googleProposalTool');
     }
 
-    # Yahoo Babelfish tools
-    public static function addYahooProposalTool($proposal)
+    /**
+     * Register Yahoo Babelfish tools in translater
+     * 
+     * @param translaterProposals $proposal translaterProposals instance
+     */
+    public static function addYahooProposalTool(translaterProposals $proposal)
     {
         $proposal->addTool('yahooProposalTool');
     }
 
-    # Microsoft Bing tools
-    public static function addMicrosoftProposalTool($proposal)
+    /**
+     * Register Microsoft Bing tools in translater
+     * 
+     * @param translaterProposals $proposal translaterProposals instance
+     */
+    public static function addMicrosoftProposalTool(translaterProposals $proposal)
     {
         $proposal->addTool('microsoftProposalTool');
     }
-}
-
-$core->addBehavior('adminDashboardFavorites', 'translaterDashboardFavorites');
-
-function translaterDashboardFavorites($core, $favs)
-{
-    $favs->register('translater', [
-        'title' => __('Translater'),
-        'url' => 'plugin.php?p=translater',
-        'small-icon' => 'index.php?pf=translater/icon.png',
-        'large-icon' => 'index.php?pf=translater/icon-big.png',
-        'permissions' => 'usage,contentadmin'
-    ]);
 }

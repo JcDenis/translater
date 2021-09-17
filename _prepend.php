@@ -15,12 +15,12 @@ if (!defined('DC_RC_PATH')) {
     return;
 }
 
-global $__autoload;
+$d = dirname(__FILE__) . '/inc/';
 
-$__autoload['dcTranslater'] = dirname(__FILE__) . '/inc/class.dc.translater.php';
-$__autoload['translaterRest'] = dirname(__FILE__) . '/inc/class.translater.rest.php';
-$__autoload['translaterProposals'] = dirname(__FILE__) . '/inc/class.translater.proposals.php';
+$__autoload['dcTranslater']           = $d . 'class.dc.translater.php';
+$__autoload['translaterRest']         = $d . 'class.translater.rest.php';
+$__autoload['translaterProposals']    = $d . 'class.translater.proposals.php';
 
-$__autoload['translaterProposalTool'] = dirname(__FILE__) . '/inc/lib.translater.proposal.php';
-$__autoload['googleProposalTool'] = dirname(__FILE__) . '/inc/lib.translater.google.php';
-$__autoload['microsoftProposalTool'] = dirname(__FILE__) . '/inc/lib.translater.microsoft.php';
+$__autoload['translaterProposalTool'] = $d . 'lib.translater.proposal.php';
+$__autoload['googleProposalTool']     = $d . 'lib.translater.google.php';
+$__autoload['microsoftProposalTool']  = $d . 'lib.translater.microsoft.php';

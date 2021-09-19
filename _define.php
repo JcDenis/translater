@@ -22,7 +22,7 @@ $this->registerModule(
     '2021.09.02.1',
     [
         'requires' => [['core', '2.19']],
-        'permissions' => 'usage,contentadmin,admin',
+        'permissions' => null,
         'type' => 'plugin',
         'support' => 'http://forum.dotclear.org/viewtopic.php?id=39220',
         'details' => 'https://plugins.dotaddict.org/dc2/details/translater',

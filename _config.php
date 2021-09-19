@@ -55,7 +55,7 @@ if (!empty($_POST['save'])) {
                 throw new Exception('You must choose one file format at least');
             }
             foreach($translater->getDefaultSettings() as $k => $v) {
-                $translater->set($k, (isset($_POST['translater_' . $k]) ? $_POST['translater_' . $k] : ''));
+                $translater->setSetting($k, (isset($_POST['translater_' . $k]) ? $_POST['translater_' . $k] : ''));
             }
             foreach($translater->proposal->getTools() AS $k => $v) {
                 $v->save();

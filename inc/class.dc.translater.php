@@ -23,214 +23,224 @@ class dcTranslater
     public $core;
     public $proposal;
 
-    # List of l10n code/name allowed from clearbricks l10n class
-    protected static $iso = array();
-    # List of type of folder where backups could be saved
-    public static $allowed_backup_folders = array(
+    /** @var array $iso List of l10n code/name allowed from clearbricks l10n class */
+    protected static $iso = [];
+
+    /** @var array $allowed_backup_folders List of allowed backup folder */
+    public static $allowed_backup_folders = [
         'public',
         'module',
         'plugin',
         'cache',
         'translater'
-    );
-    # List of l10n groups (subname) of file allowed
-    public static $allowed_l10n_groups = array(
+    ];
+
+    /** @var array $allowed_l10n_groups List of place of tranlsations */
+    public static $allowed_l10n_groups = [
         'main',
         'public',
         'theme',
         'admin',
         'date',
         'error'
-    );
-    # List of informations about author allowed
-    public static $allowed_user_informations = array(
+    ];
+
+    /** @var array $allowed_user_informations List of user info can be parsed */
+    public static $allowed_user_informations = [
         'firstname',
         'displayname',
         'name',
         'email',
         'url'
-    );
-    # List of settings and infos
-    private $default_settings = array(
-        'plugin_menu' => array(
+    ];
+
+    /** @var array $default_settings Plugins default settings */
+    private $default_settings = [
+        'plugin_menu' => [
             'id' => 'translater_plugin_menu',
             'value' => 0,
             'type' => 'boolean',
             'label' => 'Put an link in plugins page'
-        ),
-        'theme_menu' => array(
+        ],
+        'theme_menu' => [
             'id' => 'translater_theme_menu',
             'value' => 0,
             'type' => 'boolean',
             'label' => 'Put a link in themes page'
-        ),
-        'backup_auto' => array(
+        ],
+        'backup_auto' => [
             'id' => 'translater_backup_auto',
             'value' => 1,
             'type' => 'boolean',
             'label' => 'Make a backup of languages old files when there are modified'
-        ),
-        'backup_limit' => array(
+        ],
+        'backup_limit' => [
             'id' => 'translater_backup_limit',
             'value' => 20,
             'type' => 'string',
             'label' => 'Maximum backups per module'
-        ),
-        'backup_folder' => array(
+        ],
+        'backup_folder' => [
             'id' => 'translater_backup_folder',
             'value' => 'module',
             'type' => 'string',
             'label' => 'In which folder to store backups'
-        ),
-        'start_page' => array(
+        ],
+        'start_page' => [
             'id' => 'translater_start_page',
             'value' => 'setting',
             'type' => 'string',
             'label' => 'Page to start on'
-        ),
-        'write_po' => array(
+        ],
+        'write_po' => [
             'id' => 'translater_write_po',
             'value' => 1,
             'type' => 'boolean',
             'label' => 'Write .po languages files'
-        ),
-        'write_langphp' => array(
+        ],
+        'write_langphp' => [
             'id' => 'translater_write_langphp',
             'value' => 1,
             'type' => 'boolean',
             'label' => 'Write .lang.php languages files'
-        ),
-        'scan_tpl' => array(
+        ],
+        'scan_tpl' => [
             'id' => 'translater_scan_tpl',
             'value' => 0,
             'type' => 'boolean',
             'label' => 'Translate strings of templates files'
-        ),
-        'parse_nodc' => array(
+        ],
+        'parse_nodc' => [
             'id' => 'translater_parse_nodc',
             'value' => 1,
             'type' => 'boolean',
             'label' => 'Translate only untranslated strings of Dotclear',
-        ),
-        'hide_default' => array(
+        ],
+        'hide_default' => [
             'id' => 'translater_hide_default',
             'value' => 1,
             'type' => 'boolean',
             'label' => 'Hide default modules of Dotclear',
-        ),
-        'parse_comment' => array(
+        ],
+        'parse_comment' => [
             'id' => 'translater_parse_comment',
             'value' => 1,
             'type' => 'boolean',
             'label' => 'Write comments and strings informations in lang files'
-        ),
-        'parse_user' => array(
+        ],
+        'parse_user' => [
             'id' => 'translater_parse_user',
             'value' => 1,
             'type' => 'boolean',
             'label' => 'Write inforamtions about author in lang files'
-        ),
-        'parse_userinfo' => array(
+        ],
+        'parse_userinfo' => [
             'id' => 'translater_parse_userinfo',
             'value' => 'displayname, email',
             'type' => 'string',
             'label' => 'Type of informations about user to write'
-        ),
-        'import_overwrite' => array(
+        ],
+        'import_overwrite' => [
             'id' => 'translater_import_overwrite',
             'value' => 0,
             'type' => 'boolean',
             'label' => 'Overwrite existing languages when import packages'
-        ),
-        'export_filename' => array(
+        ],
+        'export_filename' => [
             'id' => 'translater_export_filename',
             'value' => 'type-module-l10n-timestamp',
             'type' => 'string',
             'label' => 'Name of files of exported package'
-        ),
-        'proposal_tool' => array(
+        ],
+        'proposal_tool' => [
             'id' => 'translater_proposal_tool',
             'value' => 'google',
             'type' => 'string',
             'label' => 'Id of default tool for proposed translation'
-        ),
-        'proposal_lang' => array(
+        ],
+        'proposal_lang' => [
             'id' => 'translater_proposal_lang',
             'value' => 'en',
             'type' => 'string',
             'label' => 'Default source language for proposed translation'
-        )
-    );
-    # List of default modules of Dotclear
+        ]
+    ];
+
+    /** @var array $default_dotclear_modules List of distributed plugins and themes */
     public static $default_dotclear_modules = ['plugin' => [], 'theme' => []];
 
-    # List of modules (from plugins,thems, by dcModule::getModules)
-    private $modules = array();
-    # Particular module
-    private $module = array();
+    /** @var array $modules List of modules we could work on */
+    private $modules = [];
 
-    # Construtor
-    function __construct($core)
+    /** @var array $module Module to work on */
+    private $module = [];
+
+    /**
+     * Main translater object
+     * 
+     * @param dcCore $core dcCore instance
+     */
+    public function __construct(dcCore $core)
     {
         self::$default_dotclear_modules = [
             'plugin' => explode(',', DC_DISTRIB_PLUGINS), 
             'theme' => explode(',', DC_DISTRIB_THEMES)
         ];
-        $this->core =& $core;
+        $this->core = $core;
         $core->blog->settings->addNamespace('translater');
         $this->loadModules();
         $this->proposal = new translaterProposals($core);
     }
 
-    # Return array of default settings
-    public function getDefaultSettings()
+    /// @name settings methods
+    //@{
+    /**
+     * Get array of default settings
+     * 
+     * @return array All default settings
+     */
+    public function getDefaultSettings(): array
     {
         return $this->default_settings;
     }
 
-    # Get settings for current blog
-    public function getSettings($id = null)
-    {       
-        $res = array();
-        foreach($this->default_settings AS $k => $v) {
-            if ($k == $id) {
-                return $this->core->blog->settings->translater->get(
-                    $this->default_settings[$k]['id']
-                );
-            }
-            $res[$k] = $this->core->blog->settings->translater->get(
-                $this->default_settings[$k]['id']
-            );
-        }
-        return $res;
-    }
-
-    # Get a setting according to default settings list
-    public function get($id)
+    /**
+     * Get a setting according to default settings list
+     * 
+     * @param  string $id The settings short id
+     * @return mixed     The setting value if exists or null
+     */
+    public function getSetting(string $id)
     {
-        if (isset($this->default_settings[$id]))
-        {
-            return $this->core->blog->settings->translater->get(
-                $this->default_settings[$id]['id']
-            );
+        if (!isset($this->default_settings[$id])) {
+            return null;
         }
-        return null;
+        return $this->core->blog->settings->translater->get(
+            $this->default_settings[$id]['id']
+        );
     }
 
-    # See get()
+    /**
+     * Magic getSetting
+     */
     public function __get($id)
     {
-        return $this->get($id);
+        return $this->getSetting($id);
     }
 
-    # Set a setting according to default settings list
-    public function set($k, $v)
+    /**
+     * Set a setting according to default settings list
+     * 
+     * @param string $k The setting short id
+     * @param mixed $v The setting value
+     */
+    public function setSetting(string $k, $v)
     {
         if (!isset($this->default_settings[$k])) {
             return false;
         }
 
-        $this->dropOldSettings($this->default_settings[$k]['id']);
+        $this->core->blog->settings->translater->drop($id);
         $this->core->blog->settings->translater->put(
             $this->default_settings[$k]['id'],
             $v,
@@ -242,20 +252,25 @@ class dcTranslater
         return true;
     }
 
-    # See set()
+    /**
+     * Magis setSetting
+     */
     public function __set($k, $v)
     {
-        return $this->set($k, $v);
+        return $this->setSetting($k, $v);
     }
+    //@}
 
-    # Drop old "per blog" settings (as of version 2013.05.11)
-    private function dropOldSettings($id)
-    {
-        $this->core->blog->settings->translater->drop($id);
-    }
-
-    # Retrieve a particular info for a given module
-    public function moduleInfo($id, $info)
+    /// @name modules methods
+    //@{
+    /**
+     * Retrieve a particular info for a given module
+     * 
+     * @param  string $id   The module id
+     * @param  string $info The module info
+     * @return mixed       The module info value or null
+     */
+    public function moduleInfo(string $id, string $info)
     {
         if (isset($this->modules['plugin'][$id])) {
             $type = 'plugin';
@@ -272,12 +287,14 @@ class dcTranslater
         return isset($this->modules[$type][$id][$info]) ? $this->modules[$type][$id][$info] : null;
     }
 
-    # Load array of modules infos by type of modules
+    /** 
+     * Load array of modules infos by type of modules
+     */
     private function loadModules()
     {
         $themes = new dcThemes($this->core);
         $themes->loadModules($this->core->blog->themes_path, null);
-        $this->modules['theme'] = $this->modules['plugin'] = array();
+        $this->modules['theme'] = $this->modules['plugin'] = [];
 
         $m = $themes->getModules();
         foreach($m AS $k => $v) {
@@ -290,8 +307,7 @@ class dcTranslater
         }
 
         $m = $this->core->plugins->getModules();
-        foreach($m AS $k => $v)
-        {
+        foreach($m AS $k => $v) {
             if (!$v['root_writable']) {
                 continue;
             }
@@ -301,41 +317,50 @@ class dcTranslater
         }
     }
 
-    # Return array of modules infos by type of modules
-    public function listModules($type = '')
+    /** 
+     * Return array of modules infos by type of modules
+     * 
+     * @param  string $type The module type
+     * @return array       The list of modules infos
+     */
+    public function listModules(string $type = '')
     {
-        return in_array($type, array('plugin', 'theme')) ? 
+        return in_array($type, ['plugin', 'theme']) ? 
             $this->modules[$type] : 
             array_merge($this->modules['theme'], $this->modules['plugin']);
     }
 
-    # Return array object of a particular module for a given type of module
-    public function getModule($module='',$type='')
+    /** 
+     * Return array object of a particular module for a given type of module
+     * 
+     * @param  string $id     The module id
+     * @param  string $type   The module type
+     * @return ArrayObject    The module info
+     */
+    public function getModule(string $id = '', string $type = '')
     {
         $o = new ArrayObject();
 
         # Load nothing?
-        if (empty($module)) {
+        if (empty($id)) {
             return false;
         }
 
         # Unknow type?
-        if (!in_array($type, array('plugin', 'theme'))) {
-            $modules = array_merge($this->modules['theme'], $this->modules['plugin']);
-        } else {
-            $modules = $this->modules[$type];
-        }
+        $modules = !in_array($type, ['plugin', 'theme']) ?
+            array_merge($this->modules['theme'], $this->modules['plugin']) :
+            $this->modules[$type];
 
         # Unknow module?
-        if (!isset($modules[$module])) {
-            throw new Exception(sprintf(
-                __('Cannot find module %s'), $module
-            ));
+        if (!isset($modules[$id])) {
+            throw new Exception(
+                sprintf(__('Cannot find module %s'), $id)
+            );
             return false;
         }
 
         # Module info
-        foreach($modules[$module] as $a => $b) {
+        foreach($modules[$id] as $a => $b) {
             $o->{$a} = $b;
         }
         $o->root = path::real($o->root);
@@ -349,21 +374,30 @@ class dcTranslater
 
         return $o;
     }
+    //@}
 
-    public function getBackupFolder($module, $throw = false)
+    /**
+     * Find backup folder of a module
+     * 
+     * @param  string  $id    The module id
+     * @param  boolean $throw Silently failed
+     * @return mixed          The backup folder directory or false
+     */
+    public function getBackupFolder(string $id, bool $throw = false)
     {
         $dir = false;
         switch($this->backup_folder) {
             case 'module':
                 # plugin
-                if (isset($this->modules['plugin'][$module]) 
-                 && $this->modules['plugin'][$module]['root_writable']) {
-                    $dir = path::real($this->modules['plugin'][$module]['root']) . '/locales';
+                if (isset($this->modules['plugin'][$id]) 
+                    && $this->modules['plugin'][$id]['root_writable']
+                ) {
+                    $dir = path::real($this->modules['plugin'][$id]['root']) . '/locales';
                 #theme
-                }
-                elseif (isset($this->modules['theme'][$module]) 
-                 && $this->modules['theme'][$module]['root_writable']) {
-                    $dir = path::real($this->modules['theme'][$module]['root']) . '/locales';
+                } elseif (isset($this->modules['theme'][$id]) 
+                    && $this->modules['theme'][$id]['root_writable']
+                ) {
+                    $dir = path::real($this->modules['theme'][$id]['root']) . '/locales';
                 }
             break;
 
@@ -399,56 +433,79 @@ class dcTranslater
         }
         if (!$dir && $throw) {
             throw new Exception(sprintf(
-                __('Cannot find backups folder for module %s'), $module
+                __('Cannot find backups folder for module %s'), $id
             ));
         }
 
         return $dir;
     }
 
-    public function getLangsFolder($module = '', $throw = false)
+    /**
+     * Find language path of a module
+     * 
+     * @param  string  $id     The module id
+     * @param  boolean $throw  Silently failed
+     * @return mixed          The module language path or false
+     */
+    public function getLangsFolder(string $id = '', bool $throw = false)
     {
-        $dir = $module == 'dotclear' ?
+        $dir = $id == 'dotclear' ?
             DC_ROOT :
-            self::getModuleFolder($module, false);
+            self::getModuleFolder($id, false);
 
         if (!$dir && $throw)  {
-            throw new Exception(sprintf(
-                __('Cannot find languages folder for module %s'), $module
-            ));
+            throw new Exception(
+                sprintf(__('Cannot find languages folder for module %s'), $id)
+            );
         }
 
         return !$dir ? false : $dir . '/locales';
     }
 
-    public function getModuleFolder($module = '', $throw = false)
+    /**
+     * Find root path of a module
+     * 
+     * @param  string  $module The module id
+     * @param  boolean $throw  Silently failed
+     * @return mixed           The module root path or false
+     */
+    public function getModuleFolder($id = '', $throw = false)
     {
         $dir = false;
-        if ((isset($this->modules['plugin'][$module]['root'])
-         && ($tmp = path::real($this->modules['plugin'][$module]['root']))) ||
-         (isset($this->modules['theme'][$module]['root'])
-         && ($tmp = path::real($this->modules['theme'][$module]['root'])))) {
+        if ((isset($this->modules['plugin'][$id]['root'])
+                && ($tmp = path::real($this->modules['plugin'][$id]['root']))) 
+            || (isset($this->modules['theme'][$id]['root'])
+                && ($tmp = path::real($this->modules['theme'][$id]['root']))
+        )) {
             $dir = $tmp;
         }
         if (!$dir && $throw) {
-            throw new Exception(sprintf(
-                __('Cannot find root folder for module %s'), $module
-            ));
+            throw new Exception(
+                sprintf(__('Cannot find root folder for module %s'), $id)
+            );
         }
 
         return $dir;
     }
 
-    public function isBackupLimit($module, $throw = false)
+    /**
+     * Check limit number of backup for a module
+     * 
+     * @param  string  $id     The module id
+     * @param  boolean $throw  Silently failed
+     * @return boolean         True if limit is riched
+     */
+    public function isBackupLimit(string $id, bool $throw = false): bool
     {
         # Find folder of backups
-        $backup = self::getBackupFolder($module, true);
+        $backup = self::getBackupFolder($id, true);
 
         # Count backup files
         $count = 0;
         foreach(self::scandir($backup) AS $file) {
             if (!is_dir($backup . '/' . $file)
-             && preg_match('/^(l10n-'. $module . '(.*?).bck.zip)$/', $backup)) {
+                && preg_match('/^(l10n-'. $id . '(.*?).bck.zip)$/', $backup)
+            ) {
                 $count++;
             }
         }
@@ -456,40 +513,46 @@ class dcTranslater
         # Limite exceed
         if ($count >= $this->backup_limit) {
             if ($throw) {
-                throw new Exception(sprintf(
-                    __('Limit of %s backups for module %s exceed'),
-                    $this->backup_limit, $module
-                ));
+                throw new Exception(
+                    sprintf(__('Limit of %s backups for module %s exceed'), $this->backup_limit, $id)
+                );
             }
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
-    public function listBackups($module, $return_filename = false)
+    /**
+     * Get a list of available backups
+     * 
+     * @param  string       $id              The module id
+     * @param  bool|boolean $return_filename Return only filenames
+     * @return array                         The module backups info
+     */
+    public function listBackups(string $id, bool $return_filename = false): array
     {
         # Not a module installed
-        self::getLangsFolder($module, true);
+        self::getLangsFolder($id, true);
 
         # No backup folder for this module
-        $backup = self::getBackupFolder($module, false);
+        $backup = self::getBackupFolder($id, false);
         if (!$backup) {
-            return array();
+            return [];
         }
 
         # Scan files for backups
-        $res = $sort = array();
+        $res = $sort = [];
         $files = self::scandir($backup);
         foreach($files AS $file) {
             # Not a bakcup file
             $is_backup = preg_match(
-                '/^(l10n-(' . $module . ')-(.*?)-([0-9]*?).bck.zip)$/', $file, $m
+                '/^(l10n-(' . $id . ')-(.*?)-([0-9]*?).bck.zip)$/', $file, $m
             );
 
             if (is_dir($backup . '/' . $file) 
-             || !$is_backup 
-             || !self::isIsoCode($m[3])) {
+                || !$is_backup 
+                || !self::isIsoCode($m[3])
+            ) {
                 continue;
             }
 
@@ -500,29 +563,36 @@ class dcTranslater
                 $res[$m[3]][$file] = path::info($backup . '/' . $file);
                 $res[$m[3]][$file]['time']= filemtime($backup . '/' . $file);
                 $res[$m[3]][$file]['size'] = filesize($backup . '/' . $file);
-                $res[$m[3]][$file]['module'] = $module;
+                $res[$m[3]][$file]['module'] = $id;
             }
         }
         return $res;
     }
 
-    public function createBackup($module, $lang)
+    /**
+     * Create a backup
+     * 
+     * @param  string $id   The module id
+     * @param  string $lang The backup lang
+     * @return boolean       True on success
+     */
+    public function createBackup(string $id, string $lang): bool
     {
         # Not a module installed
-        $locales = self::getLangsFolder($module, true);
+        $locales = self::getLangsFolder($id, true);
 
         # No backup folder for this module
-        $backup = self::getBackupFolder($module, true);
+        $backup = self::getBackupFolder($id, true);
 
         # Not an existing lang
         if (!is_dir($locales . '/' . $lang)) {
             throw new Exception(sprintf(
-                __('Cannot find language folder %s for module %s') ,$lang, $module
+                __('Cannot find language folder %s for module %s') ,$lang, $id
             ));
         }
 
         # Scan files for a lang
-        $res = array();
+        $res = [];
         $files = self::scandir($locales . '/' . $lang);
         foreach($files as $file) {
             # Only lang file
@@ -530,16 +600,16 @@ class dcTranslater
             && (self::isLangphpFile($file) 
              || self::isPoFile($file))) {
                 $res[$locales . '/' . $lang . '/' . $file] = 
-                    $module . '/locales/' . $lang . '/' . $file;
+                    $id . '/locales/' . $lang . '/' . $file;
             }
         }
 
         # Do Zip 
         if (!empty($res)) {
-            self::isBackupLimit($module, true);
+            self::isBackupLimit($id, true);
 
             @set_time_limit(300);
-            $fp = fopen($backup . '/l10n-' . $module . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
+            $fp = fopen($backup . '/l10n-' . $id . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
             $zip = new fileZip($fp);
             foreach($res AS $src => $dest) {
                 $zip->addFile($src, $dest);
@@ -547,24 +617,34 @@ class dcTranslater
             $zip->write();
             $zip->close();
             unset($zip);
+
+            return true;
         }
     }
 
-    public function deleteBackup($module, $file)
+    /**
+     * Delete a module backup
+     * 
+     * @param  string $id     The module id
+     * @param  string $file   The backup filename
+     * @return boolean        True on success
+     */
+    public function deleteBackup(string $id, string $file): bool
     {
         # Not a module installed
-        self::getLangsFolder($module, true);
+        self::getLangsFolder($id, true);
 
         # No backup folder for this module
-        $backup = self::getBackupFolder($module, true);
+        $backup = self::getBackupFolder($id, true);
 
         # Not a bakcup file
-        $is_backup = preg_match('/^(l10n-(' . $module . ')-(.*?)-([0-9]*?).bck.zip)$/', $file, $m);
+        $is_backup = preg_match('/^(l10n-(' . $id . ')-(.*?)-([0-9]*?).bck.zip)$/', $file, $m);
 
         if (is_dir($backup . '/' . $file) 
-         || !$is_backup 
-         || !self::isIsoCode($m[3])) {
-            return;
+            || !$is_backup 
+            || !self::isIsoCode($m[3])
+        ) {
+            return false;
         }
 
         if (!files::isDeletable($backup . '/' . $file)) {
@@ -574,15 +654,24 @@ class dcTranslater
         }
 
         unlink($backup . '/' . $file);
+
+        return true;
     }
 
-    public function restoreBackup($module, $file)
+    /**
+     * Retore a backup
+     * 
+     * @param  string $module The module id
+     * @param  string $file   The backup filename
+     * @return boolean        True on success
+     */
+    public function restoreBackup(string $id, string $file): bool
     {
         # Not a module installed
-        $locales = self::getModuleFolder($module, true);
+        $locales = self::getModuleFolder($id, true);
 
         # No backup folder for this module
-        $backup = self::getBackupFolder($module, true);
+        $backup = self::getBackupFolder($id, true);
 
         if (!file_exists($backup . '/' . $file)) {
             throw new Exception(sprintf(
@@ -595,7 +684,7 @@ class dcTranslater
 
         foreach($zip_files AS $zip_file) {
             $f = self::explodeZipFilename($zip_file, true);
-            if ($module != $f['module']) {
+            if ($id != $f['module']) {
                 continue;
             }
 
@@ -604,13 +693,22 @@ class dcTranslater
         }
         $zip->close();
         unset($zip);
+
+        return true;
     }
 
-    public function exportPack($modules, $langs)
+    /**
+     * Export (to output) language pack
+     * 
+     * @param  array $modules  The modules to work on
+     * @param  array $langs     Langs to export
+     */
+    public function exportPack(array $modules, array $langs)
     {
-        # Not a query good formed
+        # Not a query well formed
         if (!is_array($modules) || 1 > count($modules)
-         || !is_array($langs) || 1 > count($langs)) {
+            || !is_array($langs) || 1 > count($langs)
+        ) {
             throw new Exception(
                 __('Wrong export query')
             );
@@ -621,14 +719,13 @@ class dcTranslater
 
         # Not a filename good formed
         if (empty($filename)) {
-            throw new Exception(sprintf(
-                __('Cannot use export mask %s'), $this->export_filename
-            ));
+            throw new Exception(
+                sprintf(__('Cannot use export mask %s'), $this->export_filename)
+            );
         }
 
         # Modules folders
-        $res = array();
-        $count = array();
+        $res = $count = [];
         foreach($modules AS $module) {
             # Not a module installed
             $locales = self::getLangsFolder($module, false);
@@ -648,8 +745,9 @@ class dcTranslater
                 foreach($files as $file) {
                     # Not a lang file
                     if (is_dir($locales . '/' . $lang . '/' . $file) 
-                     || !self::isLangphpFile($file) 
-                     && !self::isPoFile($file)) {
+                        || !self::isLangphpFile($file) 
+                        && !self::isPoFile($file)
+                    ) {
                         continue;
                     }
 
@@ -677,18 +775,18 @@ class dcTranslater
 
         # Set filename
         $file_infos = 1 < count($count) ? 
-            array(time(), 'modules', 'multi', self::$dcTranslaterVersion) : 
-            array(
+            [time(), 'modules', 'multi', self::$dcTranslaterVersion] : 
+            [
                 time(),
                 $modules[0],
                 self::moduleInfo($modules[0], 'type'),
                 self::moduleInfo($modules[0], 'version')
-            );
+            ];
         $filename = 
             files::tidyFileName(
                 dt::str(
                     str_replace(
-                        array('timestamp', 'module', 'type', 'version'),
+                        ['timestamp', 'module', 'type', 'version'],
                         $file_infos,
                         $this->export_filename
                     )
@@ -703,6 +801,13 @@ class dcTranslater
         exit;
     }
 
+    /**
+     * Import a language pack
+     * 
+     * @param  array $modules  The modules to work on
+     * @param  array $zip_file The uploaded file info
+     * @return boolean         True on success
+     */
     public function importPack($modules, $zip_file)
     {
         # Not a file uploaded
@@ -714,7 +819,7 @@ class dcTranslater
         }
 
         $done = false;
-        $res = array();
+        $res = [];
 
         # Load Unzip object
         $zip = new fileUnzip($zip_file['tmp_name']);
@@ -726,7 +831,8 @@ class dcTranslater
 
             # Not a requested module
             if (!is_array($f) 
-             || !in_array($f['module'],$modules)) {
+                || !in_array($f['module'],$modules)
+            ) {
                 continue;
             }
 
@@ -738,15 +844,16 @@ class dcTranslater
 
             # Not allow overwrite
             if (!$this->import_overwrite 
-             && file_exists($locales . '/' . $f['lang'] . '/' . $f['group'] . $f['ext'])) {
+                && file_exists($locales . '/' . $f['lang'] . '/' . $f['group'] . $f['ext'])
+            ) {
                 continue;
             }
 
-            $res[] = array(
+            $res[] = [
                 'from' => $file, 
                 'root' => $locales . '/' . $f['lang'], 
-                'to' => $locales . '/' . $f['lang'] . '/' . $f['group'] . $f['ext']
-            );
+                'to'   => $locales . '/' . $f['lang'] . '/' . $f['group'] . $f['ext']
+            ];
         }
         # Unzip files
         foreach ($res AS $rs) {
@@ -762,14 +869,21 @@ class dcTranslater
 
         # No file unzip
         if (!$done) {
-            throw new Exception(sprintf(
-                __('Nothing to import for these modules in pack %s'),
-                $zip_file['name']
-            ));
+            throw new Exception(
+                sprintf(__('Nothing to import for these modules in pack %s'), $zip_file['name'])
+            );
         }
+        return true;
     }
 
-    public function explodeZipFilename($file = '', $throw = false)
+    /**
+     * Parse zip filename to module, lang info
+     * 
+     * @param  string  $file  The zip filename
+     * @param  boolean $throw Silently failed
+     * @return mixed          Array of file info or false
+     */
+    public function explodeZipFilename(string $file = '', bool $throw = false)
     {
         # module/locales/lang/group.ext
         $is_file = preg_match(
@@ -790,26 +904,33 @@ class dcTranslater
         # Not good formed
         if (!$is_file || !$module || !$lang || !$group || !$ext) {
             if ($throw) {
-                throw new Exception(sprintf(
-                    __('Zip file %s is not in translater format'), $file
-                ));
+                throw new Exception(
+                    sprintf(__('Zip file %s is not in translater format'), $file)
+                );
             }
             return false;
         }
-        return array(
+        return [
             'module' => $module,
-            'lang' => $lang,
-            'group' => $group,
-            'ext' => $ext
-        );
+            'lang'   => $lang,
+            'group'  => $group,
+            'ext'    => $ext
+        ];
     }
 
-    public function listLangs($module, $return_path = false)
+    /**
+     * List available langs of a module
+     * 
+     * @param  string  $id          The module id
+     * @param  boolean $return_path Return path or name
+     * @return array                The lang list
+     */
+    public function listLangs(string $id, bool $return_path = false)
     {
-        $res = array();
+        $res = [];
 
         # Not a module installed
-        $locales = self::getLangsFolder($module, true);
+        $locales = self::getLangsFolder($id, true);
 
         # Add prefix "locales" as scandir remove it
         $prefix = preg_match('/(locales(.*))$/', $locales) ? 'locales' : '';
@@ -819,7 +940,8 @@ class dcTranslater
         foreach($files as $file) {
             if (!preg_match(
                 '/(.*?(locales\/)([^\/]*?)\/([^\/]*?)(.lang.php|.po))$/',
-                $prefix . $file, $m)) {
+                $prefix . $file, $m
+            )) {
                 continue;
             }
 
@@ -836,22 +958,29 @@ class dcTranslater
         return $res;
     }
 
-    public function addLang($module, $lang, $from_lang = '')
+    /**
+     * Add a lang to a module
+     * 
+     * @param string $module    The module id
+     * @param string $lang      The lang id
+     * @param string $from_lang The lang to copy from
+     */
+    public function addLang(string $id, string $lang, string $from_lang = '')
     {
         # Not a module installed
-        $locales = self::getLangsFolder($module, true);
+        $locales = self::getLangsFolder($id, true);
 
         # Path is right formed
         self::isIsoCode($lang, true);
 
         # Retrieve langs folders
-        $langs = self::listLangs($module);
+        $langs = self::listLangs($id);
 
         # Lang folder is not present
         if (isset($langs[$lang])) {
-            throw new Exception(sprintf(
-                __('Language %s already exists for module %s'), $lang, $module
-            ));
+            throw new Exception(
+                sprintf(__('Language %s already exists for module %s'), $lang, $id)
+            );
         }
 
         # Create new lang directory
@@ -859,20 +988,21 @@ class dcTranslater
 
         # Verify folder of other lang
         if (!empty($from_lang) && !isset($langs[$from_lang])) {
-            throw new Exception(sprintf(
-                __('Cannot copy file from language %s for module %s'),
-                $from_lang, $module
-            ));
+            throw new Exception(
+                sprintf(__('Cannot copy file from language %s for module %s'), $from_lang, $id)
+            );
         }
 
         # Copy files from other lang
         if (!empty($from_lang) 
-         && isset($langs[$from_lang])) {
+            && isset($langs[$from_lang])
+        ) {
             $files = self::scandir($locales . '/' . $from_lang);
             foreach($files as $file) {
                 if (is_dir($locales . '/' . $from_lang . '/' . $file) 
-                 || !self::isLangphpFile($file) 
-                 && !self::isPoFile($file)) {
+                    || !self::isLangphpFile($file) 
+                    && !self::isPoFile($file)
+                ) {
                     continue;
                 }
 
@@ -882,31 +1012,38 @@ class dcTranslater
             }
         } else {
             # Create basic empty lang file as translater need these files to be present
-            self::setLangphpFile($module, $lang, 'main', array());
-            self::setPoFile($module, $lang, 'main', array());
+            self::setLangphpFile($id, $lang, 'main', []);
+            self::setPoFile($id, $lang, 'main', []);
         }
     }
 
-    public function updLang($module, $lang, $msgs)
+    /**
+     * Update an existing lang
+     * 
+     * @param  string $module The module id
+     * @param  string $lang   The lang
+     * @param  array $msgs    The messages
+     */
+    public function updLang(string $id, string $lang, array $msgs)
     {
         # Not a module installed
-        $locales = self::getLangsFolder($module, true);
+        $locales = self::getLangsFolder($id, true);
 
         # Path is right formed
         self::isIsoCode($lang, true);
 
         # Retrieve langs folders
-        $langs = self::listLangs($module);
+        $langs = self::listLangs($id);
 
         # Lang folder is not present
         if (!isset($langs[$lang])) {
             throw new Exception(sprintf(
-                __('Cannot find language folder %s for module %s'), $lang, $module
+                __('Cannot find language folder %s for module %s'), $lang, $id
             ));
         }
 
         # Sort msgids by groups
-        $rs = array();
+        $rs = [];
         foreach($msgs as $msg) {
             $msg['group'] = isset($msg['group']) ? $msg['group'] : '';
             $msg['msgid'] = isset($msg['msgid']) ? $msg['msgid'] : '';
@@ -925,7 +1062,7 @@ class dcTranslater
 
         # Backup files if auto-backup is on
         if ($this->backup_auto) {
-            self::createBackup($module, $lang);
+            self::createBackup($id, $lang);
         }
 
         # Delete empty files (files with no group)
@@ -949,14 +1086,14 @@ class dcTranslater
         if (empty($rs)) {
             throw new Exception(sprintf(
                 __('No string to write, language %s deleted for module %s'),
-                $lang, $module
+                $lang, $id
             ));
         }
 
         # Write .po and .lang.php files
         foreach($rs AS $group => $msgs) {
-            self::setLangphpFile($module, $lang, $group, $msgs);
-            self::setPoFile($module, $lang, $group, $msgs);
+            self::setLangphpFile($id, $lang, $group, $msgs);
+            self::setPoFile($id, $lang, $group, $msgs);
         }
     }
 

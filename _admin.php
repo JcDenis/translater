@@ -15,21 +15,16 @@ if (!defined('DC_CONTEXT_ADMIN')) {
     return;
 }
 
-$core->blog->settings->addNamespace('translater');
 $core->addBehavior('adminModulesListGetActions', ['translaterAdminBehaviors', 'adminModulesGetActions']);
 $core->addBehavior('adminModulesListDoActions', ['translaterAdminBehaviors', 'adminModulesDoActions']);
 $core->addBehavior('adminDashboardFavorites', ['translaterAdminBehaviors', 'adminDashboardFavorites']);
-$core->addBehavior('addTranslaterProposalTool', ['translaterAdminBehaviors', 'addGoogleProposalTool']);
-$core->addBehavior('addTranslaterProposalTool', ['translaterAdminBehaviors', 'addYahooProposalTool']);
-$core->addBehavior('addTranslaterProposalTool', ['translaterAdminBehaviors', 'addMicrosoftProposalTool']);
-$core->rest->addFunction('getProposal', ['translaterRest', 'getProposal']);
 
 $_menu['Plugins']->addItem(
     __('Translater'),
-    $core->adminurl->get('admin.plugin.translater'),
+    $core->adminurl->get('translater'),
     dcPage::getPF('translater/icon.png'),
     preg_match(
-        '/' . preg_quote($core->adminurl->get('admin.plugin.translater')) . '(&.*)?$/', 
+        '/' . preg_quote($core->adminurl->get('translater')) . '(&.*)?$/', 
         $_SERVER['REQUEST_URI']
     ),
     $core->auth->isSuperAdmin()
@@ -37,6 +32,23 @@ $_menu['Plugins']->addItem(
 
 class translaterAdminBehaviors
 {
+    /** @var dcTranlsater dcTranslater instance */
+    private static $translater = null;
+
+    /**
+     * Create instance of dcTranslater once
+     * 
+     * @param  dCore $core dcCore instance
+     * @return dctranslater       dcTranslater instance
+     */
+    private static function translater($core)
+    {
+        if (!(self::$translater instanceof dcTranslater)) {
+            self::$translater = new dcTranslater($core);
+        }
+        return self::$translater;
+    }
+
     /**
      * Add button to go to module translation
      * 
@@ -48,7 +60,7 @@ class translaterAdminBehaviors
     public static function adminModulesGetActions(adminModulesList $list, string $id, array $prop): ?string
     {
         if ($list->getList() != $prop['type'] . '-activate' 
-            || !$list->core->blog->settings->translater->get('translater_' . $prop['type'] . '_menu')
+            || !self::translater($list->core)->getSetting($prop['type'] . '_menu')
             || !$list->core->auth->isSuperAdmin()
         ) {
             return null;
@@ -74,7 +86,7 @@ class translaterAdminBehaviors
         }
 
         $list->core->adminurl->redirect(
-            'admin.plugin.translater', 
+            'translater', 
             ['part' => 'module', 'type' => $type, 'module' => key($_POST['translater'])],
             '#module-lang'
         );
@@ -90,40 +102,10 @@ class translaterAdminBehaviors
     {
         $favs->register('translater', [
             'title'       => __('Translater'),
-            'url'         => $core->adminurl->get('admin.plugin.translater'),
+            'url'         => $core->adminurl->get('translater'),
             'small-icon'  => urldecode(dcPage::getPF('translater/icon.png')),
             'large-icon'  => urldecode(dcPage::getPF('translater/icon-big.png')),
             'permissions' => $core->auth->isSuperAdmin()
         ]);
-    }
-
-    /**
-     * Register Google Translater tools in translate
-     * 
-     * @param translaterProposals $proposal translaterProposals instance
-     */
-    public static function addGoogleProposalTool(translaterProposals $proposal)
-    {
-        $proposal->addTool('googleProposalTool');
-    }
-
-    /**
-     * Register Yahoo Babelfish tools in translater
-     * 
-     * @param translaterProposals $proposal translaterProposals instance
-     */
-    public static function addYahooProposalTool(translaterProposals $proposal)
-    {
-        $proposal->addTool('yahooProposalTool');
-    }
-
-    /**
-     * Register Microsoft Bing tools in translater
-     * 
-     * @param translaterProposals $proposal translaterProposals instance
-     */
-    public static function addMicrosoftProposalTool(translaterProposals $proposal)
-    {
-        $proposal->addTool('microsoftProposalTool');
     }
 }

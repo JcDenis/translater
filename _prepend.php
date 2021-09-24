@@ -17,10 +17,9 @@ if (!defined('DC_RC_PATH')) {
 
 $d = dirname(__FILE__) . '/inc/';
 
-$__autoload['dcTranslater']           = $d . 'class.dc.translater.php';
-$__autoload['translaterRest']         = $d . 'class.translater.rest.php';
-$__autoload['translaterProposals']    = $d . 'class.translater.proposals.php';
+$__autoload['dcTranslater']       = $d . 'class.dc.translater.php';
+$__autoload['dcTranslaterModule'] = $d . 'class.dc.translater.module.php';
+$__autoload['dcTranslaterLang']   = $d . 'class.dc.translater.lang.php';
+$__autoload['translaterRest']     = $d . 'class.translater.rest.php';
 
-$__autoload['translaterProposalTool'] = $d . 'lib.translater.proposal.php';
-$__autoload['googleProposalTool']     = $d . 'lib.translater.google.php';
-$__autoload['microsoftProposalTool']  = $d . 'lib.translater.microsoft.php';
+$core->adminurl->register('translater', 'plugin.php', ['p' => 'translater']);

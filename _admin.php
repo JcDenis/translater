@@ -65,6 +65,11 @@ class translaterAdminBehaviors
         ) {
             return null;
         }
+        if (self::translater($list->core)->getSetting('hide_default') 
+            && in_array($id, dctranslater::$default_distrib_modules[$prop['type']])
+        ) {
+            return null;
+        }
 
         return 
             ' <input type="submit" name="translater[' . 

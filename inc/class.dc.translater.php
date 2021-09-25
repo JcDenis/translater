@@ -458,11 +458,15 @@ class dcTranslater
         $parts = explode($func . '(', $content);
         // remove fisrt element from array
         array_shift($parts);
-        // put back first parenthesis
-        $parts = array_map(function($v){ return '(' . $v;}, $parts);
         // walk through parts
         $p = 0;
         foreach($parts as $part) {
+            // should start with quote
+            if (!in_array(substr($part,0,1), ['"', "'"])) {
+                continue;
+            }
+            // put back first parenthesis
+            $part = '('.$part;
             // find pairs of parenthesis
             preg_match_all("/\((?:[^\)\(]+|(?R))*+\)/s", $part, $subparts);
             // find quoted strings (single or double)

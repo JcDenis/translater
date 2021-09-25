@@ -1,15 +1,19 @@
-2021.09.02.1 - dev
+2021.09.25.1 - dev
 - [ ] help translation
 - [ ] source translation
-- [ ] fix third-party API (temp remoed)
-- [ ] add support for plural (.po ok)
+- [ ] fix third-party API (temp removed)
+
+2021.09.25
+- add support for plural
 - add dashboard icon
 - fix constante for official modules
 - fix superadmin permissions
+- fix global settings
+- light interface
 - remove modules list tab and add button to existing lists
 - remove multi-modules import/export
 - .po export become a requirment
-- use l10n function sto generate .lang.php files
+- use l10n functions to generate .lang.php files
 
 2021.09.02
 - clean up code and fix typo
@@ -89,7 +93,7 @@
 
 0.9 - 2009.09.23
 - Fixed bug on translate escape string
-- Added _uninstall.php support
+- Added _ uninstall.php support
 
 0.8 - 2009.08.16
 - Fixed php 5.3 compatibility

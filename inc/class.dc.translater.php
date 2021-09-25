@@ -402,7 +402,7 @@ class dcTranslater
      * 
      * @param  string $content The contents
      * @param  string $func    The function name
-     * @return array          The messages
+     * @return array           The messages
      */
     public static function extractPhpMsgs(string $content, string $func = '__'): array
     {
@@ -440,6 +440,50 @@ class dcTranslater
                     // fill final array
                     $final_strings[] = [$strings[0], $lines[$p]];
                     $duplicate[] = $strings[0][0];
+                }
+            }
+            $p++;
+        }
+        return $final_strings;
+    }
+
+    /**
+     * Extract messages from a tpl contents
+     *
+     * support plurals
+     * 
+     * @param  string $content The contents
+     * @param  string $func    The function name
+     * @return array           The messages
+     */
+    public static function extractTplMsgs(string $content, string $func = 'tpl:lang'): array
+    {
+        $duplicate = $final_strings = $lines = [];
+        // split content by line to combine match/line on the end
+        $content = str_replace("\r\n", "\n", $content);
+        $o = 0;
+        $parts = explode("\n", $content);
+        foreach($parts as $li => $part) {
+            $m = explode('{{' . $func . ' ', $part);
+            for($i = 1; $i < count($m); $i++) {
+                $lines[$o] = $li+1;
+                $o++;
+            }
+        }
+        // split content by translation function
+        if (!preg_match_all('/\{\{' . preg_quote($func) . '\s([^}]+)\}\}/', $content, $parts)) {
+            return $final_strings;
+        }
+        // walk through parts
+        $p = 0;
+        foreach($parts[1] as $part) {
+            // strings exist
+            if (!empty($part)) {
+                // filter duplicate strings
+                if (!in_array($part, $duplicate)) {
+                    // fill final array
+                    $final_strings[] = [[$part], $lines[$p]];
+                    $duplicate[] = $part;
                 }
             }
             $p++;

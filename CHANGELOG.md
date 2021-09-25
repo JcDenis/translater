@@ -8,6 +8,8 @@
 - fix superadmin permissions
 - remove modules list tab and add button to existing lists
 - remove multi-modules import/export
+- .po export become a requirment
+- use l10n function sto generate .lang.php files
 
 2021.09.02
 - clean up code and fix typo

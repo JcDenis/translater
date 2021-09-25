@@ -125,22 +125,26 @@ class dcTranslaterLang
     public function getMsgIds(): array
     {
         $res = [];
-        $files = dcTranslater::scandir($this->module->root);
-
         $scan_ext = ['php'];
         if ($this->translater->scan_tpl) {
-//            $scan_ext[] = 'html';
+            $scan_ext[] = 'html';
         }
 
-        foreach($files AS $file) {
-            if (is_dir($this->module->root . '/' . $file) 
-             || !in_array(files::getExtension($file), $scan_ext)) {
+        $files = dcTranslater::scandir($this->module->root);
+        foreach($files as $file) {
+            $extension = files::getExtension($file);
+            if (is_dir($this->module->root . '/' . $file) || !in_array($extension, $scan_ext)) {
                 continue;
             }
-
             $contents = file_get_contents($this->module->root . '/' . $file);
             # php files
-            $msgs = dcTranslater::extractPhpMsgs($contents);
+            if ($extension == 'php') {
+                $msgs = dcTranslater::extractPhpMsgs($contents);
+
+            # tpl files
+            } elseif ($extension == 'html') {
+                $msgs = dcTranslater::extractTplMsgs($contents);
+            }
             foreach($msgs as $msg) {
                 $res[] = [
                     'msgid'        => dcTranslater::encodeMsg($msg[0][0]),
@@ -149,8 +153,6 @@ class dcTranslaterLang
                     'line'         => $msg[1]
                 ];
             }
-
-            //TODO: tpl file extract
 
             unset($contents);
         }

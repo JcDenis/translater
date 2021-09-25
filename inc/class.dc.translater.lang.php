@@ -150,6 +150,8 @@ class dcTranslaterLang
                 ];
             }
 
+            //TODO: tpl file extract
+
             unset($contents);
         }
         return $res;
@@ -162,7 +164,7 @@ class dcTranslaterLang
      */
     public function getMsgStrs(): array
     {
-        $res = $scanned = [];
+        $res = $exists = $scanned = [];
 
         $langs = $this->module->getLangs(true);
         if (!isset($langs[$this->code])) {
@@ -183,7 +185,7 @@ class dcTranslaterLang
                 }
                 $entries = $po[1];
                 foreach($entries as $entry) {
-                    $res[] = array(
+                    $res[] = [
                         'msgid' => $entry['msgid'],
                         'msgid_plural' => $entry['msgid_plural'] ?? '',
                         'msgstr' => is_array($entry['msgstr']) ? $entry['msgstr'] : [$entry['msgstr']],
@@ -192,28 +194,10 @@ class dcTranslaterLang
                         'path' => $path,
                         'file' => basename($file),
                         'group'=> str_replace('.po', '', basename($file))
-                    );
+                    ];
+                    $exists[] = $entry['msgid'];
                 }
-/*
-            # .lang.php files
-            } elseif (self::isLangphpFile($file)) {
-                $php = self::getLangphpFile($path);
-                foreach($php AS $id => $str) {
-                    # Don't overwrite .po
-                    if (isset($is_po[$requested_lang][$id])) {
-                        continue;
-                    }
-                    $res[] = array(
-                        'msgid' => self::encodeMsg($id),
-                        'msgstr' => self::encodeMsg($str), 
-                        'lang' => $requested_lang,
-                        'type' => 'php',
-                        'path' => $path,
-                        'file' => basename($file),
-                        'group'=> str_replace('.lang.php', '', basename($file))
-                    );
-                }
-*/
+
             }
         }
         return $res;

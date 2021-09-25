@@ -41,9 +41,6 @@ if (!empty($_POST['save'])) {
 
 echo '
 <div class="fieldset"><h4>' . __('Translation') . '</h4>
-<p><label for="write_po">' .
-form::checkbox('write_po', '1' ,$translater->write_po) .
-__('Write .po files') . '</label></p>
 <p><label for="write_langphp">' .
 form::checkbox('write_langphp', '1', $translater->write_langphp) .
 __('Write .lang.php files') . '</label></p>

@@ -631,40 +631,6 @@ class dcTranslaterModule
     }
 
     /**
-     * Write a lang file
-     * 
-     * @param  string $file    The full file path
-     * @param  string $content The file content
-     * @param  boolean $throw  Silently failed
-     * @return boolean         True on success
-     */
-    private function writeLang(string $file, string $content, bool $throw = false)
-    {
-        $path = path::info($file);
-        if (is_dir($path['dirname']) && !is_writable($path['dirname']) 
-         || file_exists($file) && !is_writable($file)) {
-            throw new Exception(sprintf(
-                __('Cannot grant write acces on lang file %s'), $file
-            ));
-        }
-
-        # -- BEHAVIOR -- dcTranslaterBeforeWriteLangFile
-        $this->core->callBehavior('dcTranslaterBeforeWriteLangFile', $file, $content, $throw);
-
-        $f = @files::putContent($file,$content);
-        if (!$f && $throw) {
-            throw new Exception(sprintf(
-                __('Cannot write lang file %s'), $file
-            ));
-        }
-
-        # -- BEHAVIOR -- dcTranslaterAfterWriteLangFile
-        $this->core->callBehavior('dcTranslaterAfterWriteLangFile', $f, $file, $content, $throw);
-
-        return $f;
-    }
-
-    /**
      * Construct and parse a .po file
      * 
      * @param string $lang   The lang code
@@ -673,10 +639,6 @@ class dcTranslaterModule
      */
     private function setPoContent(string $lang, string $group, array $msgs)
     {
-        if (!$this->translater->write_po) {
-            return null;
-        }
-
         $lang = new dcTranslaterLang($this, $lang);
 
         $content = '';
@@ -742,7 +704,20 @@ class dcTranslaterModule
             $content .= "\n";
         }
 
-        self::writeLang($this->locales . '/' . $lang->code . '/' . $group . '.po', $content, true);
+        $file = $this->locales . '/' . $lang->code . '/' . $group . '.po';
+        $path = path::info($file);
+        if (is_dir($path['dirname']) && !is_writable($path['dirname']) 
+         || file_exists($file) && !is_writable($file)) {
+            throw new Exception(sprintf(
+                __('Cannot grant write acces on lang file %s'), $file
+            ));
+        }
+
+        if (!($f = @files::putContent($file, $content))) {
+            throw new Exception(sprintf(
+                __('Cannot write lang file %s'), $file
+            ));
+        }
     }
 
     /**
@@ -760,7 +735,7 @@ class dcTranslaterModule
 
         $lang = new dcTranslaterLang($this, $lang);
 
-        $content = "<?php\n";
+        $content = '';
         if ($this->translater->parse_comment) {
             $content .= 
             '// Language: ' . $lang->name . " \n" .
@@ -780,42 +755,8 @@ class dcTranslaterModule
             $content .= 
             '// Translated with dcTranslater - ' . $this->core->plugins->moduleInfo('translater', 'version') . " \n\n";
         }
-        if ($this->translater->parse_comment) {
-            $msgids = $lang->getMsgids();
-            foreach($msgids as $msg) {
-                if (isset($msgs[$msg['msgid']])) {
-                    $comments[$msg['msgid']] = (isset($comments[$msg['msgid']]) ?
-                        $comments[$msg['msgid']] : '') .
-                        '#'.trim($msg['file'],'/') . ':' . $msg['line'] . "\n";
-                }
-            }
-        }
 
-        foreach($msgs as $msg) {
-            if (empty($msg['msgstr'][0])) {
-                continue;
-            }
-            if ($this->translater->parse_comment && isset($comments[$msg['msgid']])) {
-                $content .= $comments[$msg['msgid']];
-            }
-            if (empty($msg['msgid_plural'])) {
-                $content .= 
-                    '$GLOBALS[\'__l10n\'][\'' . addcslashes($msg['msgid'], "'") . '\'] = ' .
-                    '\'' . dcTranslater::langphpString($msg['msgstr'][0], true) . "';\n";
-            } else {
-                foreach($msg['msgstr'] as $i => $plural) {
-                    $content .= 
-                        '$GLOBALS[\'__l10n\'][\'' . addcslashes($msg['msgid'], "'") . '\'][' . $i . '] = ' .
-                        '\'' . dcTranslater::langphpString(($msg['msgstr'][$i] ?: ''), true) . "';\n";
-                }
-            }
-            if ($this->translater->parse_comment) {
-                $content .= "\n";
-            }
-        }
-        $content .= "";
-
-        self::writeLang($this->locales . '/' . $lang->code . '/' . $group . '.lang.php', $content, true);
+        l10n::generatePhpFileFromPo($this->locales . '/' . $lang->code . '/' . $group, $content);
     }
     //@}
 }

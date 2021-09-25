@@ -1,23 +1,17 @@
 /*global $, dotclear */
 'use strict';
 $(function () {
-  $('#module-backup-create-form .checkboxes-helpers').each(function () {
-    dotclear.checkboxesHelpers(this, undefined, '#module-backup-create-form td input[type=checkbox]', '#module-backup-create-form #do-action');
+  $('#module-translations-form .checkboxes-helpers').each(function () {
+    dotclear.checkboxesHelpers(this, undefined, '#module-translations-form td input[type=checkbox]', '#module-translations-form #do-action');
   });
-  $('#module-backup-create-form td input[type=checkbox]').enableShiftClick();
-  dotclear.condSubmit('#module-backup-create-form td input[type=checkbox]', '#module-backup-create-form #do-action');
+  $('#module-translations-form td input[type=checkbox]').enableShiftClick();
+  dotclear.condSubmit('#module-translations-form td input[type=checkbox]', '#module-translations-form #do-action');
 
-  $('#module-backup-edit-form .checkboxes-helpers').each(function () {
-    dotclear.checkboxesHelpers(this, undefined, '#module-backup-edit-form td input[type=checkbox]', '#module-backup-edit-form #do-action');
+  $('#module-backups-form .checkboxes-helpers').each(function () {
+    dotclear.checkboxesHelpers(this, undefined, '#module-backups-form td input[type=checkbox]', '#module-backups-form #do-action');
   });
-  $('#module-backup-edit-form td input[type=checkbox]').enableShiftClick();
-  dotclear.condSubmit('#module-backup-edit-form td input[type=checkbox]', '#module-backup-edit-form #do-action');
-
-  $('#module-pack-export-form .checkboxes-helpers').each(function () {
-    dotclear.checkboxesHelpers(this, undefined, '#module-pack-export-form td input[type=checkbox]', '#module-pack-export-form #do-action');
-  });
-  $('#module-pack-export-form td input[type=checkbox]').enableShiftClick();
-  dotclear.condSubmit('#module-pack-export-form td input[type=checkbox]', '#module-pack-export-form #do-action');
+  $('#module-backups-form td input[type=checkbox]').enableShiftClick();
+  dotclear.condSubmit('#module-backups-form td input[type=checkbox]', '#module-backups-form #do-action');
 
   $('#lang-edit-form .checkboxes-helpers').each(function () {
     dotclear.checkboxesHelpers(this, undefined, '#lang-edit-form td input[type=checkbox]', undefined);

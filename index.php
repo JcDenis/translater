@@ -61,9 +61,9 @@ if (empty($type)) {
 }
 
 try {
-    if ($action == 'module_create_backup') {
+    if ($action == 'module_create_backups') {
         if (empty($module) || empty($_POST['codes'])) {
-            throw new Exception(__('No lang to backup'));
+            throw new Exception(__('Nothing to backup'));
         }
         $module_codes = $module->getUsedlangs();
         foreach($module_codes as $code_id) {
@@ -72,12 +72,12 @@ try {
             }
         }
         dcPage::addSuccessNotice(__('Backup successfully created'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id], '#module-backup');
+        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_restore_backup') {
         if (empty($module) || empty($_POST['files'])) {
-            throw New Exception(__('No backup to restore'));
+            throw New Exception(__('Nothing to restore'));
         }
         $module_backups = $module->getBackups(true);
         foreach($module_backups as $backup_file) {
@@ -86,12 +86,12 @@ try {
             }
         }
         dcPage::addSuccessNotice(__('Backup successfully restored'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id], '#module-backup');
+        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_delete_backup') {
         if (empty($module) || empty($_POST['files'])) {
-            throw New Exception(__('No backup to delete'));
+            throw New Exception(__('Nothing to delete'));
         }
         $module_backups = $module->getBackups(true);
         foreach($module_backups as $backup_file) {
@@ -100,7 +100,7 @@ try {
             }
         }
         dcPage::addSuccessNotice(__('Backup successfully deleted'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id], '#module-backup');
+        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_export_pack') {
@@ -109,8 +109,8 @@ try {
         }
         $module->exportPack($_POST['codes']);
 
-        dcPage::addSuccessNotice(__('Package successfully exported'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id], '#module-pack');
+        dcPage::addSuccessNotice(__('Language successfully exported'));
+        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_import_pack') {
@@ -119,33 +119,37 @@ try {
         }
         $module->importPack($_FILES['packfile']);
 
-        dcPage::addSuccessNotice(__('Package successfully imported'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id], '#module-pack');
+        dcPage::addSuccessNotice(__('Language successfully imported'));
+        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_add_code') {
         if (empty($module) || empty($_POST['code'])) {
-            throw new Exception(__('No lang to create'));
+            throw new Exception(__('Nothing to create'));
         }
         $module->addLang($_POST['code'], $_POST['from'] ?? '');
 
-        dcPage::addSuccessNotice(__('Lang successfully added'));
+        dcPage::addSuccessNotice(__('Language successfully added'));
         $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
     }
 
-    if ($action == 'module_delete_code') {
-        if (empty($module) || empty($_POST['code'])) {
-            throw new Exception(__('No lang to delete'));
+    if ($action == 'module_delete_codes') {
+        if (empty($module) || empty($_POST['codes'])) {
+            throw new Exception(__('Nothing to delete'));
         }
-        $module->delLang($_POST['code']);
-
-        dcPage::addSuccessNotice(__('Lang successfully deleted'));
+        $module_codes = $module->getUsedlangs();
+        foreach($module_codes as $code_id) {
+            if (in_array($code_id, $_POST['codes'])) {
+                $module->delLang($code_id);
+            }
+        }
+        dcPage::addSuccessNotice(__('Language successfully deleted'));
         $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
     }
 
     if ($action == 'module_update_code') {
         if (empty($module) || empty($_POST['code']) || empty($_POST['entries'])) {
-            throw new Exception(__('No lang to update'));
+            throw new Exception(__('Nothing to update'));
         }
         if (!empty($_POST['update_group'])) {
             foreach($_POST['entries'] as $i => $entry) {
@@ -156,7 +160,7 @@ try {
         }
         $module->updLang($_POST['code'], $_POST['entries']);
 
-        dcPage::addSuccessNotice(__('Lang successfully updated'));
+        dcPage::addSuccessNotice(__('Language successfully updated'));
         $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
 
     }
@@ -211,7 +215,7 @@ if (empty($module) && $type != '') {
             if ($module->root_writable) {
                 $codes[$code_id] = sprintf(
                     '<a class="wait maximal nowrap" title="%s" href="%s">%s (%s)</a>',
-                    html::escapeHTML(sprintf(__('Edit translation %s of the module %s'), html::escapeHTML($code_name), __($module->name))), 
+                    html::escapeHTML(sprintf(__('Edit language %s of module %s'), html::escapeHTML($code_name), __($module->name))), 
                     $core->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
                     html::escapeHTML($code_name),
                     $code_id
@@ -233,10 +237,10 @@ if (empty($module) && $type != '') {
         <table class="clear">
         <caption class="hidden">' . $type .' list</caption>
         <tr>
-        <th>' . __('Name') . '</th>
-        <th>' . __('Languages') . '</th>
-        <th>' . __('Id') . '</th>
-        <th>' . __('Version') . '</th>
+        <th class="nowrap">' . __('Name') . '</th>
+        <th class="nowrap">' . __('Languages') . '</th>
+        <th class="nowrap">' . __('Id') . '</th>
+        <th class="nowrap">' . __('Version') . '</th>
         </tr>' .
         $res .
         '</table></div>';
@@ -251,50 +255,39 @@ if (empty($module) && $type != '') {
     $backups = $module->getBackups();
     $unused_codes = $module->getUnusedLangs();
 
-    // module summary
-    echo '
-    <div class="multi-part" id="module-summary" title="' . __('Summary') . '">
-    <h3>' . __('Module') . '</h3>
-    <table class="clear maximal">
-    <caption>' .__('Module summary') . '</caption>
-    <tr class="line">
-    <td class="nowrap">' . __('Name') . '</td><td class="nowrap"> ' . $module->name . '</td>
-    </tr><tr class="line">
-    <td class="nowrap">' . __('Version') . '</td><td class="nowrap"> ' . $module->version . '</td>
-    </tr><tr class="line">
-    <td class="nowrap">' . __('Author') . '</td><td class="nowrap"> ' . $module->author . '</td>
-    </tr><tr class="line">
-    <td class="nowrap">' . __('Type') . '</td><td class="nowrap"> ' . $module->type . '</td>
-    </tr><tr class="line">
-    <td class="nowrap">' . __('Root') . '</td><td class="nowrap"> ' . $module->root . '</td>
-    </tr><tr class="line">
-    <td class="nowrap">' . __('Locales') . '</td><td class="nowrap"> ' . $module->locales . '</td>
-    </tr><tr class="line">
-    <td class="nowrap">' . __('Backups') . '</td><td class="nowrap"> ' . $module->getBackupRoot() . '</td>
-    </tr>
-    </table>
+    // module summary   
+    echo '<h3>' . sprintf(__('Module %s %s by %s'), $module->name, $module->version, $module->author) . '</h3>
+    <ul class="nice col">
+    <li><strong>' . __('Root') . '</strong> ' . $module->root . '</li>
+    <li><strong>' . __('Locales') . '</strong> ' . $module->locales . '</li>
+    <li><strong>' . __('Backups') . '</strong> ' . $module->getBackupRoot() . '</li>
+    </ul>
     <p>&nbsp;</p>';
+
+    // existing languages
     if (count($codes)) {
         echo 
-        '<h3>' . __('Translations') . '</h3>' . 
+        '<div class="clear fieldset"><h3>' . __('Translations') . '</h3>' . 
+        '<form id="module-translations-form" method="post" action="' . $core->adminurl->get('translater') . '">' .
         '<table class="clear maximal">' . 
-        '<caption>' . __('Existing module languages') .'</caption>' .
+        '<caption>' . __('Existing languages translations') .'</caption>' .
         '<tr>' . 
-        '<th>' . __('Languages') . '</th>' . 
-        '<th>' . __('Code') . '</th>' . 
-        '<th>' . __('Backups') . '</th>' . 
-        '<th>' . __('Last backup') . '</th>' . 
+        '<th class="nowrap" colspan="2">' . __('Languages') . '</th>' . 
+        '<th class="nowrap">' . __('Code') . '</th>' . 
+        '<th class="nowrap">' . __('Backups') . '</th>' . 
+        '<th class="nowrap">' . __('Last backup') . '</th>' . 
         '</tr>';
 
         foreach($codes AS $code_name => $code_id) {
             echo 
             '<tr class="line">' . 
+            '<td class="minimal">' . form::checkbox(['codes[]', 'existing_code_' . $code_id], $code_id, '', '', '', false) . '</td>' .
             '<td class="nowrap">' . 
             '<a href="' . 
                 $core->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id])
-                 . '">' . $code_name . '</a>' . 
+                 . '" title="' . sprintf(__('Edit %s language'), html::escapeHTML($code_name)) . '">' . $code_name . '</a>' . 
             '</td>' . 
-            '<td class="nowrap"> ' . $code_id . '</td>';
+            '<td class="nowrap maximal"> ' . $code_id . '</td>';
 
             if (isset($backups[$code_id])) {
                 foreach($backups[$code_id] AS $file => $info) {
@@ -303,143 +296,76 @@ if (empty($module) && $type != '') {
                 }
                 echo 
                 '<td class="nowrap">' . count($backups[$code_id]) . '</td>' . 
-                '<td class="maximal nowrap"> ' . 
+                '<td class="nowrap"> ' . 
                 dt::str('%Y-%m-%d %H:%M', $time[$code_id], $core->blog->settings->system->blog_timezone) . 
                 '</td>';
             } else {
-                echo '<td class="nowrap">' . __('no backup') . '</td><td class="maximal nowrap">-</td>';
+                echo '<td class="nowrap">' . __('no backups') . '</td><td class="maximal nowrap">-</td>';
             }
             echo '</tr>';
         }
-        echo '</table>';
-    }
-    echo '</div>';
+        echo '</table>
+        <div class="two-cols">
+        <p class="col checkboxes-helpers"></p>
 
-    // Add/Remove/Edit lang
-    echo '<div class="multi-part" id="module-code" title="' . __('Translations') . '">';
-
-    // edit lang
-    if (!empty($codes)) {
-        echo '<h3>' . __('Edit language') . '</h3>
-        <form id="module-code-edit-form" method="get" action="' . $core->adminurl->get('translater', ) . '">
-        <p class="field"><label for="code">' . __('Select language:') . '</label>' .  
-        form::combo(['lang'], $codes, $core->auth->getInfo('user_lang')) . '</p>
-        <p><input type="submit" name="save" value="' . __('Edit translation') . '" />' . 
-        $core->formNonce() .
+        <p class="col right">' . __('Selected languages action:') . ' ' . 
+        form::combo('action', [
+            __('Backup languages') => 'module_create_backups',
+            __('Delete languages') => 'module_delete_codes',
+            __('Export languages') => 'module_export_pack'
+        ]) . ' 
+        <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
+        $core->formNonce() . 
         $core->adminurl->getHiddenFormFields(
             'translater',
             ['type' => $module->type, 'module' => $module->id]
         ) . '
-        </p></form><p>&nbsp;</p>';
+        </p></div></form><p>&nbsp;</p></div>';
     }
-
-    // add lang
-    if (!empty($unused_codes)) {
-        echo '<h3>' . __('Add language') . '</h3>
-        <form id="muodule-code-create-form" method="post" action="' . $core->adminurl->get('translater') . '#module-code">
-        <p class="field"><label for="code">' . __('Select language:') . '</label>' .  
-        form::combo(['code'], array_merge(['-' => '-'], $unused_codes), $core->auth->getInfo('user_lang')) . '</p>';
-        if (empty($codes)) {
-            echo '<p>' . form::hidden(['from'], '') . '</p>';
-        } else {
-            echo 
-            '<p class="field"><label for="from">' . __('Copy from language:') . '</label>' .  
-            form::combo(['from'], array_merge(['-' => ''], $codes)) . ' (' . __('Optionnal') . ')</p>';
-        }
-        echo '
-        <p><input type="submit" name="save" value="' . __('Add translation') . '" />' . 
-        $core->formNonce() . 
-        $core->adminurl->getHiddenFormFields(
-            'translater',
-            ['type' => $module->type, 'module' => $module->id, 'action' => 'module_add_code']
-        ) . '
-        </p></form><p>&nbsp;</p>';
-    }
-
-    // delete langs
-    if (!empty($codes)) {
-        echo '<h3>' . __('Delete language') . '</h3>
-        <form id="module-code-delete-form" method="post" action="' . $core->adminurl->get('translater') . '#module-code">
-        <p class="field"><label for="code">' . __('Select language:') . '</label>' .  
-        form::combo(['code'], array_merge(['-' => ''], $codes)) . '</p>
-        <p><input type="submit" name="save" value="' . __('Delete translation') . '" />' . 
-        $core->formNonce() . 
-        $core->adminurl->getHiddenFormFields(
-            'translater',
-            ['type' => $module->type, 'module' => $module->id, 'action' => 'module_delete_code']
-        ) . '
-        </p></form><p>&nbsp;</p>';
-    }
-    echo '</div>';
 
     // backups
     if (!empty($codes) || !empty($backups)) {
-
-        echo '<div class="multi-part" id="module-backup" title="' . __('Backups') . '">';
-
-        // create backups
-        if (!empty($codes)) {
-            echo '<h3>' . __('Create backups') . '</h3>
-            <form id="module-backup-create-form" method="post" action="' . $core->adminurl->get('translater') . '#module-backup">
-            <table class="clear">
-            <caption>' . __('Existing module languages') . '</caption>
-            <tr><th colspan="2">' . __('Language') . '</th><th>' . __('Code') . '</th></tr>';
-            $i=0;
-            foreach($codes AS $code_name => $code_id) {
-                $i++;
-                echo '
-                <tr class="line">
-                <td class="minimal">' . form::checkbox(['codes[]', 'backup_code_' . $code_id], $code_id, '', '', '', false) . '</td>
-                <td class="nowrap"><label for="backup_code_' . $code_id . '">' . $code_name . '</label></td>
-                <td class="maximal nowrap">' . $code_id . '</td>
-                </tr>';
-            }
-            echo '
-            </table>
-            <div class="two-cols">
-            <p class="col checkboxes-helpers"></p>
-
-            <p class="col right">
-            <input id="do-action" type="submit" value="' . __('Backup') . '" /></p>' .
-            $core->formNonce() . 
-            $core->adminurl->getHiddenFormFields(
-                'translater',
-                ['type' => $module->type, 'module' => $module->id, 'action' => 'module_create_backup']
-            ) . '
-            </p></div></form><p>&nbsp;</p>';
-        }
-
         // delete / retore backups
         if (!empty($backups)) {
-            echo '<h3>' . __('List of backups') . '</h3>' . 
-            '<form id="module-backup-edit-form" method="post" action="' . $core->adminurl->get('translater') . '#module-backup">' . 
+            echo '<div class="fieldset"><h3>' . __('Backups') . '</h3>' . 
+            '<form id="module-backups-form" method="post" action="' . $core->adminurl->get('translater') . '">' . 
             '<table class="clear">' . 
-            '<caption>' . __('Existing backuped languages') . '</caption>' .
+            '<caption>' . __('Existing languages backups') . '</caption>' .
             '<tr>' . 
-            '<th colspan="2">' . __('Name') . '</th>' . 
-            '<th>' . __('Code') . '</th>' . 
-            '<th>' . __('Date') . '</th>' . 
-            '<th>' . __('File') . '</th>' . 
-            '<th>' . __('Size') . '</th>' . 
+            '<th class="nowrap" colspan="2">' . __('Name') . '</th>' . 
+            '<th class="nowrap">' . __('Code') . '</th>' . 
+            '<th class="nowrap">' . __('Date') . '</th>' . 
+            '<th class="nowrap">' . __('File') . '</th>' . 
+            '<th class="nowrap">' . __('Size') . '</th>' . 
             '</tr>';
+
+            $table_line = 
+                '<tr class="line">' .
+                '<td class="minimal">%s</td>' .
+                '<td class="nowrap"><label for="%s">%s</label></td>' .
+                '<td class="nowrap maximal">%s</td>' .
+                '<td class="nowrap count">%s</td>' .
+                '<td class="nowrap">%s</td>' . 
+                '<td class="nowrap count">%s</td>' .
+                '</tr>';
+
             $i=0;
             foreach($backups as $backup_codes) {
                 foreach($backup_codes as $backup_file => $backup_code) {
                     $i++;
                     $form_id = 'form_file_' . $backup_code['code'] . $backup_code['time'];
-                    echo 
-                    '<tr class="line">' . 
-                    '<td class="minimal">' . form::checkbox(['files[]', $form_id], $backup_file, '', '', '', false) . '</td>' . 
-                    '<td class="nowrap"><label for="' . $form_id . '">' . $backup_code['name'] . '</label></td>' . 
-                    '<td class="nowrap">' . $backup_code['code'] . '</td>' . 
-                    '<td class="nowrap count">' . dt::str(
-                        $core->blog->settings->system->date_format . ' ' . $core->blog->settings->system->time_format, 
-                        $backup_code['time'], 
-                        $core->blog->settings->system->blog_timezone
-                    ) . '</td>' . 
-                    '<td class="maximal">' . $backup_code['path']['basename'] . '</td>' . 
-                    '<td class="nowrap count">' . files::size($backup_code['size']) . '</td>' . 
-                    '</tr>';
+                    echo sprintf($table_line,
+                        form::checkbox(['files[]', $form_id], $backup_file, '', '', '', false),
+                        $form_id, $backup_code['name'],
+                        $backup_code['code'],
+                        dt::str(
+                            $core->blog->settings->system->date_format . ' ' . $core->blog->settings->system->time_format, 
+                            $backup_code['time'], 
+                            $core->blog->settings->system->blog_timezone
+                        ),
+                        $backup_code['path']['basename'],
+                        files::size($backup_code['size'])
+                    );
                 }
             }
             echo '
@@ -458,18 +384,39 @@ if (empty($module) && $type != '') {
                 'translater',
                 ['type' => $module->type, 'module' => $module->id]
             ) . '
-            </p></div></form><p>&nbsp;</p>';
+            </p></div></form><p>&nbsp;</p></div>';
         }
-        echo '</div>';
     }
 
-    // Import/Export pack
-    echo '<div class="multi-part" id="module-pack" title="' . __('Import/Export') . '">';
+    echo '<div class="two-cols">';
+
+    // add language
+    if (!empty($unused_codes)) {
+        echo '<div class="col fieldset"><h3>' . __('Add language') . '</h3>
+        <form id="muodule-code-create-form" method="post" action="' . $core->adminurl->get('translater') . '">
+        <p class="field"><label for="code">' . __('Select language:') . '</label>' .  
+        form::combo(['code'], array_merge(['-' => '-'], $unused_codes), $core->auth->getInfo('user_lang')) . '</p>';
+        if (empty($codes)) {
+            echo '<p>' . form::hidden(['from'], '') . '</p>';
+        } else {
+            echo 
+            '<p class="field"><label for="from">' . __('Copy from language:') . '</label>' .  
+            form::combo(['from'], array_merge(['-' => ''], $codes)) . ' (' . __('Optionnal') . ')</p>';
+        }
+        echo '
+        <p><input type="submit" name="save" value="' . __('Create') . '" />' . 
+        $core->formNonce() . 
+        $core->adminurl->getHiddenFormFields(
+            'translater',
+            ['type' => $module->type, 'module' => $module->id, 'action' => 'module_add_code']
+        ) . '
+        </p></form><p>&nbsp;</p></div>';
+    }
 
     // Import
-    echo '<h3>' . __('Import') . '</h3>
-    <form id="module-pack-import-form" method="post" action="' . $core->adminurl->get('translater') . '#module-pack" enctype="multipart/form-data">
-    <p><label for="packfile">' . __('Select language pack to import') . '<label> ' .
+    echo '<div class="col fieldset"><h3>' . __('Import') . '</h3>
+    <form id="module-pack-import-form" method="post" action="' . $core->adminurl->get('translater') . '" enctype="multipart/form-data">
+    <p><label for="packfile">' . __('Select languages package to import:') . '<label> ' .
     '<input id="packfile" type="file" name="packfile" /></p>
     <p>
     <input type="submit" name="save" value="' . __('Import') . '" />' . 
@@ -478,41 +425,8 @@ if (empty($module) && $type != '') {
         'translater',
         ['type' => $module->type, 'module' => $module->id, 'action' => 'module_import_pack']
     ) . '
-    </p></form><p>&nbsp;</p>';
+    </p></form><p>&nbsp;</p></div>';
 
-    // Export
-    if (!empty($codes)) {
-        echo '<h3>' . __('Export') . '</h3>' . 
-        '<form id="module-pack-export-form" method="post" action="' . $core->adminurl->get('translater') . '#module-pack">' . 
-        '<table class="clear">' . 
-        '<caption>' . __('Existing module languages') . '</caption>' .
-        '<tr><th colspan="2">' . __('Language') . '</th><th>' . __('Code') . '</th></tr>';
-        $i=0;
-        foreach($codes AS $code_name => $code_id) {
-            $i++;
-            echo 
-            '<tr class="line">' . 
-            '<td class="minimal">' . 
-            form::checkbox(['codes[]', 'export_code_' . $code_id], $code_id, '', '', '', false) . 
-            '</td>' . 
-            '<td class="nowrap"><label for="export_code_' . $code_id . '">' . $code_name . '</label></td>' . 
-            '<td class="maximal nowrap">' . $code_id . '</td>' . 
-            '</tr>';
-        }
-        echo 
-        '</table>' . 
-        '<div class="two-cols">' .
-        '<p class="col checkboxes-helpers"></p>' .
-
-        '<p class="col right">' .
-        '<input id="do-action" type="submit" value="' . __('Export') . '" /></p>' .
-        $core->formNonce() . 
-        $core->adminurl->getHiddenFormFields(
-            'translater',
-            ['type' => $module->type, 'module' => $module->id, 'action' => 'module_export_pack']
-        ) . 
-        '</p></div></form><p>&nbsp;</p>';
-    }
     echo '</div>';
 
 } elseif (!empty($lang)) {
@@ -633,7 +547,7 @@ if (empty($module) && $type != '') {
     '<p class="checkboxes-helpers"></p>' .
     '<p><label for="update_group">' .
     form::checkbox('update_group', 1) .
-    __('Change the group of the selected entries to:') . ' ' . 
+    __('Change the group of the selected translations to:') . ' ' . 
     form::combo('multigroup', $allowed_l10n_groups) . '</label></p>' .
     '</div>' .
     '<p class="col right">' .

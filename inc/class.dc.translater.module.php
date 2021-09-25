@@ -283,7 +283,7 @@ class dcTranslaterModule
         $zip = new fileUnzip($zip_file['tmp_name']);
         $files = $zip->getFilesList();
 
-        foreach($files AS $file) {
+        foreach($files as $file) {
             $f = $this->parseZipFilename($file, true);
 
             if (!$this->translater->import_overwrite 
@@ -300,7 +300,7 @@ class dcTranslaterModule
             ];
         }
 
-        foreach ($res AS $rs) {
+        foreach ($res as $rs) {
             if (!is_dir($rs['root'])) {
                 files::makeDir($rs['root'], true);
             }
@@ -395,9 +395,9 @@ class dcTranslaterModule
      * 
      * @param  string  $file  The zip filename
      * @param  boolean $throw Silently failed
-     * @return mixed          Array of file info or false
+     * @return mixed          Array of file info
      */
-    public function parseZipFilename(string $file = '', bool $throw = false)
+    public function parseZipFilename(string $file = '', bool $throw = false): array
     {
         $is_file = preg_match('/^(.*?)\/locales\/(.*?)\/(.*?)(.po|.lang.php)$/', $file, $f);
 
@@ -414,7 +414,7 @@ class dcTranslaterModule
                     __('Zip file %s is not in translater format'), $file
                 ));
             }
-            return false;
+            return [];
         }
         return [
             'module' => $module,
@@ -433,7 +433,7 @@ class dcTranslaterModule
      * @param  boolean $return_path Return path or name
      * @return array                The lang list
      */
-    public function getLangs(bool $return_path = false)
+    public function getLangs(bool $return_path = false): array
     {
         $res = [];
 

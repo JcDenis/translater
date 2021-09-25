@@ -324,7 +324,7 @@ class dcTranslater
      * @param  array  $res  Internal recursion
      * @return array        List of path
      */
-    public static function scandir(string $path, string $dir = '', array $res = [])
+    public static function scandir(string $path, string $dir = '', array $res = []): array
     {
         $path = path::real($path, false);
         if (!is_dir($path) || !is_readable($path)) {
@@ -347,16 +347,57 @@ class dcTranslater
         return $res;
     }
 
-    /* Try if a file is a .lang.php file */
-    public static function isLangphpFile($file)
+    /**
+     * Encode a string
+     * 
+     * @param  string $str The string to encode
+     * @return string      The encoded string
+     */
+    public static function encodeMsg(string $str): string
     {
-        return files::getExtension($file) == 'php' && stristr($file, '.lang.php');
+        return text::toUTF8(stripslashes(trim($str)));
     }
 
-    /* Try if a file is a .po file */
-    public static function isPoFile($file)
+    /**
+     * Clean a po string
+     * 
+     * @param  string  $string  The string to clean
+     * @param  boolean $reverse Un/escape string
+     * @return string           The cleaned string
+     */
+    public static function poString(string $string, bool $reverse = false): string
+    {
+        if ($reverse) {
+            $smap = array('"', "\n", "\t", "\r");
+            $rmap = array('\\"', '\\n"' . "\n" . '"', '\\t', '\\r');
+            return trim((string) str_replace($smap, $rmap, $string));
+        } else {
+            $smap = array('/"\s+"/', '/\\\\n/', '/\\\\r/', '/\\\\t/', '/\\\"/');
+            $rmap = array('', "\n", "\r", "\t", '"');
+            return trim((string) preg_replace($smap, $rmap, $string));
+        }
+    }
+
+    /**
+     * Try if a file is a .po file
+     * 
+     * @param  string  $file The path to test
+     * @return boolean       Success
+     */
+    public static function isPoFile(string $file): bool
     {
         return files::getExtension($file) == 'po';
+    }
+
+    /**
+     * Try if a file is a .lang.php file
+     * 
+     * @param  string  $file The path to test
+     * @return boolean       Success
+     */
+    public static function isLangphpFile(string $file): bool
+    {
+        return files::getExtension($file) == 'php' && stristr($file, '.lang.php');
     }
 
     /**
@@ -445,8 +486,6 @@ class dcTranslater
     /**
      * Extract messages from a tpl contents
      *
-     * support plurals
-     * 
      * @param  string $content The contents
      * @param  string $func    The function name
      * @return array           The messages
@@ -484,37 +523,6 @@ class dcTranslater
             $p++;
         }
         return $final_strings;
-    }
-
-    /**
-     * Encode a string
-     * 
-     * @param  string $str The string to encode
-     * @return string      The encoded string
-     */
-    public static function encodeMsg(string $str): string
-    {
-        return text::toUTF8(stripslashes(trim($str)));
-    }
-
-    /**
-     * Clean a po string
-     * 
-     * @param  string  $string  The string to clean
-     * @param  boolean $reverse Un/escape string
-     * @return string           The cleaned string
-     */
-    public static function poString(string $string, bool $reverse = false): string
-    {
-        if ($reverse) {
-            $smap = array('"', "\n", "\t", "\r");
-            $rmap = array('\\"', '\\n"' . "\n" . '"', '\\t', '\\r');
-            return trim((string) str_replace($smap, $rmap, $string));
-        } else {
-            $smap = array('/"\s+"/', '/\\\\n/', '/\\\\r/', '/\\\\t/', '/\\\"/');
-            $rmap = array('', "\n", "\r", "\t", '"');
-            return trim((string) preg_replace($smap, $rmap, $string));
-        }
     }
     //@}
 }

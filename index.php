@@ -46,7 +46,7 @@ if (!empty($module) && !empty($lang)) {
     }
 }
 
-$breadcrumb = [__('Translater') => $core->adminurl->get('translater')];
+$breadcrumb = [__('Translater') => $core->adminurl->get('translater', ['type' => '-'])];
 if (empty($type)) {
     $breadcrumb = [__('Translater') => ''];
 } elseif (empty($module)) {

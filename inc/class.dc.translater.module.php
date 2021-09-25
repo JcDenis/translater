@@ -524,8 +524,8 @@ class dcTranslaterModule
                 );
             }
         } else {
-            //$this->setLangphpFile($lang, 'main', []);
             $this->setPoContent($lang, 'main', []);
+            $this->setLangphpContent($lang, 'main', []);
         }
     }
 
@@ -587,7 +587,7 @@ class dcTranslaterModule
 
         foreach($rs as $group => $msgs) {
             $this->setPoContent($lang, $group, $msgs);
-            //$this->setLangphpFile($lang, $group, $msgs);
+            $this->setLangphpContent($lang, $group, $msgs);
         }
     }
 
@@ -679,11 +679,11 @@ class dcTranslaterModule
 
         $lang = new dcTranslaterLang($this, $lang);
 
-        $l = '';
+        $content = '';
         if ($this->translater->parse_comment) {
-            $l .= 
+            $content .= 
             '# Language: ' . $lang->name . "\n" .
-            '# Module: ' . $this->prop['id'] . " - " . $this->prop['version'] . "\n" .
+            '# Module: ' . $this->id . " - " . $this->version . "\n" .
             '# Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
 
             if ($this->translater->parse_user && !empty($this->translater->parse_userinfo)) {
@@ -693,18 +693,18 @@ class dcTranslaterModule
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
-                    $l .= '# Author: ' . html::escapeHTML($info) . "\n";
+                    $content .= '# Author: ' . html::escapeHTML($info) . "\n";
                 }
             }
-            $l .= 
+            $content .= 
             '# Translated with translater ' . $this->core->plugins->moduleInfo('translater', 'version') . "\n";
         }
-        $l .= 
+        $content .= 
         "\n".
         "msgid \"\"\n" .
         "msgstr \"\"\n" .
         '"Content-Type: text/plain; charset=UTF-8\n"' . "\n" .
-        '"Project-Id-Version: ' . $this->prop['id'] . ' ' . $this->prop['version'] . '\n"' . "\n" .
+        '"Project-Id-Version: ' . $this->id . ' ' . $this->version . '\n"' . "\n" .
         '"POT-Creation-Date: \n"' . "\n" .
         '"PO-Revision-Date: ' . date('c') . '\n"' . "\n" .
         '"Last-Translator: ' . $this->core->auth->getInfo('user_cn') . '\n"' . "\n" .
@@ -723,7 +723,6 @@ class dcTranslaterModule
             }
         }
 
-        $content = '';
         foreach($msgs as $msg) {
             if (empty($msg['msgstr'][0])) {
                 continue;
@@ -744,6 +743,79 @@ class dcTranslaterModule
         }
 
         self::writeLang($this->locales . '/' . $lang->code . '/' . $group . '.po', $content, true);
+    }
+
+    /**
+     * Construct and write a .lang.php file
+     * 
+     * @param string $lang   The lang code
+     * @param string $group  The lang group
+     * @param array $msgs    The strings
+     */
+    private function setLangphpContent(string $lang, string $group, array $msgs)
+    {
+        if (!$this->translater->write_langphp) {
+            return null;
+        }
+
+        $lang = new dcTranslaterLang($this, $lang);
+
+        $content = "<?php\n";
+        if ($this->translater->parse_comment) {
+            $content .= 
+            '// Language: ' . $lang->name . " \n" .
+            '// Module: ' . $this->id . " - " . $this->verison . "\n" .
+            '// Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . " \n";
+
+            if ($this->translater->parse_user && !empty($this->translater->parse_userinfo)) {
+                $search = dcTranslater::$allowed_user_informations;
+                foreach($search as $n) {
+                    $replace[] = $this->core->auth->getInfo('user_' . $n);
+                }               
+                $info = trim(str_replace($search, $replace,$this->translater->parse_userinfo));
+                if (!empty($info)) {
+                    $content .= '// Author: ' . html::escapeHTML($info) . "\n";
+                }
+            }
+            $content .= 
+            '// Translated with dcTranslater - ' . $this->core->plugins->moduleInfo('translater', 'version') . " \n\n";
+        }
+        if ($this->translater->parse_comment) {
+            $msgids = $lang->getMsgids();
+            foreach($msgids as $msg) {
+                if (isset($msgs[$msg['msgid']])) {
+                    $comments[$msg['msgid']] = (isset($comments[$msg['msgid']]) ?
+                        $comments[$msg['msgid']] : '') .
+                        '#'.trim($msg['file'],'/') . ':' . $msg['line'] . "\n";
+                }
+            }
+        }
+
+        foreach($msgs as $msg) {
+            if (empty($msg['msgstr'][0])) {
+                continue;
+            }
+            if ($this->translater->parse_comment && isset($comments[$msg['msgid']])) {
+                $content .= $comments[$msg['msgid']];
+            }
+            if (empty($msg['msgid_plural'])) {
+                $content .= 
+                    '$GLOBALS[\'__l10n\'][\'' . addcslashes($msg['msgid'], "'") . '\'] = ' .
+                    '\'' . dcTranslater::langphpString($msg['msgstr'][0], true) . "';\n";
+            } else {
+                foreach($msg['msgstr'] as $i => $plural) {
+                    $content .= 
+                        '$GLOBALS[\'__l10n\'][\'' . addcslashes($msg['msgid'], "'") . '\'][' . $i . '] = ' .
+                        '\'' . dcTranslater::langphpString(($msg['msgstr'][$i] ?: ''), true) . "';\n";
+                }
+            }
+            if ($this->translater->parse_comment) {
+                $content .= "\n";
+            }
+        }
+        $content .= "";
+
+        self::writeLang($this->locales . '/' . $lang->code . '/' . $group . '.lang.php', $content, true);
     }
     //@}
 }

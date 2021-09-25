@@ -483,5 +483,25 @@ class dcTranslater
             return trim((string) preg_replace($smap, $rmap, $string));
         }
     }
+
+    /**
+     * Clean a lang.php string
+     * 
+     * @param  string  $string  The string to clean
+     * @param  boolean $reverse Un/escape string
+     * @return string           The cleaned string
+     */
+    public static function langphpString(string $string, bool $reverse = false): string
+    {
+        if ($reverse) {
+            $smap = array('\'', "\n", "\t", "\r");
+            $rmap = array('\\\'', '\\n"' . "\n" . '"', '\\t', '\\r');
+            return trim((string) str_replace($smap, $rmap, $string));
+        } else {
+            $smap = array('/\\\\n/', '/\\\\r/', '/\\\\t/', "/\\\'/");
+            $rmap = array("\n", "\r", "\t", "'");
+            return trim((string) preg_replace($smap, $rmap, $string));
+        }
+    }
     //@}
 }

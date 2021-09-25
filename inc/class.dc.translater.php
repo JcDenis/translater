@@ -69,7 +69,7 @@ class dcTranslater
         ],
         'scan_tpl' => [
             'id' => 'translater_scan_tpl',
-            'value' => 0,
+            'value' => 1,
             'type' => 'boolean',
             'label' => 'Translate strings of templates files'
         ],
@@ -87,13 +87,13 @@ class dcTranslater
         ],
         'parse_comment' => [
             'id' => 'translater_parse_comment',
-            'value' => 1,
+            'value' => 0,
             'type' => 'boolean',
             'label' => 'Write comments and strings informations in lang files'
         ],
         'parse_user' => [
             'id' => 'translater_parse_user',
-            'value' => 1,
+            'value' => 0,
             'type' => 'boolean',
             'label' => 'Write inforamtions about author in lang files'
         ],

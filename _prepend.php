@@ -22,4 +22,6 @@ $__autoload['dcTranslaterModule'] = $d . 'class.dc.translater.module.php';
 $__autoload['dcTranslaterLang']   = $d . 'class.dc.translater.lang.php';
 $__autoload['translaterRest']     = $d . 'class.translater.rest.php';
 
-$core->adminurl->register('translater', 'plugin.php', ['p' => 'translater']);
+if (isset($core->adminurl)) {
+    $core->adminurl->register('translater', 'plugin.php', ['p' => 'translater']);
+}

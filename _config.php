@@ -19,11 +19,6 @@ $translater = new dcTranslater($core);
 
 if (!empty($_POST['save'])) {
     try {
-        if (empty($_POST['write_po']) && empty($_POST['write_langphp'])) {
-            throw new Exception(
-                __('You must at least choose one file format to write')
-            );
-        }
         foreach($translater->getDefaultSettings() as $k => $v) {
             $translater->setSetting($k, (isset($_POST[$k]) ? $_POST[$k] : ''));
         }
@@ -93,7 +88,7 @@ form::combo('start_page',[
 ], $translater->start_page) . '</p>
 <p><label for="plugin_menu">' . 
 form::checkbox('plugin_menu', '1', $translater->plugin_menu) .
-__('Enable menu on extensions page') . '</label></p>
+__('Enable menu on plugins page') . '</label></p>
 <p><label for="theme_menu">' . 
 form::checkbox('theme_menu', '1', $translater->theme_menu) .
 __('Enable menu on themes page') . '</label></p>

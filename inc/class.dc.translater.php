@@ -293,7 +293,7 @@ class dcTranslater
     {
         if (!isset($this->modules[$type][$id])) {
             throw new Exception(
-                sprintf(__('Cannot find module %s'), $id)
+                sprintf(__('Failed to find module %s'), $id)
             );
             return false;
         }
@@ -311,7 +311,7 @@ class dcTranslater
     {
         if (!l10n::isCode($lang)) {
             throw new Exception(
-                sprintf(__('Cannot find lang %s'), $lang)
+                sprintf(__('Failed find language %s'), $lang)
             );
             return false;
         }

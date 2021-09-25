@@ -115,7 +115,7 @@ class dcTranslaterModule
         }
         if (!$dir && $throw) {
             throw new Exception(sprintf(
-                __('Cannot find backups folder for module %s'), $id
+                __('Failed to find backups folder for module %s'), $id
             ));
         }
 
@@ -173,7 +173,7 @@ class dcTranslaterModule
 
         if (!is_dir($this->prop['locales'] . '/' . $lang)) {
             throw new Exception(sprintf(
-                __('Cannot find language folder %s for module %s') ,$lang, $this->prop['id']
+                __('Failed to find language %s'), $lang
             ));
         }
 
@@ -217,7 +217,7 @@ class dcTranslaterModule
 
         if (!file_exists($backup . '/' . $file)) {
             throw new Exception(sprintf(
-                __('Cannot find backup file %s'), $file
+                __('Failed to find file %s'), $file
             ));
         }
 
@@ -256,7 +256,7 @@ class dcTranslaterModule
 
         if (!files::isDeletable($backup . '/' . $file)) {
             throw new Exception(sprintf(
-                __('Cannot delete backup file %s'), $file
+                __('Failed to delete file %s'), $file
             ));
         }
 
@@ -317,7 +317,7 @@ class dcTranslaterModule
             ));
         } elseif (!$done) {
             throw new Exception(sprintf(
-                __('Nothing to import for these modules in pack %s'), $zip_file['name']
+                __('Nothing to import from %s'), $zip_file['name']
             ));
         }
         return true;
@@ -326,14 +326,13 @@ class dcTranslaterModule
     /**
      * Export (to output) language pack
      * 
-     * @param  array $modules  The modules to work on
      * @param  array $langs     Langs to export
      */
     public function exportPack(array $langs)
     {
         if (empty($langs)) {
             throw new Exception(
-                __('Wrong export query')
+                __('Nothing to export')
             );
         }
 
@@ -490,7 +489,7 @@ class dcTranslaterModule
     {
         if (!l10n::isCode($lang)) {
             throw new Exception(sprintf(
-                __('Wrong language %s'), $lang
+                __('Unknow language %s'), $lang
             ));
         }
 
@@ -505,7 +504,7 @@ class dcTranslaterModule
 
         if (!empty($from_lang) && !isset($langs[$from_lang])) {
             throw new Exception(sprintf(
-                __('Cannot copy file from language %s'), $from_lang
+                __('Failed to copy file from language %s'), $from_lang
             ));
         }
 
@@ -539,7 +538,7 @@ class dcTranslaterModule
     {
         if (!l10n::isCode($lang)) {
             throw new Exception(sprintf(
-                __('Wrong language %s'), $lang
+                __('Unknow language %s'), $lang
             ));
         }
 
@@ -580,8 +579,7 @@ class dcTranslaterModule
 
         if (empty($rs)) {
             throw new Exception(sprintf(
-                __('No string to write, language %s deleted for module %s'),
-                $lang, $id
+                __('No string to write, language %s deleted'), $lang
             ));
         }
 
@@ -603,14 +601,14 @@ class dcTranslaterModule
         # Path is right formed
         if (!l10n::isCode($lang)) {
             throw new Exception(sprintf(
-                __('Wrong language %s'), $lang
+                __('Unknow language %s'), $lang
             ));
         }
 
         $files = $this->getLangs(true);
         if (!isset($files[$lang])) {
             throw new Exception(sprintf(
-                __('Cannot find language folder %s'), $lang
+                __('Failed to find language %s'), $lang
             ));
         }
 
@@ -709,13 +707,13 @@ class dcTranslaterModule
         if (is_dir($path['dirname']) && !is_writable($path['dirname']) 
          || file_exists($file) && !is_writable($file)) {
             throw new Exception(sprintf(
-                __('Cannot grant write acces on lang file %s'), $file
+                __('Failed to grant write acces on file %s'), $file
             ));
         }
 
         if (!($f = @files::putContent($file, $content))) {
             throw new Exception(sprintf(
-                __('Cannot write lang file %s'), $file
+                __('Failed to write file %s'), $file
             ));
         }
     }

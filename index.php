@@ -170,7 +170,7 @@ try {
 }
 
 echo 
-'<html><head><title>' . __('translater') . '</title>' . 
+'<html><head><title>' . __('Translater') . '</title>' . 
 dcPage::jsPageTabs() . 
 dcPage::cssLoad(dcPage::getPF('translater/css/translater.css')) .
 dcpage::jsJson('translater', [
@@ -551,7 +551,7 @@ if (empty($module) && $type != '') {
     form::combo('multigroup', $allowed_l10n_groups) . '</label></p>' .
     '</div>' .
     '<p class="col right">' .
-    '<input id="do-action" type="submit" value="' . __('Save (s)') . '" accesskey="s" /></p>' .
+    '<input id="do-action" type="submit" value="' . __('Save') . ' (s)" accesskey="s" /></p>' .
     $core->formNonce() . 
     form::hidden(['code'], $lang->code) .
     $core->adminurl->getHiddenFormFields(

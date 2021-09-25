@@ -16,7 +16,7 @@ if (!defined('DC_RC_PATH')) {
 }
 
 $this->registerModule(
-    'translater',
+    'Translater',
     'Translate your Dotclear plugins and themes',
     'Jean-Christian Denis & contributors',
     '2021.09.02.1',

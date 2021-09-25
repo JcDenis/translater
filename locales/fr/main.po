@@ -4,7 +4,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Project-Id-Version: translater 2021.09.25\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2021-09-25T16:28:04+00:00\n"
+"PO-Revision-Date: 2021-09-25T21:38:48+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -278,12 +278,12 @@ msgstr "Forme plurielle de \"%s\""
 msgid "Change the group of the selected translations to:"
 msgstr "Changer le groupe des chaines sélectionnées vers :"
 
+msgid "Translate your Dotclear plugins and themes"
+msgstr "Traduire vos plugins et thèmes Dotclear"
+
 msgid "Translate plugins"
 msgstr "Traduire des plugins"
 
 msgid "Translate themes"
 msgstr "Traduire des thèmes"
-
-msgid "Translate your Dotclear plugins and themes"
-msgstr "Traduire vos plugins et thèmes Dotclear"
 

@@ -565,19 +565,20 @@ if (empty($module) && $type != '') {
 
 } else {
     $line = '<li><a href="%s"%s>%s</a></li>';
-    echo sprintf(
-        '<h3><ul class="nice">%s</ul></h3>',
+    echo '<h4><i>' . __('Translate your Dotclear plugins and themes') . '</i></h4>' .
         sprintf(
-            $line, 
-            $core->adminurl->get('translater', ['type' => 'plugin']), 
-            $type == 'plugin' ? ' class="active"' : '',
-            __('Translate plugins')) .
-        sprintf(
-            $line, 
-            $core->adminurl->get('translater', ['type' => 'theme']), 
-            $type == 'theme' ? ' class="active"' : '',
-            __('Translate themes'))
-    );
+            '<h3><ul class="nice">%s</ul></h3>',
+            sprintf(
+                $line, 
+                $core->adminurl->get('translater', ['type' => 'plugin']), 
+                $type == 'plugin' ? ' class="active"' : '',
+                __('Translate plugins')) .
+            sprintf(
+                $line, 
+                $core->adminurl->get('translater', ['type' => 'theme']), 
+                $type == 'theme' ? ' class="active"' : '',
+                __('Translate themes'))
+        );
 }
 
 dcPage::helpBlock('translater');

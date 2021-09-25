@@ -14,19 +14,17 @@
 if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
-
+$id = 'translater';
 try {
-    if (version_compare($core->getVersion($id), $this->moduleInfo($id, 'version'), '>=')) {
+    if (version_compare($core->getVersion($id), $core->plugins->moduleInfo($id, 'version'), '>=')) {
         return null;
     }
-
-    $t = new dcTranslater($core);
-    $s = $t->getDefaultSettings();
-    foreach($s as $v) {
-        $t->setSetting($v[0], $v[1], false);
+    $translater = new dcTranslater($core, false);
+    $settings = $translater->getDefaultSettings();
+    foreach($settings as $key => $setting) {
+        $translater->setSetting($key, $setting['value'], false);
     }
-
-    $core->setVersion($id, $this->moduleInfo($id, 'version'));
+    $core->setVersion($id, $core->plugins->moduleInfo($id, 'version'));
 
     return true;
 } catch (Exception $e) {

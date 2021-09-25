@@ -44,7 +44,7 @@ class translaterAdminBehaviors
     private static function translater($core)
     {
         if (!(self::$translater instanceof dcTranslater)) {
-            self::$translater = new dcTranslater($core);
+            self::$translater = new dcTranslater($core, false);
         }
         return self::$translater;
     }
@@ -69,7 +69,7 @@ class translaterAdminBehaviors
         return 
             ' <input type="submit" name="translater[' . 
             html::escapeHTML($id) . 
-            ']" value="' . _('Translate') . '" /> ';
+            ']" value="' . __('Translate') . '" /> ';
     }
 
     /**

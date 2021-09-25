@@ -57,7 +57,7 @@ class dcTranslater
         ],
         'start_page' => [
             'id' => 'translater_start_page',
-            'value' => 'setting',
+            'value' => '-',
             'type' => 'string',
             'label' => 'Page to start on'
         ],
@@ -151,15 +151,18 @@ class dcTranslater
     /**
      * translater instance
      * 
-     * @param dcCore $core dcCore instance
+     * @param dcCore $core  dcCore instance
+     * @param boolean $core Also load modules
      */
-    public function __construct($core)
+    public function __construct(dcCore $core, bool $full = true)
     {
         $this->core = $core;
         $core->blog->settings->addNamespace('translater');
-        $this->loadModules();
 
-        // fill with translated string
+        if ($full) {
+            $this->loadModules();
+        }
+
         self::$allowed_backup_folders = [
             __('locales folders of each module') => 'module',
             __('plugins folder root')            => 'plugin',
@@ -167,8 +170,6 @@ class dcTranslater
             __('cache folder of Dotclear')       => 'cache',
             __('locales folder of translater')   => 'translater'
         ];
-
-        // fill distrib modules list
         self::$default_distrib_modules = [
             'plugin' => explode(',', DC_DISTRIB_PLUGINS), 
             'theme'  => explode(',', DC_DISTRIB_THEMES)
@@ -215,20 +216,14 @@ class dcTranslater
      * @param mixed  $overwrite Overwrite settings if exists
      * @return boolean          Success
      */
-    public function setSetting(string $id, $value, $overwrite = true)
+    public function setSetting(string $id, $value, $overwrite = true): bool
     {
         if (!array_key_exists($id, self::$default_settings)) {
             return false;
         }
-        $this->core->blog->settings->translater->drop(self::$default_settings[$id]['id']);
-        $this->core->blog->settings->translater->put(
-            self::$default_settings[$id]['id'],
-            $value,
-            self::$default_settings[$id]['type'],
-            self::$default_settings[$id]['label'],
-            $overwrite,
-            true
-        );
+        $s = self::$default_settings[$id];
+        $this->core->blog->settings->translater->drop($s['id']);
+        $this->core->blog->settings->translater->put($s['id'], $value, $s['type'], $s['label'], $overwrite, true);
         return true;
     }
 

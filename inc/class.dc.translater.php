@@ -463,6 +463,7 @@ class dcTranslater
         foreach($parts as $part) {
             // should start with quote
             if (!in_array(substr($part,0,1), ['"', "'"])) {
+                $p++;
                 continue;
             }
             // put back first parenthesis

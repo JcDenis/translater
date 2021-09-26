@@ -1,0 +1,106 @@
+<html>
+<head>
+  <title>Translater</title>
+</head>
+
+<body>
+  
+<h4>Avant propos</h4>
+  <p>Le terme générique <em>"module"</em> utilisé dans le plugin translater peut désigner un plugin ou un thème installé.<br />
+  Une langue peut être désignée soit par son nom <em>(Français)</em>, soit par son code <em>(fr)</em>.</p>
+  <p>La configuration du plugin translater est importante, elle permet d'affiner les automatismes du plugin 
+  et ainsi de gagner beaucoup de temps dans la gestion des traductions.</p>
+
+<h4>Traduction</h4>
+<dl>
+  <dt>Ecrire les fichiers <code>.lang.php</code></dt>
+  <dd>C'est le format <em>rapide</em> des fichiers de langues. 
+  <em>Le fichier de langue .po étant la norme, le plugin translater le génère automatiquement lors de la création ou édition d'une langue, 
+  cependant vous pouvez souhaiter générer le fichier .lang.php, il sera alors utilisé par défaut.</em></dd>
+
+  <dt>Traduire également les chaines des fichiers de template</dt>
+  <dd>Cette option permet de traduire les balises de langage des fichiers .html. Ex&nbsp;: <code>{{tpl:lang Lorem}}</code>.</dd>
+  
+  <dt>Traduire uniquement les chaines inconnues</dt>
+  <dd>Cette option est recommandée. Les chaines déjà traduites dans Dotclear sont alors grisées et non modifiable.</dd>
+  
+  <dt>Ecrire les commentaires dans les fichiers</dt>
+  <dd>Pratique durant la phase de développement d'une extension, les noms et lignes relatives à la chaine sont alors spécifiés dans le fichier de langue.
+  Il est conseillé de désactiver cette option lors de la réalisation de version finale afin d'avoir des fichiers plus légers.</dd>
+
+  <dt>Ecrire les informations à propos de l'auteur</dt>
+  <dd>Ajoute aux fichiers de langue <em>(si les commentaires sont actifs)</em> des informations (pour peu qu'elles existent) à propos de l'auteur de la traduction.
+  Les masques suivants sont acceptés&nbsp;:
+    <ul>
+      <li>displayname : pseudo de l'auteur</li>
+      <li>firstname : prénom de l'auteur</li>
+    	<li>name : nom de l'auteur</li>
+    	<li>email : email de l'auteur</li>
+      <li>url : site de l'auteur</li>
+    </ul>
+  </dd>
+</dl>
+<h4>Import/Export</h4>
+<dl>
+  <dt>Ecraser les langages existants</dt>
+  <dd>Si cette option est activée, lors de l'importation d'un paquetage de langues, les langues contenues dans ce paquetage remplacent celles existantes dans le module.</dd>
+  
+  <dt>Nom du paquetage exporté</dt>
+  <dd>C'est le nom par défaut du fichier zip lorsque vous exportez des sauvegardes.</dd>
+  <dd>Il accepte les masques suivants :
+    <ul>
+      <li>type : plugin ou thème</li>
+    	<li>module : nom du module</li>
+    	<li>version : la version du module</li>
+    	<li>timestamp : le temps unix</li>
+    	<li>%Y%m%D.... : les masques de date Dotclear</li>
+    </ul>
+    Exemple&nbsp;: <code>type-module-l10n-timestamp</code>
+  </dd>
+</dl>
+<h4>Sauvegardes</h4>
+  <dt>Faire une sauvegarde quand des changements sont effectués</dt>
+  <dd>Permet de faire automatiquement des sauvegardes des fichiers de langue d'un module à chaque changement enregistré.</dd>
+  
+  <dt>Limiter les sauvegardes à x fichiers par module</dt>
+  <dd>Permet de limiter le nombre de sauvegarde par module afin de ne pas prendre trop de place sur la plateforme. 
+  Les sauvegardes ne sont pas effacées automatiquement. Il faut alors le faire dans le plugin translater depuis la liste des sauvegardes d'un module.</dd>
+  
+  <dt>Enregistrer les sauvegardes dans :</dt>
+  <dd>Plusieurs choix de lieu de sauvegarde s'offrent :
+  <ul>
+    <li>Repertoires <em>locales</em> de chaque module</li>
+  	<li>Repertoire racine des plugins</li>
+  	<li>Repertoire public <em>(du blog en cours)</em></li>
+  	<li>Repertoire <em>cache</em> de Dotclear</li>
+  	<li>Repertoire unique du plugin <em>translater</em></li>
+  </ul>
+  </dd>
+  <dd>Le répertoire choisi doit être accessible en écriture au plugin translater.</dd>
+</dl>
+
+<h4>Comportements</h4>
+<dl>
+  <dt>Menu de départ par défaut</dt>
+  <dd>Permet de choisir quelle page apparaît lors de l'accès au plugin translater.</dd>
+
+  <dt>Activer le menu de la page des plugins</dt>
+  <dd>Ajoute le bouton <em>Traduire</em> à chaque plugin sur la page de gestion des plugins.</dd>
+
+  <dt>Activer le menu de la page des thèmes</dt>
+  <dd>Ajoute le bouton <em>Traduire</em> dans les détails de chauqe thème de la gestion d'apparence du blog.</dd>
+
+  <dt>Tableau de bord</dt>
+  <dd>Il est possible d'ajouter le plugin translater au tableau de bord. La gestion de ces icones se fait depuis les préférences utilisateur de Dotclear.</dd>
+</dl>
+
+<h4>Support</h4>
+<p>Si vous souhaitez plus d'aide ou apporter votre contribution à ce plugin, voici quelques liens utiles.</p>
+<ul>
+  <li><a href="http://forum.dotclear.net/viewtopic.php?id=39220">Sujet sur le forum Dotclear</a></li>
+  <li><a href="http://plugins.dotaddict.org/dc2/details/translater">Fiche du plugin sur dotaddict</a></li>
+  <li><a href="https://github.com/JcDenis/translater">Développement du plugin sur Github</a></li>
+</ul>
+
+</body>
+</html>

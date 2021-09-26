@@ -1,10 +1,9 @@
-
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Project-Id-Version: translater 2021.09.25\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2021-09-25T21:38:48+00:00\n"
+"PO-Revision-Date: 2021-09-26T21:54:33+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -39,7 +38,7 @@ msgid "Write informations about author in files"
 msgstr "Ecrire les informations à propos de l'auteur"
 
 msgid "User info:"
-msgstr "Information d'auteur"
+msgstr "Information à propos de l'auteur :"
 
 msgid "Following informations can be used: %s"
 msgstr "Les informations suivantes peuvent être utilisées : %s"
@@ -165,7 +164,7 @@ msgid "Nothing to delete"
 msgstr "Rien à effacer"
 
 msgid "Backup successfully deleted"
-msgstr "Sauvegarde effacer avec succès"
+msgstr "Sauvegarde effacée avec succès"
 
 msgid "Language successfully exported"
 msgstr "Langue exportée avec succès"
@@ -196,6 +195,9 @@ msgstr "Traduire le module %s"
 
 msgid "Edit language %s of module %s"
 msgstr "Modifier la langue %s du module %s"
+
+msgid "Modules list of type \"%s\""
+msgstr "Listes de modules de type \"%s\""
 
 msgid "There is no editable modules"
 msgstr "Il n'y a pas de module modifiable"
@@ -248,11 +250,11 @@ msgstr "Ajouter une langue"
 msgid "Copy from language:"
 msgstr "Copier depuis la langue :"
 
-msgid "Optionnal"
-msgstr "Optionnel"
+msgid "optionnal"
+msgstr "optionnel"
 
 msgid "Select languages package to import:"
-msgstr "Selectionner le paquetage de langues à importer :"
+msgstr "Sélectionner le paquetage de langues à importer :"
 
 msgid "List of %s localized strings"
 msgstr "Liste des %s chaines de traduction"

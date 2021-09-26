@@ -1,0 +1,53 @@
+<html>
+<head>
+  <title>Translater</title>
+</head>
+
+<body>
+
+<h4>Avant propos</h4>
+  <p>Le terme générique <em>"module"</em> utilisé dans le plugin translater peut désigner un plugin ou un thème installé.<br />
+  Une langue peut être désignée soit par son nom <em>(Français)</em>, soit par son code <em>(fr)</em>.</p>
+
+<h4>Edition d'une langue</h4>
+<dl>
+  <dt>Lignes grisées</dt>
+  <dd>Si une ligne est grisée <em>(Inaccessible)</em>, c'est que cette chaine est déjà traduite dans la distribution Dotclear 
+  et que l'option <em>"Traduire uniquement les chaines inconnues"</em> est selectionnée dans les paramètres.</dd>
+
+  <dt>Groupe</dt>
+  <dd>C'est le nom du fichier de langue. 
+  D'autres choix sont possibles mais Dotclear ne recherche que le groupe <em>main</em> de façon générique, et <em>public</em> pour la partie publique. 
+  Pour de gros plugin ou tout simplement pour des raisons de commodité (!) vous pouvez vouloir séparer certaines traductions. 
+  Il faut alors demander explicitement à Dotclear de les charger.
+  Par exemple si vous avez un fichier mon_plugin/locales/fr/error.po coté admin pour gérer les traductions de messages d'erreurs, 
+  il faudra alors dans le fichier _admin.php du votre plugin charger ce fichier avec l10n::set('mon_plugin/locales/fr/error'); sans extension. 
+  Attention dans cet exemple seul la langue fr est chargé, il faut adapter l'appel pour charger la bonne langue.</dd>
+  
+  <dt>Chaine</dt>
+  <dd>C'est la chaine à traduire trouvée dans l'extension. elle est apellé avec __('ma_chaine') . 
+  Si la ligne suivante commence par un "+", il s'agira alors de la forme pluriel de cette traduction. 
+  Elle est appelé avec __('un singulier', '%s pluriels'), certaines langues ont jsuqu'à six formes pluriels.</dd>
+
+  <dt>Traduction</dt>
+  <dd>Traduction donnée à cette chaine pour la langue choisie.</dd>
+
+  <dt>Existant</dt>
+  <dd>Indique la traduction et l'extension qui utilise cette chaine le cas échéant. 
+  Si javascript est activé l'icone présent avant permet de copier d'un click cette tradution 
+  et l'icone d'après déplie la liste des traductions existantes.</dd>
+
+  <dt>Fichier</dt>
+  <dd>C'est la liste des fichiers sources ainsi que la ligne ou se trouve la chaine à traduire.</dd>
+</dl>
+
+<h4>Support</h4>
+<p>Si vous souhaitez plus d'aide ou apporter votre contribution à ce plugin, voici quelques liens utiles.</p>
+<ul>
+  <li><a href="http://forum.dotclear.net/viewtopic.php?id=39220">Sujet sur le forum Dotclear</a></li>
+  <li><a href="http://plugins.dotaddict.org/dc2/details/translater">Fiche du plugin sur dotaddict</a></li>
+  <li><a href="https://github.com/JcDenis/translater">Développement du plugin sur Github</a></li>
+</ul>
+
+</body>
+</html>

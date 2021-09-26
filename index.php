@@ -174,9 +174,9 @@ echo
 dcPage::jsPageTabs() . 
 dcPage::cssLoad(dcPage::getPF('translater/css/translater.css')) .
 dcpage::jsJson('translater', [
-    'title_add'    => __('Use this text'),
-    'image_field'  => dcPage::getPF('translater/img/field.png'),
-    'image_toggle' => dcPage::getPF('translater/img/toggle.png')
+    'title_add_detail' => __('Use this text'),
+    'image_field'      => dcPage::getPF('translater/img/field.png'),
+    'image_toggle'     => dcPage::getPF('translater/img/toggle.png')
 ]) .
 dcPage::jsLoad(dcPage::getPF('translater/js/translater.js')) .
 
@@ -235,9 +235,9 @@ if (empty($module) && $type != '') {
         echo '
         <div class="table-outer">
         <table class="clear">
-        <caption class="hidden">' . $type .' list</caption>
+        <caption>' . sprintf(__('Modules list of type "%s"'), $type) .'</caption>
         <tr>
-        <th class="nowrap">' . __('Name') . '</th>
+        <th class="nowrap">' . __('Module') . '</th>
         <th class="nowrap">' . __('Languages') . '</th>
         <th class="nowrap">' . __('Id') . '</th>
         <th class="nowrap">' . __('Version') . '</th>
@@ -249,6 +249,8 @@ if (empty($module) && $type != '') {
         echo '<tr><td colspan="6">' . __('There is no editable modules') . '</td></tr>';
     }
     echo '</form>';
+
+    dcPage::helpBlock('translater.type');
 
 } elseif (!empty($module) && empty($lang)) {
     $codes = $module->getUsedLangs();
@@ -272,7 +274,7 @@ if (empty($module) && $type != '') {
         '<table class="clear maximal">' . 
         '<caption>' . __('Existing languages translations') .'</caption>' .
         '<tr>' . 
-        '<th class="nowrap" colspan="2">' . __('Languages') . '</th>' . 
+        '<th class="nowrap" colspan="2">' . __('Language') . '</th>' . 
         '<th class="nowrap">' . __('Code') . '</th>' . 
         '<th class="nowrap">' . __('Backups') . '</th>' . 
         '<th class="nowrap">' . __('Last backup') . '</th>' . 
@@ -332,7 +334,7 @@ if (empty($module) && $type != '') {
             '<table class="clear">' . 
             '<caption>' . __('Existing languages backups') . '</caption>' .
             '<tr>' . 
-            '<th class="nowrap" colspan="2">' . __('Name') . '</th>' . 
+            '<th class="nowrap" colspan="2">' . __('Language') . '</th>' . 
             '<th class="nowrap">' . __('Code') . '</th>' . 
             '<th class="nowrap">' . __('Date') . '</th>' . 
             '<th class="nowrap">' . __('File') . '</th>' . 
@@ -401,7 +403,7 @@ if (empty($module) && $type != '') {
         } else {
             echo 
             '<p class="field"><label for="from">' . __('Copy from language:') . '</label>' .  
-            form::combo(['from'], array_merge(['-' => ''], $codes)) . ' (' . __('Optionnal') . ')</p>';
+            form::combo(['from'], array_merge(['-' => ''], $codes)) . ' (' . __('optionnal') . ')</p>';
         }
         echo '
         <p><input type="submit" name="save" value="' . __('Create') . '" />' . 
@@ -428,6 +430,8 @@ if (empty($module) && $type != '') {
     </p></form><p>&nbsp;</p></div>';
 
     echo '</div>';
+
+    dcPage::helpBlock('translater.module');
 
 } elseif (!empty($lang)) {
     $lines = $lang->getMessages();
@@ -563,6 +567,8 @@ if (empty($module) && $type != '') {
     '<p>&nbsp;</p>' . 
     '</div>';
 
+    dcPage::helpBlock('translater.lang');
+
 } else {
     $line = '<li><a href="%s"%s>%s</a></li>';
     echo '<h4><i>' . __('Translate your Dotclear plugins and themes') . '</i></h4>' .
@@ -579,8 +585,8 @@ if (empty($module) && $type != '') {
                 $type == 'theme' ? ' class="active"' : '',
                 __('Translate themes'))
         );
-}
 
-dcPage::helpBlock('translater');
+    dcPage::helpBlock('translater.index');
+}
 
 echo '</body></html>';

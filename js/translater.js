@@ -34,7 +34,7 @@ $(function () {
         var img_str = $('<a class="togglelist" title="detail">'+tog+'</a>').css('cursor','pointer');
         $(this).children('strong').each(function(){
           var txt = $(this).text();
-          var img_add = $('<a class="addfield" title="'+dctranslater.title_add+'">'+img+'</a>').css('cursor','pointer');
+          var img_add = $('<a class="addfield" title="'+dctranslater.title_add_detail+'">'+img+'</a>').css('cursor','pointer');
           $(this).prepend(' ').prepend(img_add);
           $(img_add).click(function(){$(target).children(':text').val(txt)});
 
@@ -46,7 +46,7 @@ $(function () {
       });
 
       $(msgfile).children('.subtranslater').each(function(){
-      var img_file = $('<a class="togglelist" title="detail">'+tog+'</a>').css('cursor','pointer');
+      var img_file = $('<a class="togglelist" title="'+dctranslater.title_add_detail+'">'+tog+'</a>').css('cursor','pointer');
       $(this).children('strong').each(function(){
         $(this).append(' ').append(img_file);
         var strlist=$(this).siblings('.strlist');

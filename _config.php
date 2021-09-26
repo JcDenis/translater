@@ -57,7 +57,7 @@ __('Write informations about author in files') . '</label></p>
 <p><label for="parse_userinfo">' . __('User info:') . '</label>' .
 form::field('parse_userinfo', 65, 255, $translater->parse_userinfo) . '</p>
 <p class="form-note">' . sprintf(
-    __('Following informations can be used: %s '), implode(', ', $translater::$allowed_user_informations)) . '
+    __('Following informations can be used: %s'), implode(', ', $translater::$allowed_user_informations)) . '
 </p>
 </div>
 
@@ -93,3 +93,5 @@ __('Enable menu on plugins page') . '</label></p>
 form::checkbox('theme_menu', '1', $translater->theme_menu) .
 __('Enable menu on themes page') . '</label></p>
 </div>';
+
+dcPage::helpBlock('translater.config');

@@ -15,4 +15,6 @@ if (!defined('DC_RC_PATH')) {
     return;
 }
 
-$__resources['help']['translater'] = dirname(__FILE__) . '/help/translater.html';
+foreach(['index', 'type', 'module', 'lang', 'config'] as $v) {
+    $__resources['help']['translater.' . $v] = dirname(__FILE__) . '/help/translater.' . $v . '.html';
+}

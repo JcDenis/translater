@@ -657,10 +657,9 @@ class dcTranslaterModule
                 }
             }
             $content .= 
-            '# Translated with translater ' . $this->core->plugins->moduleInfo('translater', 'version') . "\n";
+            '# Translated with translater ' . $this->core->plugins->moduleInfo('translater', 'version') . "\n\n";
         }
         $content .= 
-        "\n".
         "msgid \"\"\n" .
         "msgstr \"\"\n" .
         '"Content-Type: text/plain; charset=UTF-8\n"' . "\n" .

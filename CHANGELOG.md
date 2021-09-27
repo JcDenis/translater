@@ -3,6 +3,13 @@
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2021.09.28
+- Fix help (thx Pierre Van Glabeke)
+- Fix translations (thx Pierre Van Glabeke)
+- Fix wrong number line for source files
+- Fix false positive on unquoted srtings
+- Fix empty line on .po file
+
 2021.09.25
 - add support for plural
 - add dashboard icon

@@ -6,11 +6,33 @@
 <body>
   
 <h4>Avant propos</h4>
-  <p>Le terme générique <em>"module"</em> utilisé dans le plugin translater peut désigner un plugin ou un thème installé.<br />
+  <p>Le terme <em>plugin translater</em> désigne ce plugin.<br />
+  Le terme générique <em>"module"</em> utilisé dans le plugin translater peut désigner un plugin ou un thème installé.<br />
   Une langue peut être désignée soit par son nom <em>(Français)</em>, soit par son code <em>(fr)</em>.</p>
 
-<h4>Module</h4>
-<p>Rédaction en cours...</p>
+<h4>Traductions</h4>
+<p>Si des traductions sont présentes pour le module, un tableau listant les langues sera affiché. 
+Le nom de la langue est un lien vers l'édition des traduction de cette langue du module.<br />
+Le traitement par lot dans cette liste permet d'effacer, sauvegarder ou exporter les langues seletionnées.</p>
+
+<h4>Sauvegardes</h4>
+<p>Si des sauvergardes de langues du module sont disponibles, un tableau listant les sauvegardes de ces langues sera affiché.
+Le traitement par lot de cette liste permet d'effacer ou de restaurer ces sauvegardes.<br />
+A noter que si plusieurs sauvergardes d'une même langue sont restaurés en même temps, 
+le plugin translater les restaurera de la plus ancienne à la plus récente.<br />
+Ces sauvegardes sont générées soit depuis la liste des traductions existantes ci-dessus, 
+soit, suivant la configuration du plugin translater, lors de l'édition d'un langue.<br />
+Attention: Une limite du nombre de sauvegardes est appliquée, elle est paramettrable dans la configuration du plugin translater.</p>
+
+<h4>Ajouter une langue</h4>
+<p>Cette partie permet de créer un nouveau fichier de traduction pour une langue pour le module.
+Il est possible de copier les traductions depuis un fichier d'une autre langue de ce module.</p>
+
+<h4>Import</h4>
+<p>Il est possible d'importert un fichier zip contenant une ou plusieurs traductions du module. 
+Typiquement c'est un fichier zip qui a précédement été généré par le plugin translater.<br />
+Lors de l'import, suivant la configuration du plugin translater, 
+les langues présentes dans ce fichier d'import pouront ou non écraser les langues présentent dans le module.</p>
 
 <h4>Support</h4>
 <p>Si vous souhaitez plus d'aide ou apporter votre contribution à ce plugin, voici quelques liens utiles.</p>

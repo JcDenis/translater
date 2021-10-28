@@ -193,7 +193,9 @@ if (empty($module) && $type != '') {
     echo '<form id="theme-form" method="post" action="' . $core->adminurl->get('translater', ['type' => 'plugin']) . '">';
 
     $res = '';
-    foreach ($translater->getModules($type) as $module) {
+    $modules = $translater->getModules($type);
+    ksort($modules);
+    foreach ($modules as $module) {
         if ($translater->hide_default && in_array($module->id, $translater::$default_distrib_modules[$type])) {
             continue;
         }
@@ -202,12 +204,12 @@ if (empty($module) && $type != '') {
                 '<tr class="line"><td class="nowrap minimal"><a href="%s" title="%s">%s</a></td>',
                 $core->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id]),
                 html::escapeHTML(sprintf(__('Translate module %s'), __($module->name))),
-                html::escapeHTML(__($module->name))
+                html::escapeHTML(__($module->id))
             );
         } else {
             $res .= sprintf(
                 '<tr class="line offline"><td class="nowrap">%s</td>',
-                html::escapeHTML(__($module->name))
+                html::escapeHTML(__($module->id))
             );
         }
         $codes = $module->getLangs();
@@ -227,7 +229,7 @@ if (empty($module) && $type != '') {
         $res .= sprintf(
             '<td class="nowrap maximal">%s</td><td class="nowrap minimal">%s</td><td class="nowrap minimal count">%s</td></tr>',
             implode(', ', $codes),
-            html::escapeHTML($module->id),
+            html::escapeHTML($module->name),
             $module->version
         );
     }
@@ -237,9 +239,9 @@ if (empty($module) && $type != '') {
         <table class="clear">
         <caption>' . sprintf(__('Modules list of type "%s"'), $type) .'</caption>
         <tr>
-        <th class="nowrap">' . __('Module') . '</th>
-        <th class="nowrap">' . __('Languages') . '</th>
         <th class="nowrap">' . __('Id') . '</th>
+        <th class="nowrap">' . __('Languages') . '</th>
+        <th class="nowrap">' . __('Name') . '</th>
         <th class="nowrap">' . __('Version') . '</th>
         </tr>' .
         $res .

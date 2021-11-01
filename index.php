@@ -204,12 +204,12 @@ if (empty($module) && $type != '') {
                 '<tr class="line"><td class="nowrap minimal"><a href="%s" title="%s">%s</a></td>',
                 $core->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id]),
                 html::escapeHTML(sprintf(__('Translate module %s'), __($module->name))),
-                html::escapeHTML(__($module->id))
+                html::escapeHTML($module->id)
             );
         } else {
             $res .= sprintf(
                 '<tr class="line offline"><td class="nowrap">%s</td>',
-                html::escapeHTML(__($module->id))
+                html::escapeHTML($module->id)
             );
         }
         $codes = $module->getLangs();
@@ -229,7 +229,7 @@ if (empty($module) && $type != '') {
         $res .= sprintf(
             '<td class="nowrap maximal">%s</td><td class="nowrap minimal">%s</td><td class="nowrap minimal count">%s</td></tr>',
             implode(', ', $codes),
-            html::escapeHTML($module->name),
+            html::escapeHTML(__($module->name)),
             $module->version
         );
     }

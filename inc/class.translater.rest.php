@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief translater, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis & contributors
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_ADMIN')) {
     return;
 }
@@ -25,13 +24,13 @@ class translaterRest
 {
     public static function getProposal($core, $get)
     {
-        $from = !empty($get['langFrom']) ? trim($get['langFrom']) : '';
-        $to = !empty($get['langTo']) ? trim($get['langTo']) : '';
-        $tool = !empty($get['langTool']) ? trim($get['langTool']) : '';
+        $from   = !empty($get['langFrom']) ? trim($get['langFrom']) : '';
+        $to     = !empty($get['langTo']) ? trim($get['langTo']) : '';
+        $tool   = !empty($get['langTool']) ? trim($get['langTool']) : '';
         $str_in = !empty($get['langStr']) ? trim($get['langStr']) : '';
 
-        $str_in = text::toUTF8($str_in);
-        $str_in = trim($str_in);
+        $str_in  = text::toUTF8($str_in);
+        $str_in  = trim($str_in);
         $str_out = '';
 
         $rsp = new xmlTag();
@@ -51,19 +50,20 @@ class translaterRest
                     throw new Exception(__('Translation tool is not configured'));
                 }
 
-                $str_out = (string) $translater->proposal->getTool($tool)->translate($str_in ,$from, $to);
+                $str_out = (string) $translater->proposal->getTool($tool)->translate($str_in, $from, $to);
             }
 
-            $x = new xmlTag('proposal');
+            $x            = new xmlTag('proposal');
             $x->lang_from = $from;
-            $x->lang_to = $to;
-            $x->tool = $tool;
-            $x->str_from = $str_in;
-            $x->str_to = text::toUTF8(html::decodeEntities($str_out));
+            $x->lang_to   = $to;
+            $x->tool      = $tool;
+            $x->str_from  = $str_in;
+            $x->str_to    = text::toUTF8(html::decodeEntities($str_out));
             $rsp->insertNode($x);
         } catch (Exception $e) {
             $core->error->add($e->getMessage());
         }
+
         return $rsp;
     }
 }

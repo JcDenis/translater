@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief translater, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis & contributors
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_ADMIN')) {
     return;
 }
@@ -22,9 +21,9 @@ if (!defined('DC_CONTEXT_ADMIN')) {
  */
 class googleProposalTool extends translaterProposalTool
 {
-    private $api = 'https://www.googleapis.com/language/translate/v2';
+    private $api   = 'https://www.googleapis.com/language/translate/v2';
     private $agent = 'dcTranslater - http://jcd.lv/?q=translater';
-    private $key = null; //ex: AsSDqsGsfdSDSQFQsfedj9bnzY390aIg-1d
+    private $key   = null; //ex: AsSDqsGsfdSDSQFQsfedj9bnzY390aIg-1d
 
     protected function setup()
     {
@@ -41,7 +40,7 @@ class googleProposalTool extends translaterProposalTool
         '<p><label class="classic" for="translater_google_proposal_key">' .
         __('API Console Single Access Key') . '<br />' .
         form::field('translater_google_proposal_key', 65, 255, $this->key) .
-        '</label></p>'.
+        '</label></p>' .
         '<p>' . __('You must have on Google API console:') . '</p>' .
         '<ul>' .
         '<li><a href="https://code.google.com/apis/console/#access">' . __('A single access API key') . '</a></li>' .
@@ -51,7 +50,7 @@ class googleProposalTool extends translaterProposalTool
 
     public function save()
     {
-        $key = empty($_POST['translater_google_proposal_key']) ? 
+        $key = empty($_POST['translater_google_proposal_key']) ?
             '' : $_POST['translater_google_proposal_key'];
 
         $this->core->blog->settings->translater->put('translater_google_proposal_key', $key, 'string', '', true, true);
@@ -60,19 +59,19 @@ class googleProposalTool extends translaterProposalTool
     public function translate($str, $from, $to)
     {
         try {
-            $data = array(
-                'key' => $this->key,
-                'q' => $str,
+            $data = [
+                'key'    => $this->key,
+                'q'      => $str,
                 'source' => $from,
                 'target' => $to
-            );
+            ];
 
-            $path = '';
+            $path   = '';
             $client = netHttp::initClient($this->api, $path);
             $client->setUserAgent($this->agent);
             $client->useGzip(false);
             $client->setPersistReferers(false);
-            $client->get($path,$data);
+            $client->get($path, $data);
 
             $rs = $client->getContent();
 
@@ -89,8 +88,9 @@ class googleProposalTool extends translaterProposalTool
             }
 
             return $dec->data->translations[0]->translatedText;
+        } catch (Exception $e) {
         }
-        catch (Exception $e) {}
+
         return '';
     }
 }

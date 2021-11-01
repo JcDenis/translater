@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief translater, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis & contributors
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_ADMIN')) {
     return;
 }
@@ -39,27 +38,27 @@ class microsoftProposalTool extends translaterProposalTool
     public function form()
     {
         return
-        '<p><label class="classic" for="translater_microsoft_proposal_client">' . 
-        __('Application client ID') . '<br />' . 
-        form::field('translater_microsoft_proposal_client', 65, 255, $this->client) . 
-        '</label></p>' . 
-        '<p><label class="classic" for="translater_microsoft_proposal_secret">' . 
-        __('Application client Secret') . '<br />' . 
-        form::field('translater_microsoft_proposal_secret', 65, 255, $this->secret) . 
-        '</label></p>' . 
-        '<p>' . __('You must have:') . '</p>' . 
-        '<ul>' . 
-        '<li><a href="https://datamarket.azure.com/account">' . __('A Microsoft Windows Azure account') . '</a></li>' . 
-        '<li><a href="https://datamarket.azure.com/dataset/bing/microsofttranslator">' . __('A valid subscription to Microsoft Translator') . '</a></li>' . 
-        '<li><a href="https://datamarket.azure.com/developer/applications/">' . __('And register an application') . '</a></li>' . 
+        '<p><label class="classic" for="translater_microsoft_proposal_client">' .
+        __('Application client ID') . '<br />' .
+        form::field('translater_microsoft_proposal_client', 65, 255, $this->client) .
+        '</label></p>' .
+        '<p><label class="classic" for="translater_microsoft_proposal_secret">' .
+        __('Application client Secret') . '<br />' .
+        form::field('translater_microsoft_proposal_secret', 65, 255, $this->secret) .
+        '</label></p>' .
+        '<p>' . __('You must have:') . '</p>' .
+        '<ul>' .
+        '<li><a href="https://datamarket.azure.com/account">' . __('A Microsoft Windows Azure account') . '</a></li>' .
+        '<li><a href="https://datamarket.azure.com/dataset/bing/microsofttranslator">' . __('A valid subscription to Microsoft Translator') . '</a></li>' .
+        '<li><a href="https://datamarket.azure.com/developer/applications/">' . __('And register an application') . '</a></li>' .
         '</ul>';
     }
 
     public function save()
     {
-        $client = empty($_POST['translater_microsoft_proposal_client']) ? 
+        $client = empty($_POST['translater_microsoft_proposal_client']) ?
             '' : $_POST['translater_microsoft_proposal_client'];
-        $secret = empty($_POST['translater_microsoft_proposal_secret']) ? 
+        $secret = empty($_POST['translater_microsoft_proposal_secret']) ?
             '' : $_POST['translater_microsoft_proposal_secret'];
 
         $this->core->blog->settings->translater->put('translater_microsoft_proposal_client', $client, 'string', '', true, true);
@@ -70,7 +69,8 @@ class microsoftProposalTool extends translaterProposalTool
     {
         try {
             return $this->doYourFuckingJob($this->client, $this->secret, $str, $from, $to);
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         return '';
     }
@@ -83,20 +83,20 @@ class microsoftProposalTool extends translaterProposalTool
     {
         try {
             //Client ID of the application.
-            $clientID       = $client;
+            $clientID = $client;
             //Client Secret key of the application.
             $clientSecret = $secret;
             //OAuth Url.
-            $authUrl      = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13/";
+            $authUrl = 'https://datamarket.accesscontrol.windows.net/v2/OAuth2-13/';
             //Application Scope Url
-            $scopeUrl     = "http://api.microsofttranslator.com";
+            $scopeUrl = 'http://api.microsofttranslator.com';
             //Application grant type
-            $grantType    = "client_credentials";
+            $grantType = 'client_credentials';
 
             //Get the Access token.
-            $accessToken  = $this->getTokens($grantType, $scopeUrl, $clientID, $clientSecret, $authUrl);
+            $accessToken = $this->getTokens($grantType, $scopeUrl, $clientID, $clientSecret, $authUrl);
             //Create the authorization Header string.
-            $authHeader = "Authorization: Bearer " . $accessToken;
+            $authHeader = 'Authorization: Bearer ' . $accessToken;
 
             //Set the params.//
             $fromLanguage = $from;
@@ -105,7 +105,7 @@ class microsoftProposalTool extends translaterProposalTool
             $contentType  = 'text/plain';
             $category     = 'general';
 
-            $params = "text=" . urlencode($inputStr) . "&to=" . $toLanguage . "&from=" . $fromLanguage;
+            $params       = 'text=' . urlencode($inputStr) . '&to=' . $toLanguage . '&from=' . $fromLanguage;
             $translateUrl = "http://api.microsofttranslator.com/v2/Http.svc/Translate?$params";
 
             //Get the curlResponse.
@@ -113,8 +113,8 @@ class microsoftProposalTool extends translaterProposalTool
 
             //Interprets a string of XML into an object.
             $xmlObj = simplexml_load_string($curlResponse);
-            foreach((array)$xmlObj[0] as $val){
-               $translatedStr = $val;
+            foreach ((array) $xmlObj[0] as $val) {
+                $translatedStr = $val;
             }
 
             return (string) $translatedStr;
@@ -148,40 +148,42 @@ class microsoftProposalTool extends translaterProposalTool
             //Initialize the Curl Session.
             $ch = curl_init();
             //Create the request Array.
-            $paramArr = array (
-                 'grant_type'    => $grantType,
-                 'scope'         => $scopeUrl,
-                 'client_id'     => $clientID,
-                 'client_secret' => $clientSecret
-            );
+            $paramArr = [
+                'grant_type'    => $grantType,
+                'scope'         => $scopeUrl,
+                'client_id'     => $clientID,
+                'client_secret' => $clientSecret
+            ];
             //Create an Http Query.//
             $paramArr = http_build_query($paramArr);
             //Set the Curl URL.
             curl_setopt($ch, CURLOPT_URL, $authUrl);
             //Set HTTP POST Request.
-            curl_setopt($ch, CURLOPT_POST, TRUE);
+            curl_setopt($ch, CURLOPT_POST, true);
             //Set data to POST in HTTP "POST" Operation.
             curl_setopt($ch, CURLOPT_POSTFIELDS, $paramArr);
             //CURLOPT_RETURNTRANSFER- TRUE to return the transfer as a string of the return value of curl_exec().
-            curl_setopt ($ch, CURLOPT_RETURNTRANSFER, TRUE);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             //CURLOPT_SSL_VERIFYPEER- Set FALSE to stop cURL from verifying the peer's certificate.
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             //Execute the  cURL session.
             $strResponse = curl_exec($ch);
             //Get the Error Code returned by Curl.
             $curlErrno = curl_errno($ch);
-            if($curlErrno) {
+            if ($curlErrno) {
                 $curlError = curl_error($ch);
                 curl_close($ch);
+
                 throw new Exception($curlError);
             }
             //Close the Curl Session.
             curl_close($ch);
             //Decode the returned JSON string.
             $objResponse = json_decode($strResponse);
-            if (@$objResponse->error){
+            if (@$objResponse->error) {
                 throw new Exception($objResponse->error_description);
             }
+
             return $objResponse->access_token;
         } catch (Exception $e) {
             throw $e;
@@ -198,17 +200,18 @@ class microsoftProposalTool extends translaterProposalTool
      * @return string.
      *
      */
-    private function curlRequest($url, $authHeader) {
+    private function curlRequest($url, $authHeader)
+    {
         //Initialize the Curl Session.
         $ch = curl_init();
         //Set the Curl url.
-        curl_setopt ($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_URL, $url);
         //Set the HTTP HEADER Fields.
-        curl_setopt ($ch, CURLOPT_HTTPHEADER, array($authHeader,"Content-Type: text/xml"));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [$authHeader,'Content-Type: text/xml']);
         //CURLOPT_RETURNTRANSFER- TRUE to return the transfer as a string of the return value of curl_exec().
-        curl_setopt ($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         //CURLOPT_SSL_VERIFYPEER- Set FALSE to stop cURL from verifying the peer's certificate.
-        curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, False);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         //Execute the  cURL session.
         $curlResponse = curl_exec($ch);
         //Get the Error Code returned by Curl.
@@ -216,10 +219,12 @@ class microsoftProposalTool extends translaterProposalTool
         if ($curlErrno) {
             $curlError = curl_error($ch);
             curl_close($ch);
+
             throw new Exception($curlError);
         }
         //Close a cURL session.
         curl_close($ch);
+
         return $curlResponse;
     }
 }

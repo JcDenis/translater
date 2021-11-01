@@ -1,16 +1,15 @@
 <?php
 /**
  * @brief translater, a plugin for Dotclear 2
- * 
+ *
  * @package Dotclear
  * @subpackage Plugin
- * 
+ *
  * @author Jean-Christian Denis & contributors
- * 
+ *
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 if (!defined('DC_CONTEXT_ADMIN')) {
     return;
 }
@@ -40,20 +39,20 @@ class dcTranslaterModule
         $this->translater = $translater;
         $this->prop       = $module;
 
-        $this->prop['root'] = path::real($this->prop['root']);
-        $i = path::info($this->prop['root']);
+        $this->prop['root']     = path::real($this->prop['root']);
+        $i                      = path::info($this->prop['root']);
         $this->prop['basename'] = $i['basename'];
-        $this->prop['locales'] = $this->prop['root'] . '/locales';
+        $this->prop['locales']  = $this->prop['root'] . '/locales';
     }
 
     /**
      * Get a module property
-     * 
+     *
      * @param  string $key The module property key
      * @return mixed       The module property value or null
      */
     public function get(string $key)
-    {  
+    {
         return array_key_exists($key, $this->prop) ? $this->prop[$key] : null;
     }
 
@@ -69,18 +68,19 @@ class dcTranslaterModule
     //@{
     /**
      * Find backup folder of a module
-     * 
+     *
      * @param  boolean $throw Silently failed
      * @return mixed          The backup folder directory or false
      */
     public function getBackupRoot(bool $throw = false)
     {
         $dir = false;
-        switch($this->translater->backup_folder) {
+        switch ($this->translater->backup_folder) {
             case 'module':
                 if ($this->prop['root_writable']) {
                     $dir = $this->prop['locales'];
                 }
+
             break;
 
             case 'plugin':
@@ -88,6 +88,7 @@ class dcTranslaterModule
                 if ($tmp && is_writable($tmp)) {
                     $dir = $tmp;
                 }
+
             break;
 
             case 'public':
@@ -95,6 +96,7 @@ class dcTranslaterModule
                 if ($tmp && is_writable($tmp)) {
                     $dir = $tmp;
                 }
+
             break;
 
             case 'cache':
@@ -103,6 +105,7 @@ class dcTranslaterModule
                     @mkDir($tmp . '/l10n');
                     $dir = $tmp . '/l10n';
                 }
+
             break;
 
             case 'translater':
@@ -111,11 +114,13 @@ class dcTranslaterModule
                 @mkDir($tmp . '/locales');
                 $dir = $tmp . '/locales';
             }
+
             break;
         }
         if (!$dir && $throw) {
             throw new Exception(sprintf(
-                __('Failed to find backups folder for module %s'), $id
+                __('Failed to find backups folder for module %s'),
+                $id
             ));
         }
 
@@ -124,7 +129,7 @@ class dcTranslaterModule
 
     /**
      * Get a list of available backups
-     * 
+     *
      * @param  boolean $return_filename Return only filenames
      * @return array                    The module backups info
      */
@@ -135,13 +140,13 @@ class dcTranslaterModule
             return [];
         }
 
-        $res = [];
+        $res   = [];
         $files = dcTranslater::scandir($backup);
-        foreach($files AS $file) {
+        foreach ($files as $file) {
             $is_backup = preg_match(sprintf($this->backup_file_regexp, preg_quote($this->prop['id'])), $file, $m);
 
-            if (is_dir($backup . '/' . $file) 
-                || !$is_backup 
+            if (is_dir($backup . '/' . $file)
+                || !$is_backup
                 || !l10n::isCode($m[1])
             ) {
                 continue;
@@ -158,12 +163,13 @@ class dcTranslaterModule
                 $res[$m[1]][$file]['module'] = $this->prop['id'];
             }
         }
+
         return $res;
     }
 
     /**
      * Create a backup
-     * 
+     *
      * @param  string $lang The backup lang
      * @return boolean      True on success
      */
@@ -173,18 +179,18 @@ class dcTranslaterModule
 
         if (!is_dir($this->prop['locales'] . '/' . $lang)) {
             throw new Exception(sprintf(
-                __('Failed to find language %s'), $lang
+                __('Failed to find language %s'),
+                $lang
             ));
         }
 
-        $res = [];
+        $res   = [];
         $files = dcTranslater::scandir($this->prop['locales'] . '/' . $lang);
-        foreach($files as $file) {
-            if (!is_dir($this->prop['locales'] . '/' . $lang . '/' . $file) 
+        foreach ($files as $file) {
+            if (!is_dir($this->prop['locales'] . '/' . $lang . '/' . $file)
                 && (dcTranslater::isLangphpFile($file) || dcTranslater::isPoFile($file))
             ) {
-                $res[$this->prop['locales'] . '/' . $lang . '/' .$file] = 
-                    $this->prop['id'] . '/locales/' . $lang . '/' . $file;
+                $res[$this->prop['locales'] . '/' . $lang . '/' . $file] = $this->prop['id'] . '/locales/' . $lang . '/' . $file;
             }
         }
 
@@ -192,9 +198,9 @@ class dcTranslaterModule
             dcTranslater::isBackupLimit($backup, $this->translater->backup_limit, true);
 
             @set_time_limit(300);
-            $fp = fopen($backup . '/l10n-' . $this->prop['id'] . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
+            $fp  = fopen($backup . '/l10n-' . $this->prop['id'] . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
             $zip = new fileZip($fp);
-            foreach($res AS $from => $to) {
+            foreach ($res as $from => $to) {
                 $zip->addFile($from, $to);
             }
             $zip->write();
@@ -207,7 +213,7 @@ class dcTranslaterModule
 
     /**
      * Retore a backup
-     * 
+     *
      * @param  string $file   The backup filename
      * @return boolean        True on success
      */
@@ -217,14 +223,15 @@ class dcTranslaterModule
 
         if (!file_exists($backup . '/' . $file)) {
             throw new Exception(sprintf(
-                __('Failed to find file %s'), $file
+                __('Failed to find file %s'),
+                $file
             ));
         }
 
-        $zip = new fileUnzip($backup . '/' . $file);
+        $zip       = new fileUnzip($backup . '/' . $file);
         $zip_files = $zip->getFilesList();
 
-        foreach($zip_files AS $zip_file) {
+        foreach ($zip_files as $zip_file) {
             $f = $this->parseZipFilename($zip_file, true);
             $zip->unzip($zip_file, $this->prop['locales'] . '/' . $f['lang'] . '/' . $f['group'] . $f['ext']);
             $done = true;
@@ -237,7 +244,7 @@ class dcTranslaterModule
 
     /**
      * Delete a module backup
-     * 
+     *
      * @param  string $file The backup filename
      * @return boolean       True on success
      */
@@ -247,8 +254,8 @@ class dcTranslaterModule
 
         $is_backup = preg_match(sprintf($this->backup_file_regexp, preg_quote($this->prop['id'])), $file, $m);
 
-        if (!file_exists($backup . '/' . $file) 
-            || !$is_backup 
+        if (!file_exists($backup . '/' . $file)
+            || !$is_backup
             || !l10n::isCode($m[1])
         ) {
             return false;
@@ -256,7 +263,8 @@ class dcTranslaterModule
 
         if (!files::isDeletable($backup . '/' . $file)) {
             throw new Exception(sprintf(
-                __('Failed to delete file %s'), $file
+                __('Failed to delete file %s'),
+                $file
             ));
         }
 
@@ -267,7 +275,7 @@ class dcTranslaterModule
 
     /**
      * Import a language pack
-     * 
+     *
      * @param  array $zip_file The uploaded file info
      * @return boolean         True on success
      */
@@ -275,27 +283,28 @@ class dcTranslaterModule
     {
         files::uploadStatus($zip_file);
 
-        $imported = false;
+        $imported       = false;
         $not_overwrited = [];
-        $res = [];
+        $res            = [];
 
         # Load Unzip object
-        $zip = new fileUnzip($zip_file['tmp_name']);
+        $zip   = new fileUnzip($zip_file['tmp_name']);
         $files = $zip->getFilesList();
 
-        foreach($files as $file) {
+        foreach ($files as $file) {
             $f = $this->parseZipFilename($file, true);
 
-            if (!$this->translater->import_overwrite 
+            if (!$this->translater->import_overwrite
                 && file_exists($this->prop['locales'] . '/' . $f['lang'] . '/' . $f['group'] . $f['ext'])
             ) {
                 $not_overwrited[] = implode('-', [$f['lang'], $f['group'], $f['ext']]);
+
                 continue;
             }
 
             $res[] = [
-                'from' => $file, 
-                'root' => $this->prop['locales'] . '/' . $f['lang'], 
+                'from' => $file,
+                'root' => $this->prop['locales'] . '/' . $f['lang'],
                 'to'   => $this->prop['locales'] . '/' . $f['lang'] . '/' . $f['group'] . $f['ext']
             ];
         }
@@ -313,19 +322,22 @@ class dcTranslaterModule
 
         if (!empty($not_overwrited)) {
             throw new Exception(sprintf(
-                __('Some languages has not been overwrited %s'), implode(', ', $not_overwrited)
+                __('Some languages has not been overwrited %s'),
+                implode(', ', $not_overwrited)
             ));
         } elseif (!$done) {
             throw new Exception(sprintf(
-                __('Nothing to import from %s'), $zip_file['name']
+                __('Nothing to import from %s'),
+                $zip_file['name']
             ));
         }
+
         return true;
     }
 
     /**
      * Export (to output) language pack
-     * 
+     *
      * @param  array $langs     Langs to export
      */
     public function exportPack(array $langs)
@@ -344,23 +356,21 @@ class dcTranslaterModule
         }
 
         $res = [];
-        foreach($langs AS $lang) {
+        foreach ($langs as $lang) {
             if (!is_dir($this->prop['locales'] . '/' . $lang)) {
                 continue;
             }
 
             $files = dcTranslater::scandir($this->prop['locales'] . '/' . $lang);
-            foreach($files as $file) {
-
-                if (is_dir($this->prop['locales'] . '/' . $lang . '/' . $file) 
-                    || !dcTranslater::isLangphpFile($file) 
+            foreach ($files as $file) {
+                if (is_dir($this->prop['locales'] . '/' . $lang . '/' . $file)
+                    || !dcTranslater::isLangphpFile($file)
                     && !dcTranslater::isPoFile($file)
                 ) {
                     continue;
                 }
 
-                $res[$this->prop['locales'] . '/' . $lang . '/' . $file] = 
-                    $this->prop['id'] . '/locales/' . $lang . '/' . $file;
+                $res[$this->prop['locales'] . '/' . $lang . '/' . $file] = $this->prop['id'] . '/locales/' . $lang . '/' . $file;
             }
         }
 
@@ -371,9 +381,9 @@ class dcTranslaterModule
         }
 
         @set_time_limit(300);
-        $fp = fopen('php://output', 'wb');
+        $fp  = fopen('php://output', 'wb');
         $zip = new fileZip($fp);
-        foreach($res as $from => $to) {
+        foreach ($res as $from => $to) {
             $zip->addFile($from, $to);
         }
 
@@ -392,7 +402,7 @@ class dcTranslaterModule
 
     /**
      * Parse zip filename to module, lang info
-     * 
+     *
      * @param  string  $file  The zip filename
      * @param  boolean $throw Silently failed
      * @return mixed          Array of file info
@@ -403,19 +413,22 @@ class dcTranslaterModule
 
         if ($is_file) {
             $module = $f[1] == $this->prop['id'] ?$f[1] : false;
-            $lang = l10n::isCode($f[2]) ? $f[2] : false;
-            $group = in_array($f[3], dctranslater::$allowed_l10n_groups) ? $f[3] : false;
-            $ext = dctranslater::isLangphpFile($f[4]) || dctranslater::isPoFile($f[4]) ? $f[4] : false;
+            $lang   = l10n::isCode($f[2]) ? $f[2] : false;
+            $group  = in_array($f[3], dctranslater::$allowed_l10n_groups) ? $f[3] : false;
+            $ext    = dctranslater::isLangphpFile($f[4]) || dctranslater::isPoFile($f[4]) ? $f[4] : false;
         }
 
         if (!$is_file || !$module || !$lang || !$group || !$ext) {
             if ($throw) {
                 throw new Exception(sprintf(
-                    __('Zip file %s is not in translater format'), $file
+                    __('Zip file %s is not in translater format'),
+                    $file
                 ));
             }
+
             return [];
         }
+
         return [
             'module' => $module,
             'lang'   => $lang,
@@ -429,7 +442,7 @@ class dcTranslaterModule
     //@{
     /**
      * List available langs of a module
-     * 
+     *
      * @param  boolean $return_path Return path or name
      * @return array                The lang list
      */
@@ -440,7 +453,7 @@ class dcTranslaterModule
         $prefix = preg_match('/(locales(.*))$/', $this->prop['locales']) ? 'locales' : '';
 
         $files = dcTranslater::scandir($this->prop['locales']);
-        foreach($files as $file) {
+        foreach ($files as $file) {
             if (!preg_match('/.*?locales\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
                 continue;
             }
@@ -455,12 +468,13 @@ class dcTranslaterModule
                 $res[$m[1]] = l10n::getLanguageName($m[1]); // Lang name
             }
         }
+
         return $res;
     }
 
     /**
      * List of used langs of a module
-     * 
+     *
      * @return array The list of iso names and codes
      */
     public function getUsedLangs()
@@ -470,7 +484,7 @@ class dcTranslaterModule
 
     /**
      * List of unsused langs of a module
-     * 
+     *
      * @return array The list of iso names and codes
      */
     public function getUnusedLangs()
@@ -480,7 +494,7 @@ class dcTranslaterModule
 
     /**
      * Add a lang to a module
-     * 
+     *
      * @param string $lang      The lang id
      * @param string $from_lang The lang to copy from
      * @return boolean          True on success
@@ -489,14 +503,16 @@ class dcTranslaterModule
     {
         if (!l10n::isCode($lang)) {
             throw new Exception(sprintf(
-                __('Unknow language %s'), $lang
+                __('Unknow language %s'),
+                $lang
             ));
         }
 
         $langs = $this->getLangs();
         if (isset($langs[$lang])) {
             throw new Exception(sprintf(
-                __('Language %s already exists'), $lang
+                __('Language %s already exists'),
+                $lang
             ));
         }
 
@@ -504,21 +520,23 @@ class dcTranslaterModule
 
         if (!empty($from_lang) && !isset($langs[$from_lang])) {
             throw new Exception(sprintf(
-                __('Failed to copy file from language %s'), $from_lang
+                __('Failed to copy file from language %s'),
+                $from_lang
             ));
         }
 
         if (!empty($from_lang) && isset($langs[$from_lang])) {
             $files = dcTranslater::scandir($this->prop['locales'] . '/' . $from_lang);
-            foreach($files as $file) {
-                if (is_dir($this->prop['locales'] . '/' . $from_lang . '/' . $file) 
-                    || !dcTranslater::isLangphpFile($file) 
+            foreach ($files as $file) {
+                if (is_dir($this->prop['locales'] . '/' . $from_lang . '/' . $file)
+                    || !dcTranslater::isLangphpFile($file)
                     && !dcTranslater::isPoFile($file)
                 ) {
                     continue;
                 }
 
-                files::putContent($this->prop['locales'] . '/' . $lang . '/' . $file,
+                files::putContent(
+                    $this->prop['locales'] . '/' . $lang . '/' . $file,
                     file_get_contents($this->prop['locales'] . '/' . $from_lang . '/' . $file)
                 );
             }
@@ -530,7 +548,7 @@ class dcTranslaterModule
 
     /**
      * Update an existing lang
-     * 
+     *
      * @param  string $lang   The lang
      * @param  array $msgs    The messages
      */
@@ -538,14 +556,16 @@ class dcTranslaterModule
     {
         if (!l10n::isCode($lang)) {
             throw new Exception(sprintf(
-                __('Unknow language %s'), $lang
+                __('Unknow language %s'),
+                $lang
             ));
         }
 
         $langs = $this->getLangs();
         if (!isset($langs[$lang])) {
             throw new Exception(sprintf(
-                __('Failed to find language %s'), $lang
+                __('Failed to find language %s'),
+                $lang
             ));
         }
 
@@ -554,19 +574,19 @@ class dcTranslaterModule
         }
 
         $rs = [];
-        foreach($msgs as $msg) {
+        foreach ($msgs as $msg) {
             if (empty($msg['msgstr'][0])) {
                 continue;
             }
             $rs[$msg['group']][] = $msg;
         }
 
-        foreach(dcTranslater::$allowed_l10n_groups as $group) {
+        foreach (dcTranslater::$allowed_l10n_groups as $group) {
             if (isset($rs[$group])) {
                 continue;
             }
 
-            $po_file = $this->prop['locales'] . '/' . $lang . '/' . $group . '.po';
+            $po_file      = $this->prop['locales'] . '/' . $lang . '/' . $group . '.po';
             $langphp_file = $this->prop['locales'] . '/' . $lang . '/' . $group . '.lang.php';
 
             if (file_exists($po_file)) {
@@ -579,11 +599,12 @@ class dcTranslaterModule
 
         if (empty($rs)) {
             throw new Exception(sprintf(
-                __('No string to write, language %s deleted'), $lang
+                __('No string to write, language %s deleted'),
+                $lang
             ));
         }
 
-        foreach($rs as $group => $msgs) {
+        foreach ($rs as $group => $msgs) {
             $this->setPoContent($lang, $group, $msgs);
             $this->setLangphpContent($lang, $group, $msgs);
         }
@@ -591,7 +612,7 @@ class dcTranslaterModule
 
     /**
      * Delete a lang
-     * 
+     *
      * @param  string  $lang          The lang code
      * @param  boolean $del_empty_dir Also remove empty locales dir
      * @return boolean                True on success
@@ -601,18 +622,20 @@ class dcTranslaterModule
         # Path is right formed
         if (!l10n::isCode($lang)) {
             throw new Exception(sprintf(
-                __('Unknow language %s'), $lang
+                __('Unknow language %s'),
+                $lang
             ));
         }
 
         $files = $this->getLangs(true);
         if (!isset($files[$lang])) {
             throw new Exception(sprintf(
-                __('Failed to find language %s'), $lang
+                __('Failed to find language %s'),
+                $lang
             ));
         }
 
-        foreach($files[$lang] as $file) {
+        foreach ($files[$lang] as $file) {
             unlink($this->prop['locales'] . '/' . $file);
         }
 
@@ -625,12 +648,13 @@ class dcTranslaterModule
         if (empty($loc)) {
             rmdir($this->prop['locales']);
         }
+
         return true;
     }
 
     /**
      * Construct and parse a .po file
-     * 
+     *
      * @param string $lang   The lang code
      * @param string $group  The lang group
      * @param array $msgs    The strings
@@ -641,14 +665,13 @@ class dcTranslaterModule
 
         $content = '';
         if ($this->translater->parse_comment) {
-            $content .= 
-            '# Language: ' . $lang->name . "\n" .
-            '# Module: ' . $this->id . " - " . $this->version . "\n" .
+            $content .= '# Language: ' . $lang->name . "\n" .
+            '# Module: ' . $this->id . ' - ' . $this->version . "\n" .
             '# Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
 
             if ($this->translater->parse_user && $this->translater->parse_userinfo != '') {
                 $search = dctranslater::$allowed_user_informations;
-                foreach($search AS $n) {
+                foreach ($search as $n) {
                     $replace[] = $this->core->auth->getInfo('user_' . $n);
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
@@ -656,11 +679,9 @@ class dcTranslaterModule
                     $content .= '# Author: ' . html::escapeHTML($info) . "\n";
                 }
             }
-            $content .= 
-            '# Translated with translater ' . $this->core->plugins->moduleInfo('translater', 'version') . "\n\n";
+            $content .= '# Translated with translater ' . $this->core->plugins->moduleInfo('translater', 'version') . "\n\n";
         }
-        $content .= 
-        "msgid \"\"\n" .
+        $content .= "msgid \"\"\n" .
         "msgstr \"\"\n" .
         '"Content-Type: text/plain; charset=UTF-8\n"' . "\n" .
         '"Project-Id-Version: ' . $this->id . ' ' . $this->version . '\n"' . "\n" .
@@ -675,14 +696,13 @@ class dcTranslaterModule
         $comments = [];
         if ($this->translater->parse_comment) {
             $msgids = $lang->getMsgids();
-            foreach($msgids as $msg) {
-                $comments[$msg['msgid']] = (isset($comments[$msg['msgid']]) ?
-                    $comments[$msg['msgid']] : '') .
-                    '#: '.trim($msg['file'],'/') . ':' . $msg['line'] . "\n";
+            foreach ($msgids as $msg) {
+                $comments[$msg['msgid']] = ($comments[$msg['msgid']] ?? '') .
+                    '#: ' . trim($msg['file'], '/') . ':' . $msg['line'] . "\n";
             }
         }
 
-        foreach($msgs as $msg) {
+        foreach ($msgs as $msg) {
             if (empty($msg['msgstr'][0])) {
                 continue;
             }
@@ -694,7 +714,7 @@ class dcTranslaterModule
                 $content .= 'msgstr "' . dcTranslater::poString($msg['msgstr'][0], true) . '"' . "\n";
             } else {
                 $content .= 'msgid_plural "' . dcTranslater::poString($msg['msgid_plural'], true) . '"' . "\n";
-                foreach($msg['msgstr'] as $i => $plural) {
+                foreach ($msg['msgstr'] as $i => $plural) {
                     $content .= 'msgstr[' . $i . '] "' . dcTranslater::poString(($msg['msgstr'][$i] ?: ''), true) . '"' . "\n";
                 }
             }
@@ -703,23 +723,25 @@ class dcTranslaterModule
 
         $file = $this->locales . '/' . $lang->code . '/' . $group . '.po';
         $path = path::info($file);
-        if (is_dir($path['dirname']) && !is_writable($path['dirname']) 
+        if (is_dir($path['dirname']) && !is_writable($path['dirname'])
          || file_exists($file) && !is_writable($file)) {
             throw new Exception(sprintf(
-                __('Failed to grant write acces on file %s'), $file
+                __('Failed to grant write acces on file %s'),
+                $file
             ));
         }
 
         if (!($f = @files::putContent($file, $content))) {
             throw new Exception(sprintf(
-                __('Failed to write file %s'), $file
+                __('Failed to write file %s'),
+                $file
             ));
         }
     }
 
     /**
      * Construct and write a .lang.php file
-     * 
+     *
      * @param string $lang   The lang code
      * @param string $group  The lang group
      * @param array $msgs    The strings
@@ -734,23 +756,21 @@ class dcTranslaterModule
 
         $content = '';
         if ($this->translater->parse_comment) {
-            $content .= 
-            '// Language: ' . $lang->name . "\n" .
-            '// Module: ' . $this->id . " - " . $this->verison . "\n" .
+            $content .= '// Language: ' . $lang->name . "\n" .
+            '// Module: ' . $this->id . ' - ' . $this->verison . "\n" .
             '// Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
 
             if ($this->translater->parse_user && !empty($this->translater->parse_userinfo)) {
                 $search = dcTranslater::$allowed_user_informations;
-                foreach($search as $n) {
+                foreach ($search as $n) {
                     $replace[] = $this->core->auth->getInfo('user_' . $n);
-                }               
-                $info = trim(str_replace($search, $replace,$this->translater->parse_userinfo));
+                }
+                $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
                     $content .= '// Author: ' . html::escapeHTML($info) . "\n";
                 }
             }
-            $content .= 
-            '// Translated with dcTranslater - ' . $this->core->plugins->moduleInfo('translater', 'version') . "\n\n";
+            $content .= '// Translated with dcTranslater - ' . $this->core->plugins->moduleInfo('translater', 'version') . "\n\n";
         }
 
         l10n::generatePhpFileFromPo($this->locales . '/' . $lang->code . '/' . $group, $content);

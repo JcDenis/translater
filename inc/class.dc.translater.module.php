@@ -735,9 +735,9 @@ class dcTranslaterModule
         $content = '';
         if ($this->translater->parse_comment) {
             $content .= 
-            '// Language: ' . $lang->name . " \n" .
+            '// Language: ' . $lang->name . "\n" .
             '// Module: ' . $this->id . " - " . $this->verison . "\n" .
-            '// Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . " \n";
+            '// Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
 
             if ($this->translater->parse_user && !empty($this->translater->parse_userinfo)) {
                 $search = dcTranslater::$allowed_user_informations;
@@ -750,7 +750,7 @@ class dcTranslaterModule
                 }
             }
             $content .= 
-            '// Translated with dcTranslater - ' . $this->core->plugins->moduleInfo('translater', 'version') . " \n\n";
+            '// Translated with dcTranslater - ' . $this->core->plugins->moduleInfo('translater', 'version') . "\n\n";
         }
 
         l10n::generatePhpFileFromPo($this->locales . '/' . $lang->code . '/' . $group, $content);

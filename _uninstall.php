@@ -15,67 +15,67 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 }
 
 $this->addUserAction(
-    /* type */ 
+    /* type */
     'settings',
-    /* action */ 
+    /* action */
     'delete_all',
-    /* ns */ 
+    /* ns */
     'translater',
-    /* description */ 
+    /* description */
     __('delete all settings')
 );
 
 $this->addUserAction(
-    /* type */ 
+    /* type */
     'plugins',
-    /* action */ 
+    /* action */
     'delete',
-    /* ns */ 
+    /* ns */
     'translater',
-    /* description */ 
+    /* description */
     __('delete plugin files')
 );
 
 $this->addUserAction(
-    /* type */ 
+    /* type */
     'versions',
-    /* action */ 
+    /* action */
     'delete',
-    /* ns */ 
+    /* ns */
     'translater',
-    /* description */ 
+    /* description */
     __('delete the version number')
 );
 
 $this->addDirectAction(
-    /* type */ 
+    /* type */
     'settings',
-    /* action */ 
+    /* action */
     'delete_all',
-    /* ns */ 
+    /* ns */
     'translater',
-    /* description */ 
+    /* description */
     sprintf(__('delete all %s settings'), 'translater')
 );
 
 $this->addDirectAction(
-    /* type */ 
+    /* type */
     'plugins',
-    /* action */ 
+    /* action */
     'delete',
-    /* ns */ 
+    /* ns */
     'translater',
-    /* description */ 
+    /* description */
     sprintf(__('delete %s plugin files'), 'translater')
 );
 
 $this->addDirectAction(
-    /* type */ 
+    /* type */
     'versions',
-    /* action */ 
+    /* action */
     'delete',
-    /* ns */ 
+    /* ns */
     'translater',
-    /* description */ 
+    /* description */
     sprintf(__('delete %s version number'), 'translater')
 );

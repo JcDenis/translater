@@ -10,7 +10,6 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-
 /**
  * Translater proposal tool.
  *
@@ -80,7 +79,7 @@ abstract class translaterProposalTool
      */
     final protected function setActive($active)
     {
-        $this->active = (boolean) $active;
+        $this->active = (bool) $active;
     }
 
     /**

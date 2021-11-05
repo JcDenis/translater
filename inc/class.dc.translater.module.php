@@ -412,7 +412,7 @@ class dcTranslaterModule
         $is_file = preg_match('/^(.*?)\/locales\/(.*?)\/(.*?)(.po|.lang.php)$/', $file, $f);
 
         if ($is_file) {
-            $module = $f[1] == $this->prop['id'] ?$f[1] : false;
+            $module = $f[1] == $this->prop['id'] ? $f[1] : false;
             $lang   = l10n::isCode($f[2]) ? $f[2] : false;
             $group  = in_array($f[3], dctranslater::$allowed_l10n_groups) ? $f[3] : false;
             $ext    = dctranslater::isLangphpFile($f[4]) || dctranslater::isPoFile($f[4]) ? $f[4] : false;

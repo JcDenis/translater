@@ -1,7 +1,9 @@
-2021.09.25.1 - dev
+dev
 - [ ] help translation
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
+- sort modules by id
+- fix extra whitespace in exported files
 
 2021.09.28
 - Fix help (thx Pierre Van Glabeke)

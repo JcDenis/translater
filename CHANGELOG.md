@@ -2,8 +2,11 @@ dev
 - [ ] help translation
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
+
+2021.11.06
 - sort modules by id
 - fix extra whitespace in exported files
+- update to PSR12
 
 2021.09.28
 - Fix help (thx Pierre Van Glabeke)

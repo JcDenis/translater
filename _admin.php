@@ -31,18 +31,19 @@ $_menu['Plugins']->addItem(
 
 class translaterAdminBehaviors
 {
-    /** @var dcTranlsater dcTranslater instance */
+    /** @var dcTranslater dcTranslater instance */
     private static $translater = null;
 
     /**
      * Create instance of dcTranslater once
      *
-     * @param  dCore $core dcCore instance
-     * @return dctranslater       dcTranslater instance
+     * @param  dcCore $core     dcCore instance
+     *
+     * @return dcTranslater     dcTranslater instance
      */
-    private static function translater($core)
+    private static function translater(dcCore $core): dcTranslater
     {
-        if (!(self::$translater instanceof dcTranslater)) {
+        if (!is_a(self::$translater, 'dcTranslater')) {
             self::$translater = new dcTranslater($core, false);
         }
 
@@ -52,21 +53,22 @@ class translaterAdminBehaviors
     /**
      * Add button to go to module translation
      *
-     * @param  object $list     adminModulesList instance
-     * @param  string $id       Module id
-     * @param  arrray $prop     Module properties
-     * @return string           HTML submit button
+     * @param  adminModulesList     $list   adminModulesList instance
+     * @param  string               $id     Module id
+     * @param  array                $prop   Module properties
+     *
+     * @return string                       HTML submit button
      */
     public static function adminModulesGetActions(adminModulesList $list, string $id, array $prop): ?string
     {
         if ($list->getList() != $prop['type'] . '-activate'
-            || !self::translater($list->core)->getSetting($prop['type'] . '_menu')
+            || !self::translater($list->core)->{$prop['type'] . '_menu'}
             || !$list->core->auth->isSuperAdmin()
         ) {
             return null;
         }
-        if (self::translater($list->core)->getSetting('hide_default')
-            && in_array($id, dctranslater::$default_distrib_modules[$prop['type']])
+        if (self::translater($list->core)->hide_default
+            && in_array($id, dcTranslater::$default_distrib_modules[$prop['type']])
         ) {
             return null;
         }
@@ -84,10 +86,10 @@ class translaterAdminBehaviors
      * @param  array                $modules    Selected modules ids
      * @param  string               $type       List type (plugin|theme)
      */
-    public static function adminModulesDoActions(adminModulesList $list, array $modules, string $type)
+    public static function adminModulesDoActions(adminModulesList $list, array $modules, string $type): void
     {
         if (empty($_POST['translater']) || !is_array($_POST['translater'])) {
-            return null;
+            return;
         }
 
         $list->core->adminurl->redirect(
@@ -103,7 +105,7 @@ class translaterAdminBehaviors
      * @param  dcCore       $core   dcCore instance
      * @param  dcFavorites  $favs   dcFavorites instance
      */
-    public static function adminDashboardFavorites(dcCore $core, dcFavorites$favs)
+    public static function adminDashboardFavorites(dcCore $core, dcFavorites$favs): void
     {
         $favs->register('translater', [
             'title'       => __('Translater'),

@@ -18,9 +18,10 @@ $translater = new dcTranslater($core);
 
 if (!empty($_POST['save'])) {
     try {
-        foreach ($translater->getDefaultSettings() as $k => $v) {
-            $translater->setSetting($k, ($_POST[$k] ?? ''));
+        foreach ($translater->getDefaultSettings() as $key => $value) {
+            $translater->$key = $_POST[$key] ?? '';
         }
+        $translater->writeSettings();
         dcPage::addSuccessNotice(
             __('Configuration successfully updated.')
         );

@@ -14,119 +14,61 @@ if (!defined('DC_CONTEXT_ADMIN')) {
     return;
 }
 
+class dcTranslaterDefaultSettings
+{
+    /** @var boolean Show tranlsater button on plugins list */
+    public $plugin_menu = false;
+    /** @var boolean Show tranlsater button on themes list */
+    public $theme_menu = false;
+    /** @var boolean Create language backup on save */
+    public $backup_auto = false;
+    /** @var integer Backups number limit */
+    public $backup_limit = 20;
+    /** @var string Backup main folder */
+    public $backup_folder = 'module';
+    /** @var string Default ui start page */
+    public $start_page = '-';
+    /** @var boolean Write .lang.php file (deprecated) */
+    public $write_langphp = false;
+    /** @var boolean SCan also template files for translations */
+    public $scan_tpl = true;
+    /** @var boolean Disable translation of know dotclear strings */
+    public $parse_nodc = true;
+    /** @var boolean Hide official modules */
+    public $hide_default = true;
+    /** @var boolean Add comment to translations files */
+    public $parse_comment = false;
+    /** @var boolean Parse user info to translations files */
+    public $parse_user = false;
+    /** @var string User infos to parse */
+    public $parse_userinfo = 'displayname, email';
+    /** @var boolean Overwrite existing languages on import */
+    public $import_overwrite = false;
+    /** @var string Filename of exported lang */
+    public $export_filename = 'type-module-l10n-timestamp';
+    /** @var string Default service for external proposal tool */
+    public $proposal_tool = 'google';
+    /** @var string Default lang for external proposal tool */
+    public $proposal_lang = 'en';
+
+    /**
+     * get default settings
+     *
+     * @return array Settings key/value pair
+     */
+    public static function getDefaultSettings()
+    {
+        return get_class_vars('dcTranslaterDefaultSettings');
+    }
+}
+
 /**
  * Translater tools.
  */
-class dcTranslater
+class dcTranslater extends dcTranslaterDefaultSettings
 {
-    /** @var dCore dcCore instance */
+    /** @var dcCore dcCore instance */
     public $core;
-
-    /** @var array $default_settings Plugins default settings */
-    private static $default_settings = [
-        'plugin_menu' => [
-            'id'    => 'translater_plugin_menu',
-            'value' => 0,
-            'type'  => 'boolean',
-            'label' => 'Put an link in plugins page'
-        ],
-        'theme_menu' => [
-            'id'    => 'translater_theme_menu',
-            'value' => 0,
-            'type'  => 'boolean',
-            'label' => 'Put a link in themes page'
-        ],
-        'backup_auto' => [
-            'id'    => 'translater_backup_auto',
-            'value' => 1,
-            'type'  => 'boolean',
-            'label' => 'Make a backup of languages old files when there are modified'
-        ],
-        'backup_limit' => [
-            'id'    => 'translater_backup_limit',
-            'value' => 20,
-            'type'  => 'string',
-            'label' => 'Maximum backups per module'
-        ],
-        'backup_folder' => [
-            'id'    => 'translater_backup_folder',
-            'value' => 'module',
-            'type'  => 'string',
-            'label' => 'In which folder to store backups'
-        ],
-        'start_page' => [
-            'id'    => 'translater_start_page',
-            'value' => '-',
-            'type'  => 'string',
-            'label' => 'Page to start on'
-        ],
-        'write_langphp' => [
-            'id'    => 'translater_write_langphp',
-            'value' => 0,
-            'type'  => 'boolean',
-            'label' => 'Write .lang.php languages files'
-        ],
-        'scan_tpl' => [
-            'id'    => 'translater_scan_tpl',
-            'value' => 1,
-            'type'  => 'boolean',
-            'label' => 'Translate strings of templates files'
-        ],
-        'parse_nodc' => [
-            'id'    => 'translater_parse_nodc',
-            'value' => 1,
-            'type'  => 'boolean',
-            'label' => 'Translate only untranslated strings of Dotclear',
-        ],
-        'hide_default' => [
-            'id'    => 'translater_hide_default',
-            'value' => 1,
-            'type'  => 'boolean',
-            'label' => 'Hide default modules of Dotclear',
-        ],
-        'parse_comment' => [
-            'id'    => 'translater_parse_comment',
-            'value' => 0,
-            'type'  => 'boolean',
-            'label' => 'Write comments and strings informations in lang files'
-        ],
-        'parse_user' => [
-            'id'    => 'translater_parse_user',
-            'value' => 0,
-            'type'  => 'boolean',
-            'label' => 'Write inforamtions about author in lang files'
-        ],
-        'parse_userinfo' => [
-            'id'    => 'translater_parse_userinfo',
-            'value' => 'displayname, email',
-            'type'  => 'string',
-            'label' => 'Type of informations about user to write'
-        ],
-        'import_overwrite' => [
-            'id'    => 'translater_import_overwrite',
-            'value' => 0,
-            'type'  => 'boolean',
-            'label' => 'Overwrite existing languages when import packages'
-        ],
-        'export_filename' => [
-            'id'    => 'translater_export_filename',
-            'value' => 'type-module-l10n-timestamp',
-            'type'  => 'string',
-            'label' => 'Name of files of exported package'
-        ],
-        'proposal_tool' => [
-            'id'    => 'translater_proposal_tool',
-            'value' => 'google',
-            'type'  => 'string',
-            'label' => 'Id of default tool for proposed translation'
-        ],
-        'proposal_lang' => [
-            'id'    => 'translater_proposal_lang',
-            'value' => 'en',
-            'type'  => 'string',
-            'label' => 'Default source language for proposed translation'
-        ]
-    ];
 
     /** @var array $allowed_backup_folders List of allowed backup folder */
     public static $allowed_backup_folders = [];
@@ -151,12 +93,14 @@ class dcTranslater
      * translater instance
      *
      * @param dcCore $core  dcCore instance
-     * @param boolean $core Also load modules
+     * @param boolean $full Also load modules
      */
     public function __construct(dcCore $core, bool $full = true)
     {
         $this->core = $core;
         $core->blog->settings->addNamespace('translater');
+
+        $this->loadSettings();
 
         if ($full) {
             $this->loadModules();
@@ -178,61 +122,31 @@ class dcTranslater
     /// @name settings methods
     //@{
     /**
-     * Get array of default settings
-     *
-     * @return array All default settings
+     * Load settings from db
      */
-    public function getDefaultSettings(): array
+    public function loadSettings(): void
     {
-        return self::$default_settings;
-    }
+        foreach ($this->getDefaultSettings() as $key => $value) {
+            $this->$key = $this->core->blog->settings->translater->get('translater_' . $key);
 
-    /**
-     * Get a setting according to default settings list
-     *
-     * @param  string $id The settings short id
-     * @return mixed     The setting value if exists or null
-     */
-    public function getSetting(string $id)
-    {
-        return array_key_exists($id, self::$default_settings) ?
-            $this->core->blog->settings->translater->get(self::$default_settings[$id]['id']) : '';
-    }
-
-    /**
-     * Magic getSetting
-     */
-    public function __get($id)
-    {
-        return $this->getSetting($id);
-    }
-
-    /**
-     * Set a setting according to default settings list
-     *
-     * @param string $id        The setting short id
-     * @param mixed  $value     The setting value
-     * @param mixed  $overwrite Overwrite settings if exists
-     * @return boolean          Success
-     */
-    public function setSetting(string $id, $value, $overwrite = true): bool
-    {
-        if (!array_key_exists($id, self::$default_settings)) {
-            return false;
+            try {
+                settype($this->$key, gettype($value));
+            } catch (Exception $e) {
+            }
         }
-        $s = self::$default_settings[$id];
-        $this->core->blog->settings->translater->drop($s['id']);
-        $this->core->blog->settings->translater->put($s['id'], $value, $s['type'], $s['label'], $overwrite, true);
-
-        return true;
     }
 
     /**
-     * Magic setSetting
+     * Write settings to db
+     *
+     * @param  boolean $overwrite Overwrite existing settings
      */
-    public function __set($id, $value)
+    public function writeSettings($overwrite = true): void
     {
-        return $this->setSetting($id, $value);
+        foreach ($this->getDefaultSettings() as $key => $value) {
+            $this->core->blog->settings->translater->drop('translater_' . $key);
+            $this->core->blog->settings->translater->put('translater_' . $key, $this->$key, gettype($value), '', true, true);
+        }
     }
     //@}
 
@@ -241,7 +155,7 @@ class dcTranslater
     /**
      * Load array of modules infos by type of modules
      */
-    private function loadModules()
+    private function loadModules(): void
     {
         $this->modules['theme'] = $this->modules['plugin'] = [];
 
@@ -268,6 +182,7 @@ class dcTranslater
      * Return array of modules infos by type of modules
      *
      * @param  string $type The modules type
+     * 
      * @return array        The list of modules infos
      */
     public function getModules(string $type = ''): array
@@ -280,9 +195,10 @@ class dcTranslater
     /**
      * Return module class of a particular module for a given type of module
      *
-     * @param  string $type       The module type
-     * @param  string $id         The module id
-     * @return dcTranslaterModule The dcTranslaterModule instance
+     * @param  string   $type       The module type
+     * @param  string   $id         The module id
+     * 
+     * @return dcTranslaterModule   The dcTranslaterModule instance
      */
     public function getModule(string $type, string $id)
     {
@@ -290,8 +206,6 @@ class dcTranslater
             throw new Exception(
                 sprintf(__('Failed to find module %s'), $id)
             );
-
-            return false;
         }
 
         return $this->modules[$type][$id];
@@ -300,9 +214,10 @@ class dcTranslater
     /**
      * Return module class of a particular module for a given type of module
      *
-     * @param  string $module   dcTranslaterModule instance
-     * @param  string $lang     The lang iso code
-     * @return dcTranslaterLang dcTranslaterLang instance or false
+     * @param  dcTranslaterModule   $module     dcTranslaterModule instance
+     * @param  string               $lang       The lang iso code
+     * 
+     * @return dcTranslaterLang                 dcTranslaterLang instance or false
      */
     public function getLang(dcTranslaterModule $module, string $lang)
     {
@@ -310,8 +225,6 @@ class dcTranslater
             throw new Exception(
                 sprintf(__('Failed find language %s'), $lang)
             );
-
-            return false;
         }
 
         return new dcTranslaterLang($module, $lang);
@@ -330,8 +243,8 @@ class dcTranslater
      */
     public static function scandir(string $path, string $dir = '', array $res = []): array
     {
-        $path = path::real($path, false);
-        if (!is_dir($path) || !is_readable($path)) {
+        $path = (string) path::real($path, false);
+        if (empty($path) || !is_dir($path) || !is_readable($path)) {
             return [];
         }
 
@@ -409,12 +322,13 @@ class dcTranslater
     /**
      * Check limit number of backup for a module
      *
+     * @param  string  $id     The module id
      * @param  string  $root   The backups root
-     * @param  string  $limit  The backups limit
+     * @param  integer $limit  The backups limit
      * @param  boolean $throw  Silently failed
      * @return boolean         True if limit is riched
      */
-    public static function isBackupLimit(string $root, int $limit = 10, bool $throw = false): bool
+    public static function isBackupLimit(string $id, string $root, int $limit = 10, bool $throw = false): bool
     {
         $count = 0;
         foreach (self::scandir($root) as $file) {
@@ -429,7 +343,7 @@ class dcTranslater
         if ($count >= $limit) {
             if ($throw) {
                 throw new Exception(
-                    sprintf(__('Limit of %s backups for module %s exceed'), $this->backup_limit, $id)
+                    sprintf(__('Limit of %s backups for module %s exceed'), $limit, $id)
                 );
             }
 

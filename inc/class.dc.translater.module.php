@@ -195,7 +195,7 @@ class dcTranslaterModule
         }
 
         if (!empty($res)) {
-            dcTranslater::isBackupLimit($backup, $this->translater->backup_limit, true);
+            dcTranslater::isBackupLimit($this->prop['id'] , $backup, $this->translater->backup_limit, true);
 
             @set_time_limit(300);
             $fp  = fopen($backup . '/l10n-' . $this->prop['id'] . '-' . $lang . '-' . time() . '.bck.zip', 'wb');

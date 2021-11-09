@@ -20,10 +20,7 @@ try {
         return null;
     }
     $translater = new dcTranslater($core, false);
-    $settings   = $translater->getDefaultSettings();
-    foreach ($settings as $key => $setting) {
-        $translater->setSetting($key, $setting['value'], false);
-    }
+    $translater->writeSettings(false);
     $core->setVersion($id, $core->plugins->moduleInfo($id, 'version'));
 
     return true;

@@ -27,8 +27,8 @@ class microsoftProposalTool extends translaterProposalTool
     protected function setup()
     {
         $this->setActive(false);
-        $this->client = $this->core->blog->settings->translater->translater_microsoft_proposal_client;
-        $this->secret = $this->core->blog->settings->translater->translater_microsoft_proposal_secret;
+        $this->client = dcCore::app()->blog->settings->translater->translater_microsoft_proposal_client;
+        $this->secret = dcCore::app()->blog->settings->translater->translater_microsoft_proposal_secret;
 
         $this->setName(__('Bing'));
         $this->setDesc(__('Microsoft Bing translation tool'));
@@ -61,8 +61,8 @@ class microsoftProposalTool extends translaterProposalTool
         $secret = empty($_POST['translater_microsoft_proposal_secret']) ?
             '' : $_POST['translater_microsoft_proposal_secret'];
 
-        $this->core->blog->settings->translater->put('translater_microsoft_proposal_client', $client, 'string', '', true, true);
-        $this->core->blog->settings->translater->put('translater_microsoft_proposal_secret', $secret, 'string', '', true, true);
+        dcCore::app()->blog->settings->translater->put('translater_microsoft_proposal_client', $client, 'string', '', true, true);
+        dcCore::app()->blog->settings->translater->put('translater_microsoft_proposal_secret', $secret, 'string', '', true, true);
     }
 
     public function translate($str, $from, $to)
@@ -152,7 +152,7 @@ class microsoftProposalTool extends translaterProposalTool
                 'grant_type'    => $grantType,
                 'scope'         => $scopeUrl,
                 'client_id'     => $clientID,
-                'client_secret' => $clientSecret
+                'client_secret' => $clientSecret,
             ];
             //Create an Http Query.//
             $paramArr = http_build_query($paramArr);

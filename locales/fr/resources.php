@@ -15,5 +15,5 @@ if (!defined('DC_RC_PATH')) {
 }
 
 foreach (['index', 'type', 'module', 'lang', 'config'] as $v) {
-    $__resources['help']['translater.' . $v] = dirname(__FILE__) . '/help/translater.' . $v . '.html';
+    dcCore::app()->resources['help']['translater.' . $v] = __DIR__ . '/help/translater.' . $v . '.html';
 }

@@ -15,16 +15,12 @@
  */
 class translaterProposals
 {
-    public $core;
-
     private $stack = [];
 
-    public function __construct($core)
+    public function __construct()
     {
-        $this->core = $core;
-
         # --BEHAVIOR-- addTranslaterProposalTool
-        $core->callBehavior('addTranslaterProposalTool', $this);
+        dcCore::app()->callBehavior('addTranslaterProposalTool', $this);
     }
 
     public function addTool($id)
@@ -40,7 +36,7 @@ class translaterProposals
             return;
         }
 
-        $this->stack[$id] = new $id($this->core);
+        $this->stack[$id] = new $id();
     }
 
     public function getTools()

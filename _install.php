@@ -16,16 +16,16 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 $id = 'translater';
 
 try {
-    if (version_compare($core->getVersion($id), $core->plugins->moduleInfo($id, 'version'), '>=')) {
+    if (version_compare(dcCore::app()->getVersion($id), dcCore::app()->plugins->moduleInfo($id, 'version'), '>=')) {
         return null;
     }
-    $translater = new dcTranslater($core, false);
+    $translater = new dcTranslater(false);
     $translater->writeSettings(false);
-    $core->setVersion($id, $core->plugins->moduleInfo($id, 'version'));
+    dcCore::app()->setVersion($id, dcCore::app()->plugins->moduleInfo($id, 'version'));
 
     return true;
 } catch (Exception $e) {
-    $core->error->add($e->getMessage());
+    dcCore::app()->error->add($e->getMessage());
 }
 
 return false;

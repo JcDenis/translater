@@ -67,20 +67,17 @@ class dcTranslaterDefaultSettings
  */
 class dcTranslater extends dcTranslaterDefaultSettings
 {
-    /** @var dcCore dcCore instance */
-    public $core;
-
     /** @var array $allowed_backup_folders List of allowed backup folder */
     public static $allowed_backup_folders = [];
 
     /** @var array $allowed_l10n_groups List of place of tranlsations */
     public static $allowed_l10n_groups = [
-        'main', 'public', 'theme', 'admin', 'date', 'error'
+        'main', 'public', 'theme', 'admin', 'date', 'error',
     ];
 
     /** @var array $allowed_user_informations List of user info can be parsed */
     public static $allowed_user_informations = [
-        'firstname', 'displayname', 'name', 'email', 'url'
+        'firstname', 'displayname', 'name', 'email', 'url',
     ];
 
     /** @var array $default_distrib_modules List of distributed plugins and themes */
@@ -92,13 +89,11 @@ class dcTranslater extends dcTranslaterDefaultSettings
     /**
      * translater instance
      *
-     * @param dcCore $core  dcCore instance
      * @param boolean $full Also load modules
      */
-    public function __construct(dcCore $core, bool $full = true)
+    public function __construct(bool $full = true)
     {
-        $this->core = $core;
-        $core->blog->settings->addNamespace('translater');
+        dcCore::app()->blog->settings->addNamespace('translater');
 
         $this->loadSettings();
 
@@ -111,11 +106,11 @@ class dcTranslater extends dcTranslaterDefaultSettings
             __('plugins folder root')            => 'plugin',
             __('public folder root')             => 'public',
             __('cache folder of Dotclear')       => 'cache',
-            __('locales folder of translater')   => 'translater'
+            __('locales folder of translater')   => 'translater',
         ];
         self::$default_distrib_modules = [
             'plugin' => explode(',', DC_DISTRIB_PLUGINS),
-            'theme'  => explode(',', DC_DISTRIB_THEMES)
+            'theme'  => explode(',', DC_DISTRIB_THEMES),
         ];
     }
 
@@ -127,7 +122,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
     public function loadSettings(): void
     {
         foreach ($this->getDefaultSettings() as $key => $value) {
-            $this->$key = $this->core->blog->settings->translater->get('translater_' . $key);
+            $this->$key = dcCore::app()->blog->settings->translater->get('translater_' . $key);
 
             try {
                 settype($this->$key, gettype($value));
@@ -144,8 +139,8 @@ class dcTranslater extends dcTranslaterDefaultSettings
     public function writeSettings($overwrite = true): void
     {
         foreach ($this->getDefaultSettings() as $key => $value) {
-            $this->core->blog->settings->translater->drop('translater_' . $key);
-            $this->core->blog->settings->translater->put('translater_' . $key, $this->$key, gettype($value), '', true, true);
+            dcCore::app()->blog->settings->translater->drop('translater_' . $key);
+            dcCore::app()->blog->settings->translater->put('translater_' . $key, $this->$key, gettype($value), '', true, true);
         }
     }
     //@}
@@ -159,12 +154,12 @@ class dcTranslater extends dcTranslaterDefaultSettings
     {
         $this->modules['theme'] = $this->modules['plugin'] = [];
 
-        $themes = new dcThemes($this->core);
-        $themes->loadModules($this->core->blog->themes_path, null);
+        $themes = new dcThemes();
+        $themes->loadModules(dcCore::app()->blog->themes_path, null);
 
         $list = [
             'theme'  => $themes->getModules(),
-            'plugin' => $this->core->plugins->getModules()
+            'plugin' => dcCore::app()->plugins->getModules(),
         ];
         foreach ($list as $type => $modules) {
             foreach ($modules as $id => $info) {
@@ -182,7 +177,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
      * Return array of modules infos by type of modules
      *
      * @param  string $type The modules type
-     * 
+     *
      * @return array        The list of modules infos
      */
     public function getModules(string $type = ''): array
@@ -197,7 +192,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
      *
      * @param  string   $type       The module type
      * @param  string   $id         The module id
-     * 
+     *
      * @return dcTranslaterModule   The dcTranslaterModule instance
      */
     public function getModule(string $type, string $id)
@@ -216,7 +211,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
      *
      * @param  dcTranslaterModule   $module     dcTranslaterModule instance
      * @param  string               $lang       The lang iso code
-     * 
+     *
      * @return dcTranslaterLang                 dcTranslaterLang instance or false
      */
     public function getLang(dcTranslaterModule $module, string $lang)

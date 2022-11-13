@@ -16,7 +16,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 
 dcPage::checkSuper();
 
-$translater = new dcTranslater($core);
+$translater = new dcTranslater();
 
 $type   = $_REQUEST['type']   ?? $translater->start_page ?: '';
 $module = $_REQUEST['module'] ?? '';
@@ -31,7 +31,7 @@ if (!empty($type) && !empty($module)) {
     try {
         $module = $translater->getModule($type, $module);
     } catch (Exception $e) {
-        $core->error->add($e->getMessage());
+        dcCore::app()->error->add($e->getMessage());
         $module = '';
     }
 }
@@ -40,22 +40,22 @@ if (!empty($module) && !empty($lang)) {
     try {
         $lang = $translater->getLang($module, $lang);
     } catch (Exception $e) {
-        $core->error->add($e->getMessage());
+        dcCore::app()->error->add($e->getMessage());
         $lang = '';
     }
 }
 
-$breadcrumb = [__('Translater') => $core->adminurl->get('translater', ['type' => '-'])];
+$breadcrumb = [__('Translater') => dcCore::app()->adminurl->get('translater', ['type' => '-'])];
 if (empty($type)) {
     $breadcrumb = [__('Translater') => ''];
 } elseif (empty($module)) {
     $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')] = '';
 } elseif (empty($lang)) {
-    $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')] = $core->adminurl->get('translater', ['type' => $type]);
+    $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')] = dcCore::app()->adminurl->get('translater', ['type' => $type]);
     $breadcrumb[html::escapeHTML($module->name)]                  = '';
 } elseif (!empty($lang)) {
-    $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')]                  = $core->adminurl->get('translater', ['type' => $type]);
-    $breadcrumb[html::escapeHTML($module->name)]                                   = $core->adminurl->get('translater', ['type' => $type, 'module' => $module->id]);
+    $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')]                  = dcCore::app()->adminurl->get('translater', ['type' => $type]);
+    $breadcrumb[html::escapeHTML($module->name)]                                   = dcCore::app()->adminurl->get('translater', ['type' => $type, 'module' => $module->id]);
     $breadcrumb[html::escapeHTML(sprintf(__('%s language edition'), $lang->name))] = '';
 }
 
@@ -70,8 +70,8 @@ try {
                 $module->createBackup($code_id);
             }
         }
-        dcPage::addSuccessNotice(__('Backup successfully created'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcAdminNotices::addSuccessNotice(__('Backup successfully created'));
+        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_restore_backup') {
@@ -84,8 +84,8 @@ try {
                 $module->restoreBackup($backup_file);
             }
         }
-        dcPage::addSuccessNotice(__('Backup successfully restored'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcAdminNotices::addSuccessNotice(__('Backup successfully restored'));
+        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_delete_backup') {
@@ -98,8 +98,8 @@ try {
                 $module->deleteBackup($backup_file);
             }
         }
-        dcPage::addSuccessNotice(__('Backup successfully deleted'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcAdminNotices::addSuccessNotice(__('Backup successfully deleted'));
+        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_export_pack') {
@@ -108,8 +108,8 @@ try {
         }
         $module->exportPack($_POST['codes']);
 
-        dcPage::addSuccessNotice(__('Language successfully exported'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcAdminNotices::addSuccessNotice(__('Language successfully exported'));
+        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_import_pack') {
@@ -118,8 +118,8 @@ try {
         }
         $module->importPack($_FILES['packfile']);
 
-        dcPage::addSuccessNotice(__('Language successfully imported'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcAdminNotices::addSuccessNotice(__('Language successfully imported'));
+        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_add_code') {
@@ -128,8 +128,8 @@ try {
         }
         $module->addLang($_POST['code'], $_POST['from'] ?? '');
 
-        dcPage::addSuccessNotice(__('Language successfully added'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
+        dcAdminNotices::addSuccessNotice(__('Language successfully added'));
+        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
     }
 
     if ($action == 'module_delete_codes') {
@@ -142,8 +142,8 @@ try {
                 $module->delLang($code_id);
             }
         }
-        dcPage::addSuccessNotice(__('Language successfully deleted'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
+        dcAdminNotices::addSuccessNotice(__('Language successfully deleted'));
+        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
     }
 
     if ($action == 'module_update_code') {
@@ -159,26 +159,26 @@ try {
         }
         $module->updLang($_POST['code'], $_POST['entries']);
 
-        dcPage::addSuccessNotice(__('Language successfully updated'));
-        $core->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
+        dcAdminNotices::addSuccessNotice(__('Language successfully updated'));
+        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
     }
 } catch (Exception $e) {
-    $core->error->add($e->getMessage());
+    dcCore::app()->error->add($e->getMessage());
 }
 
 echo
 '<html><head><title>' . __('Translater') . '</title>' .
 dcPage::jsPageTabs() .
 dcPage::cssLoad(dcPage::getPF('translater/css/translater.css')) .
-dcpage::jsJson('translater', [
+dcPage::jsJson('translater', [
     'title_add_detail' => __('Use this text'),
     'image_field'      => dcPage::getPF('translater/img/field.png'),
-    'image_toggle'     => dcPage::getPF('translater/img/toggle.png')
+    'image_toggle'     => dcPage::getPF('translater/img/toggle.png'),
 ]) .
 dcPage::jsLoad(dcPage::getPF('translater/js/translater.js')) .
 
 # --BEHAVIOR-- translaterAdminHeaders
-$core->callBehavior('translaterAdminHeaders') .
+dcCore::app()->callBehavior('translaterAdminHeaders') .
 
 '</head><body>' .
 
@@ -187,7 +187,7 @@ dcPage::notices();
 
 if (empty($module) && $type != '') {
     // modules list
-    echo '<form id="theme-form" method="post" action="' . $core->adminurl->get('translater', ['type' => 'plugin']) . '">';
+    echo '<form id="theme-form" method="post" action="' . dcCore::app()->adminurl->get('translater', ['type' => 'plugin']) . '">';
 
     $res     = '';
     $modules = $translater->getModules($type);
@@ -199,7 +199,7 @@ if (empty($module) && $type != '') {
         if ($module->root_writable) {
             $res .= sprintf(
                 '<tr class="line"><td class="nowrap minimal"><a href="%s" title="%s">%s</a></td>',
-                $core->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id]),
+                dcCore::app()->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id]),
                 html::escapeHTML(sprintf(__('Translate module %s'), __($module->name))),
                 html::escapeHTML($module->id)
             );
@@ -215,7 +215,7 @@ if (empty($module) && $type != '') {
                 $codes[$code_id] = sprintf(
                     '<a class="wait maximal nowrap" title="%s" href="%s">%s (%s)</a>',
                     html::escapeHTML(sprintf(__('Edit language %s of module %s'), html::escapeHTML($code_name), __($module->name))),
-                    $core->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
+                    dcCore::app()->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
                     html::escapeHTML($code_name),
                     $code_id
                 );
@@ -267,7 +267,7 @@ if (empty($module) && $type != '') {
     if (count($codes)) {
         echo
         '<div class="clear fieldset"><h3>' . __('Translations') . '</h3>' .
-        '<form id="module-translations-form" method="post" action="' . $core->adminurl->get('translater') . '">' .
+        '<form id="module-translations-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '">' .
         '<table class="clear maximal">' .
         '<caption>' . __('Existing languages translations') . '</caption>' .
         '<tr>' .
@@ -283,12 +283,13 @@ if (empty($module) && $type != '') {
             '<td class="minimal">' . form::checkbox(['codes[]', 'existing_code_' . $code_id], $code_id, '', '', '', false) . '</td>' .
             '<td class="nowrap">' .
             '<a href="' .
-                $core->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id])
+                dcCore::app()->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id])
                  . '" title="' . sprintf(__('Edit %s language'), html::escapeHTML($code_name)) . '">' . $code_name . '</a>' .
             '</td>' .
             '<td class="nowrap maximal"> ' . $code_id . '</td>';
 
             if (isset($backups[$code_id])) {
+                $time[$code_id] = 'UTC';
                 foreach ($backups[$code_id] as $file => $info) {
                     $time[$code_id] = isset($time[$code_id]) && $time[$code_id] > $info['time'] ?
                         $time[$code_id] : $info['time'];
@@ -296,7 +297,7 @@ if (empty($module) && $type != '') {
                 echo
                 '<td class="nowrap">' . count($backups[$code_id]) . '</td>' .
                 '<td class="nowrap"> ' .
-                dt::str('%Y-%m-%d %H:%M', $time[$code_id], $core->blog->settings->system->blog_timezone) .
+                dt::str('%Y-%m-%d %H:%M', $time[$code_id], dcCore::app()->blog->settings->system->blog_timezone) .
                 '</td>';
             } else {
                 echo '<td class="nowrap">' . __('no backups') . '</td><td class="maximal nowrap">-</td>';
@@ -311,11 +312,11 @@ if (empty($module) && $type != '') {
         form::combo('action', [
             __('Backup languages') => 'module_create_backups',
             __('Delete languages') => 'module_delete_codes',
-            __('Export languages') => 'module_export_pack'
+            __('Export languages') => 'module_export_pack',
         ]) . ' 
         <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
-        $core->formNonce() .
-        $core->adminurl->getHiddenFormFields(
+        dcCore::app()->formNonce() .
+        dcCore::app()->adminurl->getHiddenFormFields(
             'translater',
             ['type' => $module->type, 'module' => $module->id]
         ) . '
@@ -327,7 +328,7 @@ if (empty($module) && $type != '') {
         // delete / retore backups
         if (!empty($backups)) {
             echo '<div class="fieldset"><h3>' . __('Backups') . '</h3>' .
-            '<form id="module-backups-form" method="post" action="' . $core->adminurl->get('translater') . '">' .
+            '<form id="module-backups-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '">' .
             '<table class="clear">' .
             '<caption>' . __('Existing languages backups') . '</caption>' .
             '<tr>' .
@@ -359,9 +360,9 @@ if (empty($module) && $type != '') {
                         $backup_code['name'],
                         $backup_code['code'],
                         dt::str(
-                            $core->blog->settings->system->date_format . ' ' . $core->blog->settings->system->time_format,
+                            dcCore::app()->blog->settings->system->date_format . ' ' . dcCore::app()->blog->settings->system->time_format,
                             $backup_code['time'],
-                            $core->blog->settings->system->blog_timezone
+                            dcCore::app()->blog->settings->system->blog_timezone
                         ),
                         $backup_code['path']['basename'],
                         files::size($backup_code['size'])
@@ -376,11 +377,11 @@ if (empty($module) && $type != '') {
             <p class="col right">' . __('Selected backups action:') . ' ' .
             form::combo('action', [
                 __('Restore backups') => 'module_restore_backup',
-                __('Delete backups')  => 'module_delete_backup'
+                __('Delete backups')  => 'module_delete_backup',
             ]) . '
             <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
-            $core->formNonce() .
-            $core->adminurl->getHiddenFormFields(
+            dcCore::app()->formNonce() .
+            dcCore::app()->adminurl->getHiddenFormFields(
                 'translater',
                 ['type' => $module->type, 'module' => $module->id]
             ) . '
@@ -393,9 +394,9 @@ if (empty($module) && $type != '') {
     // add language
     if (!empty($unused_codes)) {
         echo '<div class="col fieldset"><h3>' . __('Add language') . '</h3>
-        <form id="muodule-code-create-form" method="post" action="' . $core->adminurl->get('translater') . '">
+        <form id="muodule-code-create-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '">
         <p class="field"><label for="code">' . __('Select language:') . '</label>' .
-        form::combo(['code'], array_merge(['-' => '-'], $unused_codes), $core->auth->getInfo('user_lang')) . '</p>';
+        form::combo(['code'], array_merge(['-' => '-'], $unused_codes), dcCore::app()->auth->getInfo('user_lang')) . '</p>';
         if (empty($codes)) {
             echo '<p>' . form::hidden(['from'], '') . '</p>';
         } else {
@@ -405,8 +406,8 @@ if (empty($module) && $type != '') {
         }
         echo '
         <p><input type="submit" name="save" value="' . __('Create') . '" />' .
-        $core->formNonce() .
-        $core->adminurl->getHiddenFormFields(
+        dcCore::app()->formNonce() .
+        dcCore::app()->adminurl->getHiddenFormFields(
             'translater',
             ['type' => $module->type, 'module' => $module->id, 'action' => 'module_add_code']
         ) . '
@@ -415,13 +416,13 @@ if (empty($module) && $type != '') {
 
     // Import
     echo '<div class="col fieldset"><h3>' . __('Import') . '</h3>
-    <form id="module-pack-import-form" method="post" action="' . $core->adminurl->get('translater') . '" enctype="multipart/form-data">
+    <form id="module-pack-import-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '" enctype="multipart/form-data">
     <p><label for="packfile">' . __('Select languages package to import:') . '<label> ' .
     '<input id="packfile" type="file" name="packfile" /></p>
     <p>
     <input type="submit" name="save" value="' . __('Import') . '" />' .
-    $core->formNonce() .
-    $core->adminurl->getHiddenFormFields(
+    dcCore::app()->formNonce() .
+    dcCore::app()->adminurl->getHiddenFormFields(
         'translater',
         ['type' => $module->type, 'module' => $module->id, 'action' => 'module_import_pack']
     ) . '
@@ -432,10 +433,11 @@ if (empty($module) && $type != '') {
     dcPage::helpBlock('translater.module');
 } elseif (!empty($lang)) {
     $lines = $lang->getMessages();
+    $allowed_l10n_groups = [];
 
     echo
     '<div id="lang-form">' .
-    '<form id="lang-edit-form" method="post" action="' . $core->adminurl->get('translater') . '">' .
+    '<form id="lang-edit-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '">' .
     '<table class="table-outer">' .
     '<caption>' . sprintf(__('List of %s localized strings'), count($lines)) . '</caption>' .
     '<tr>' .
@@ -461,7 +463,7 @@ if (empty($module) && $type != '') {
     foreach ($lines as $msgid => $rs) {
         $in_dc               = ($rs['in_dc'] && $translater->parse_nodc);
         $allowed_l10n_groups = array_combine($translater::$allowed_l10n_groups, $translater::$allowed_l10n_groups);
-        $t_msgstr            = $t_files            = $strin            = [];
+        $t_msgstr            = $t_files = $strin = [];
 
         foreach ($rs['o_msgstrs'] as $o_msgstr) {
             if (!isset($strin[$o_msgstr['msgstr'][0]])) {
@@ -528,7 +530,7 @@ if (empty($module) && $type != '') {
                     sprintf(__('Plural "%s"'), $plural),
                     sprintf(__('Plural form of "%s"'), $rs['plural']),
                     form::hidden(['entries[' . $i . '][msgid_plural]'], html::escapeHTML($rs['plural'])) .
-                    form::field(['entries[' . $i . '][msgstr][' . $j + 1 . ']'], 48, 255, html::escapeHTML($rs['msgstr'][$j + 1] ?? ''), '', '', $in_dc),
+                    form::field(['entries[' . $i . '][msgstr][' . ($j + 1) . ']'], 48, 255, html::escapeHTML($rs['msgstr'][$j + 1] ?? ''), '', '', $in_dc),
                     implode('', $t_msgstr),
                     ''
                 );
@@ -559,9 +561,9 @@ if (empty($module) && $type != '') {
     '</div>' .
     '<p class="col right">' .
     '<input id="do-action" type="submit" value="' . __('Save') . ' (s)" accesskey="s" /></p>' .
-    $core->formNonce() .
+    dcCore::app()->formNonce() .
     form::hidden(['code'], $lang->code) .
-    $core->adminurl->getHiddenFormFields(
+    dcCore::app()->adminurl->getHiddenFormFields(
         'translater',
         ['type' => $module->type, 'module' => $module->id, 'lang' => $lang->code, 'action' => 'module_update_code']
     ) .
@@ -578,13 +580,13 @@ if (empty($module) && $type != '') {
             '<h3><ul class="nice">%s</ul></h3>',
             sprintf(
                 $line,
-                $core->adminurl->get('translater', ['type' => 'plugin']),
+                dcCore::app()->adminurl->get('translater', ['type' => 'plugin']),
                 $type == 'plugin' ? ' class="active"' : '',
                 __('Translate plugins')
             ) .
             sprintf(
                 $line,
-                $core->adminurl->get('translater', ['type' => 'theme']),
+                dcCore::app()->adminurl->get('translater', ['type' => 'theme']),
                 $type == 'theme' ? ' class="active"' : '',
                 __('Translate themes')
             )

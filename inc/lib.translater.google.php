@@ -27,7 +27,7 @@ class googleProposalTool extends translaterProposalTool
 
     protected function setup()
     {
-        $this->key = $this->core->blog->settings->translater->translater_google_proposal_key;
+        $this->key = dcCore::app()->blog->settings->translater->translater_google_proposal_key;
 
         $this->setName(__('Google'));
         $this->setDesc(__('Google Translation Tool API'));
@@ -53,7 +53,7 @@ class googleProposalTool extends translaterProposalTool
         $key = empty($_POST['translater_google_proposal_key']) ?
             '' : $_POST['translater_google_proposal_key'];
 
-        $this->core->blog->settings->translater->put('translater_google_proposal_key', $key, 'string', '', true, true);
+        dcCore::app()->blog->settings->translater->put('translater_google_proposal_key', $key, 'string', '', true, true);
     }
 
     public function translate($str, $from, $to)
@@ -63,7 +63,7 @@ class googleProposalTool extends translaterProposalTool
                 'key'    => $this->key,
                 'q'      => $str,
                 'source' => $from,
-                'target' => $to
+                'target' => $to,
             ];
 
             $path   = '';

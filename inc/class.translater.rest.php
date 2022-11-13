@@ -22,7 +22,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
  */
 class translaterRest
 {
-    public static function getProposal($core, $get)
+    public static function getProposal($get)
     {
         $from   = !empty($get['langFrom']) ? trim($get['langFrom']) : '';
         $to     = !empty($get['langTo']) ? trim($get['langTo']) : '';
@@ -40,7 +40,7 @@ class translaterRest
                 throw new Exception(__('Missing params'));
             }
 
-            $translater = new dcTranslater($core);
+            $translater = new dcTranslater();
 
             if (!empty($str_in)) {
                 if (!$translater->proposal->hasTool($tool)) {
@@ -61,7 +61,7 @@ class translaterRest
             $x->str_to    = text::toUTF8(html::decodeEntities($str_out));
             $rsp->insertNode($x);
         } catch (Exception $e) {
-            $core->error->add($e->getMessage());
+            dcCore::app()->error->add($e->getMessage());
         }
 
         return $rsp;

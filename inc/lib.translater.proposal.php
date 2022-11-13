@@ -17,8 +17,6 @@
  */
 abstract class translaterProposalTool
 {
-    public $core;
-
     private $active = false;
     private $name   = 'unknow';
     private $desc   = 'no description';
@@ -26,16 +24,15 @@ abstract class translaterProposalTool
     /**
     Constructor
      */
-    final public function __construct($core)
+    final public function __construct()
     {
-        $this->core = $core;
         $this->setup();
     }
 
     /**
     Set name of this tool
 
-    @param  string  Tool's name
+    @param  string  $name   Tool's name
      */
     final protected function setName($name)
     {
@@ -55,7 +52,7 @@ abstract class translaterProposalTool
     /**
     Set description of this tool
 
-    @param  string  Tool's description
+    @param  string  $desc   Tool's description
      */
     final protected function setDesc($desc)
     {
@@ -75,7 +72,7 @@ abstract class translaterProposalTool
     /**
     Set tool as (un)active
 
-    @param  boolean $active True to set it as active
+    @param  boolean     $active     True to set it as active
      */
     final protected function setActive($active)
     {
@@ -100,7 +97,7 @@ abstract class translaterProposalTool
     /**
     Get configuration interface
 
-    @return Form field
+    @return string  Form field
      */
     abstract public function form();
 
@@ -114,8 +111,8 @@ abstract class translaterProposalTool
 
     @param  string  $str    Trimed UTF-8 string to translate
     @param  string  $from   Source language code
-    @param  string  to  Destination language code
-    @return Translated string
+    @param  string  $to     Destination language code
+    @return string  Translated string
      */
     abstract public function translate($str, $from, $to);
 }

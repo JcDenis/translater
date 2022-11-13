@@ -14,7 +14,7 @@ if (!defined('DC_CONTEXT_MODULE')) {
     return null;
 }
 
-$translater = new dcTranslater($core);
+$translater = new dcTranslater();
 
 if (!empty($_POST['save'])) {
     try {
@@ -22,15 +22,15 @@ if (!empty($_POST['save'])) {
             $translater->$key = $_POST[$key] ?? '';
         }
         $translater->writeSettings();
-        dcPage::addSuccessNotice(
+        dcAdminNotices::addSuccessNotice(
             __('Configuration successfully updated.')
         );
-        $core->adminurl->redirect(
+        dcCore::app()->adminurl->redirect(
             'admin.plugins',
-            ['module' => 'translater', 'conf' => 1, 'redir' => $list->getRedir()]
+            ['module' => 'translater', 'conf' => 1, 'redir' => dcCore::app()->admin->list->getRedir()]
         );
     } catch (Exception $e) {
-        $core->error->add($e->getMessage());
+        dcCore::app()->error->add($e->getMessage());
     }
 }
 
@@ -88,7 +88,7 @@ form::combo('backup_folder', $translater::$allowed_backup_folders, $translater->
 form::combo('start_page', [
     __('Plugins') => 'plugin',
     __('Themes')  => 'theme',
-    __('Home')    => '-'
+    __('Home')    => '-',
 ], $translater->start_page) . '</p>
 <p><label for="plugin_menu">' .
 form::checkbox('plugin_menu', '1', $translater->plugin_menu) .

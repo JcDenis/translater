@@ -12,8 +12,6 @@
  */
 class dcTranslaterLang
 {
-    /** @var dCore dcCore instance */
-    public $core = null;
     /** @var dcTranslater dcTranslater instance */
     public $translater = null;
     /** @var dcTranslaterModule dcTranslaterModule instance */
@@ -24,7 +22,6 @@ class dcTranslaterLang
 
     public function __construct(dcTranslaterModule $module, string $lang)
     {
-        $this->core       = $module->core;
         $this->translater = $module->translater;
         $this->module     = $module;
 
@@ -69,7 +66,7 @@ class dcTranslaterLang
             }
         }
         $dc_module               = new dcTranslaterModule($this->translater, ['id' => 'dotclear', 'root' => DC_ROOT]);
-        $dc_lang                 = new dctranslaterLang($dc_module, $this->code);
+        $dc_lang                 = new dcTranslaterLang($dc_module, $this->code);
         $m_o_msgstrs['dotclear'] = $dc_lang->getMsgStrs();
 
         # From id list
@@ -105,7 +102,7 @@ class dcTranslaterLang
                 $res[$rs['msgid']]['o_msgstrs'][] = [
                     'msgstr' => is_array($rs['msgstr']) ? $rs['msgstr'] : [$rs['msgstr']],
                     'module' => $o_module,
-                    'file'   => $rs['file']
+                    'file'   => $rs['file'],
                 ];
                 if ($o_module == 'dotclear') {
                     $res[$rs['msgid']]['in_dc'] = true;
@@ -136,6 +133,7 @@ class dcTranslaterLang
                 continue;
             }
             $contents = file_get_contents($this->module->root . '/' . $file);
+            $msgs     = [];
             # php files
             if ($extension == 'php') {
                 $msgs = dcTranslater::extractPhpMsgs($contents);
@@ -149,7 +147,7 @@ class dcTranslaterLang
                     'msgid'        => dcTranslater::encodeMsg($msg[0][0]),
                     'msgid_plural' => empty($msg[0][1]) ? '' : dcTranslater::encodeMsg($msg[0][1]),
                     'file'         => $file,
-                    'line'         => $msg[1]
+                    'line'         => $msg[1],
                 ];
             }
 
@@ -195,7 +193,7 @@ class dcTranslaterLang
                         'type'         => 'po',
                         'path'         => $path,
                         'file'         => basename($file),
-                        'group'        => str_replace('.po', '', basename($file))
+                        'group'        => str_replace('.po', '', basename($file)),
                     ];
                     $exists[] = $entry['msgid'];
                 }

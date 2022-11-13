@@ -18,13 +18,13 @@ $this->registerModule(
     'Translater',
     'Translate your Dotclear plugins and themes',
     'Jean-Christian Denis & contributors',
-    '2021.11.06',
+    '2022.11.12',
     [
-        'requires'    => [['core', '2.19']],
+        'requires'    => [['core', '2.24']],
         'permissions' => null,
         'type'        => 'plugin',
         'support'     => 'http://forum.dotclear.org/viewtopic.php?id=39220',
         'details'     => 'https://plugins.dotaddict.org/dc2/details/translater',
-        'repository'  => 'https://raw.githubusercontent.com/JcDenis/translater/master/dcstore.xml'
+        'repository'  => 'https://raw.githubusercontent.com/JcDenis/translater/master/dcstore.xml',
     ]
 );

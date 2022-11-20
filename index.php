@@ -432,7 +432,7 @@ if (empty($module) && $type != '') {
 
     dcPage::helpBlock('translater.module');
 } elseif (!empty($lang)) {
-    $lines = $lang->getMessages();
+    $lines               = $lang->getMessages();
     $allowed_l10n_groups = [];
 
     echo

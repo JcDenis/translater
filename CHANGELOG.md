@@ -3,6 +3,9 @@ dev
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2022.11.20
+- fix compatibility with Dotclear 2.24 (required)
+
 2021.11.06
 - sort modules by id
 - fix extra whitespace in exported files

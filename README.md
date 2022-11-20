@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/JcDenis/translater)](https://github.com/JcDenis/translater/releases)
 [![Date](https://img.shields.io/github/release-date/JcDenis/translater)](https://github.com/JcDenis/translater/releases)
 [![Issues](https://img.shields.io/github/issues/JcDenis/translater)](https://github.com/JcDenis/translater/issues)
-[![Dotclear](https://img.shields.io/badge/dotclear-v2.19-blue.svg)](https://fr.dotclear.org/download)
+[![Dotclear](https://img.shields.io/badge/dotclear-v2.24-blue.svg)](https://fr.dotclear.org/download)
 [![Dotaddict](https://img.shields.io/badge/dotaddict-official-green.svg)](https://plugins.dotaddict.org/dc2/details/translater)
 [![License](https://img.shields.io/github/license/JcDenis/translater)](https://github.com/JcDenis/translater/blob/master/LICENSE)
 
@@ -19,7 +19,7 @@ It helps dev to translate plugin and theme.
 _translater_ requires: 
 
  * super admin permissions
- * Dotclear 2.19 
+ * Dotclear 2.24 
 
 ## USAGE
 

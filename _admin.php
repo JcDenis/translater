@@ -16,12 +16,12 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 
 dcCore::app()->addBehavior('adminModulesListGetActions', ['translaterAdminBehaviors', 'adminModulesGetActions']);
 dcCore::app()->addBehavior('adminModulesListDoActions', ['translaterAdminBehaviors', 'adminModulesDoActions']);
-dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['translaterAdminBehaviors', 'adminDashboardFavorites']);
+dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['translaterAdminBehaviors', 'adminDashboardFavoritesV2']);
 
 dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
     __('Translater'),
     dcCore::app()->adminurl->get('translater'),
-    dcPage::getPF('translater/icon.png'),
+    dcPage::getPF('translater/icon.svg'),
     preg_match(
         '/' . preg_quote(dcCore::app()->adminurl->get('translater')) . '(&.*)?$/',
         $_SERVER['REQUEST_URI']
@@ -102,13 +102,13 @@ class translaterAdminBehaviors
      *
      * @param  dcFavorites  $favs   dcFavorites instance
      */
-    public static function adminDashboardFavorites(dcFavorites$favs): void
+    public static function adminDashboardFavoritesV2(dcFavorites $favs): void
     {
         $favs->register('translater', [
             'title'       => __('Translater'),
             'url'         => dcCore::app()->adminurl->get('translater'),
-            'small-icon'  => urldecode(dcPage::getPF('translater/icon.png')),
-            'large-icon'  => urldecode(dcPage::getPF('translater/icon-big.png')),
+            'small-icon'  => urldecode(dcPage::getPF('translater/icon.svg')),
+            'large-icon'  => urldecode(dcPage::getPF('translater/icon.svg')),
             'permissions' => dcCore::app()->auth->isSuperAdmin(),
         ]);
     }

@@ -14,6 +14,10 @@ if (!defined('DC_CONTEXT_ADMIN')) {
     return;
 }
 
+if (!dcCore::app()->auth->isSuperAdmin()) {
+    return null;
+}
+
 dcCore::app()->addBehavior('adminModulesListGetActions', ['translaterAdminBehaviors', 'adminModulesGetActions']);
 dcCore::app()->addBehavior('adminModulesListDoActions', ['translaterAdminBehaviors', 'adminModulesDoActions']);
 dcCore::app()->addBehavior('adminDashboardFavoritesV2', ['translaterAdminBehaviors', 'adminDashboardFavoritesV2']);
@@ -109,7 +113,7 @@ class translaterAdminBehaviors
             'url'         => dcCore::app()->adminurl->get('translater'),
             'small-icon'  => urldecode(dcPage::getPF('translater/icon.svg')),
             'large-icon'  => urldecode(dcPage::getPF('translater/icon.svg')),
-            'permissions' => dcCore::app()->auth->isSuperAdmin(),
+            //'permissions' => null,
         ]);
     }
 }

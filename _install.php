@@ -13,9 +13,10 @@
 if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
-$id = 'translater';
 
 try {
+    $id = basename(__DIR__);
+
     if (version_compare(dcCore::app()->getVersion($id), dcCore::app()->plugins->moduleInfo($id, 'version'), '>=')) {
         return null;
     }

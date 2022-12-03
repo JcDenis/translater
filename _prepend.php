@@ -14,13 +14,13 @@ if (!defined('DC_RC_PATH')) {
     return;
 }
 
-$d = __DIR__ . '/inc/';
-
-Clearbricks::lib()->autoload(['dcTranslater' => $d . 'class.dc.translater.php']);
-Clearbricks::lib()->autoload(['dcTranslaterDefaultSettings' => $d . 'class.dc.translater.php']);
-Clearbricks::lib()->autoload(['dcTranslaterModule' => $d . 'class.dc.translater.module.php']);
-Clearbricks::lib()->autoload(['dcTranslaterLang' => $d . 'class.dc.translater.lang.php']);
-Clearbricks::lib()->autoload(['translaterRest' => $d . 'class.translater.rest.php']);
+Clearbricks::lib()->autoload([
+    'dcTranslater'                => __DIR__ . '/inc/class.dc.translater.php',
+    'dcTranslaterDefaultSettings' => __DIR__ . '/inc/class.dc.translater.php',
+    'dcTranslaterModule'          => __DIR__ . '/inc/class.dc.translater.module.php',
+    'dcTranslaterLang'            => __DIR__ . '/inc/class.dc.translater.lang.php',
+    'translaterRest'              => __DIR__ . '/class.translater.rest.php',
+]);
 
 if (isset(dcCore::app()->adminurl)) {
     dcCore::app()->adminurl->register('translater', 'plugin.php', ['p' => 'translater']);

@@ -15,14 +15,14 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 }
 
 try {
-    $id = basename(__DIR__);
-
-    if (version_compare(dcCore::app()->getVersion($id), dcCore::app()->plugins->moduleInfo($id, 'version'), '>=')) {
+    if (!dcCore::app()->newVersion(
+        basename(__DIR__), 
+        dcCore::app()->plugins->moduleInfo(basename(__DIR__), 'version')
+    )) {
         return null;
     }
     $translater = new dcTranslater(false);
     $translater->writeSettings(false);
-    dcCore::app()->setVersion($id, dcCore::app()->plugins->moduleInfo($id, 'version'));
 
     return true;
 } catch (Exception $e) {

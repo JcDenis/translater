@@ -161,14 +161,15 @@ class dcTranslater extends dcTranslaterDefaultSettings
             );
             while ($record->fetch()) {
                 if (preg_match('/^translater_(.*?)$/', $record->setting_id, $match)) {
-                    $cur = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
-                    $cur->setting_id = $this->$key = $match[1];
+                    $cur             = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
+                    $cur->setting_id = $this->{$match[1]} = $match[1];
                     $cur->update(
                         "WHERE setting_id = '" . $record->setting_id . "' and setting_ns = 'translater' " .
                         'AND blog_id ' . (null === $record->blog_id ? 'IS NULL ' : ("= '" . dcCore::app()->con->escape($record->blog_id) . "' "))
                     );
                 }
             }
+
             return true;
         }
 

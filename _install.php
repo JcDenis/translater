@@ -22,7 +22,9 @@ try {
         return null;
     }
     $translater = new dcTranslater(false);
-    $translater->writeSettings(false);
+    if (!$translater->growUp()) {
+        $translater->writeSettings(false);
+    }
 
     return true;
 } catch (Exception $e) {

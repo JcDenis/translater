@@ -122,7 +122,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
     public function loadSettings(): void
     {
         foreach ($this->getDefaultSettings() as $key => $value) {
-            $this->$key = dcCore::app()->blog->settings->translater->get('translater_' . $key);
+            $this->$key = dcCore::app()->blog->settings->get('translater')->get($key);
 
             try {
                 settype($this->$key, gettype($value));
@@ -139,9 +139,40 @@ class dcTranslater extends dcTranslaterDefaultSettings
     public function writeSettings($overwrite = true): void
     {
         foreach ($this->getDefaultSettings() as $key => $value) {
-            dcCore::app()->blog->settings->translater->drop('translater_' . $key);
-            dcCore::app()->blog->settings->translater->put('translater_' . $key, $this->$key, gettype($value), '', true, true);
+            dcCore::app()->blog->settings->get('translater')->drop($key);
+            dcCore::app()->blog->settings->get('translater')->put($key, $this->$key, gettype($value), '', true, true);
         }
+    }
+
+    /**
+     * Upgrade plugin
+     *
+     * @return bool Upgrade done
+     */
+    public function growUp()
+    {
+        $current = dcCore::app()->getVersion(basename(dirname(__DIR__)));
+
+        // use short settings id
+        if ($current && version_compare($current, '2022.12.22', '<')) {
+            $record = dcCore::app()->con->select(
+                'SELECT * FROM ' . dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME . ' ' .
+                "WHERE setting_ns = 'translater' "
+            );
+            while ($record->fetch()) {
+                if (preg_match('/^translater_(.*?)$/', $record->setting_id, $match)) {
+                    $cur = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
+                    $cur->setting_id = $this->$key = $match[1];
+                    $cur->update(
+                        "WHERE setting_id = '" . $record->setting_id . "' and setting_ns = 'translater' " .
+                        'AND blog_id ' . (null === $record->blog_id ? 'IS NULL ' : ("= '" . dcCore::app()->con->escape($record->blog_id) . "' "))
+                    );
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
     //@}
 

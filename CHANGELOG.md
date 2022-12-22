@@ -3,6 +3,13 @@ dev
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2022.12.22
+- use SVG icon
+- use short settings id
+- fix install
+- fix autoload
+- fix permissions
+
 2022.11.20
 - fix compatibility with Dotclear 2.24 (required)
 

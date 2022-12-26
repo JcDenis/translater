@@ -357,6 +357,10 @@ class dcTranslater extends dcTranslaterDefaultSettings
      */
     public static function isBackupLimit(string $id, string $root, int $limit = 10, bool $throw = false): bool
     {
+        if (!$limit) {
+            return false;
+        }
+
         $count = 0;
         foreach (self::scandir($root) as $file) {
             if (!is_dir($root . '/' . $file)

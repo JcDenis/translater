@@ -79,6 +79,7 @@ __('Make backups when changes are made') . '</label></p>
     __('Limit backups to %s files per module'),
     form::number('backup_limit', ['min' => 0, 'max' => 50, 'default' => $translater->backup_limit])
 ) . '</label></p>
+<p class="form-note">' . __('Set to 0 for no limit.') . '</p>
 <p><label for="backup_folder">' . __('Store backups in:') . '</label>' .
 form::combo('backup_folder', $translater::$allowed_backup_folders, $translater->backup_folder) . '</p>
 </div>

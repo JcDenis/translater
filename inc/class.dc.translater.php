@@ -93,8 +93,6 @@ class dcTranslater extends dcTranslaterDefaultSettings
      */
     public function __construct(bool $full = true)
     {
-        dcCore::app()->blog->settings->addNamespace('translater');
-
         $this->loadSettings();
 
         if ($full) {

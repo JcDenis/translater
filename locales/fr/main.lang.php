@@ -25,6 +25,7 @@ l10n::$locales['Name of exported package:']                         = 'Nom du pa
 l10n::$locales['Backups']                                           = 'Sauvegardes';
 l10n::$locales['Make backups when changes are made']                = 'Faire une sauvegarde quand des changements sont effectués';
 l10n::$locales['Limit backups to %s files per module']              = 'Limiter les sauvegardes à %s fichiers par module';
+l10n::$locales['Set to 0 for no limit.']                            = 'Mettre à 0 pour aucune limite.';
 l10n::$locales['Store backups in:']                                 = 'Enregistrer les sauvegardes dans :';
 l10n::$locales['Behaviors']                                         = 'Comportements';
 l10n::$locales['Default start menu:']                               = 'Menu de départ par défaut :';

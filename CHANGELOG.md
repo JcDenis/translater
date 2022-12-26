@@ -3,6 +3,13 @@ dev
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2022.12.26
+- fix wrong dt::str parameter (thx Pierre Van Glabeke)
+- fix backup limit (unlimited)
+- groups admin behaviors
+- remove settings addNamespace method
+- use abstract plugin id and settings ns
+
 2022.12.22
 - use SVG icon
 - use short settings id

@@ -289,7 +289,7 @@ if (empty($module) && $type != '') {
             '<td class="nowrap maximal"> ' . $code_id . '</td>';
 
             if (isset($backups[$code_id])) {
-                $time[$code_id] = 'UTC';
+                $time[$code_id] = 0;
                 foreach ($backups[$code_id] as $file => $info) {
                     $time[$code_id] = isset($time[$code_id]) && $time[$code_id] > $info['time'] ?
                         $time[$code_id] : $info['time'];
@@ -297,7 +297,7 @@ if (empty($module) && $type != '') {
                 echo
                 '<td class="nowrap">' . count($backups[$code_id]) . '</td>' .
                 '<td class="nowrap"> ' .
-                dt::str('%Y-%m-%d %H:%M', $time[$code_id], dcCore::app()->blog->settings->system->blog_timezone) .
+                dt::str('%Y-%m-%d %H:%M', (int) $time[$code_id], dcCore::app()->blog->settings->system->blog_timezone) .
                 '</td>';
             } else {
                 echo '<td class="nowrap">' . __('no backups') . '</td><td class="maximal nowrap">-</td>';
@@ -361,7 +361,7 @@ if (empty($module) && $type != '') {
                         $backup_code['code'],
                         dt::str(
                             dcCore::app()->blog->settings->system->date_format . ' ' . dcCore::app()->blog->settings->system->time_format,
-                            $backup_code['time'],
+                            (int) $backup_code['time'],
                             dcCore::app()->blog->settings->system->blog_timezone
                         ),
                         $backup_code['path']['basename'],

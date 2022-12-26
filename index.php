@@ -169,13 +169,13 @@ try {
 echo
 '<html><head><title>' . __('Translater') . '</title>' .
 dcPage::jsPageTabs() .
-dcPage::cssLoad(dcPage::getPF('translater/css/translater.css')) .
+dcPage::cssModuleLoad('translater/css/translater.css')) .
 dcPage::jsJson('translater', [
     'title_add_detail' => __('Use this text'),
     'image_field'      => dcPage::getPF('translater/img/field.png'),
     'image_toggle'     => dcPage::getPF('translater/img/toggle.png'),
 ]) .
-dcPage::jsLoad(dcPage::getPF('translater/js/translater.js')) .
+dcPage::jsModuleLoad('translater/js/translater.js') .
 
 # --BEHAVIOR-- translaterAdminHeaders
 dcCore::app()->callBehavior('translaterAdminHeaders') .

@@ -27,7 +27,7 @@ if (!empty($_POST['save'])) {
         );
         dcCore::app()->adminurl->redirect(
             'admin.plugins',
-            ['module' => 'translater', 'conf' => 1, 'redir' => dcCore::app()->admin->list->getRedir()]
+            ['module' => 'translater', 'conf' => 1, 'redir' => dcCore::app()->admin->__get('list')->getRedir()]
         );
     } catch (Exception $e) {
         dcCore::app()->error->add($e->getMessage());

@@ -20,7 +20,7 @@ $this->addUserAction(
     /* action */
     'delete_all',
     /* ns */
-    'translater',
+    basename(__DIR__),
     /* description */
     __('delete all settings')
 );
@@ -31,7 +31,7 @@ $this->addUserAction(
     /* action */
     'delete',
     /* ns */
-    'translater',
+    basename(__DIR__),
     /* description */
     __('delete plugin files')
 );
@@ -42,7 +42,7 @@ $this->addUserAction(
     /* action */
     'delete',
     /* ns */
-    'translater',
+    basename(__DIR__),
     /* description */
     __('delete the version number')
 );
@@ -53,9 +53,9 @@ $this->addDirectAction(
     /* action */
     'delete_all',
     /* ns */
-    'translater',
+    basename(__DIR__),
     /* description */
-    sprintf(__('delete all %s settings'), 'translater')
+    sprintf(__('delete all %s settings'), basename(__DIR__))
 );
 
 $this->addDirectAction(
@@ -64,9 +64,9 @@ $this->addDirectAction(
     /* action */
     'delete',
     /* ns */
-    'translater',
+    basename(__DIR__),
     /* description */
-    sprintf(__('delete %s plugin files'), 'translater')
+    sprintf(__('delete %s plugin files'), basename(__DIR__))
 );
 
 $this->addDirectAction(
@@ -75,7 +75,7 @@ $this->addDirectAction(
     /* action */
     'delete',
     /* ns */
-    'translater',
+    basename(__DIR__),
     /* description */
-    sprintf(__('delete %s version number'), 'translater')
+    sprintf(__('delete %s version number'), basename(__DIR__))
 );

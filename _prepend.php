@@ -23,5 +23,5 @@ Clearbricks::lib()->autoload([
 ]);
 
 if (isset(dcCore::app()->adminurl)) {
-    dcCore::app()->adminurl->register('translater', 'plugin.php', ['p' => 'translater']);
+    dcCore::app()->adminurl->register(basename(__DIR__), 'plugin.php', ['p' => basename(__DIR__)]);
 }

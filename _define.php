@@ -24,7 +24,7 @@ $this->registerModule(
         'permissions' => null,
         'type'        => 'plugin',
         'support'     => 'http://forum.dotclear.org/viewtopic.php?id=39220',
-        'details'     => 'https://plugins.dotaddict.org/dc2/details/translater',
-        'repository'  => 'https://raw.githubusercontent.com/JcDenis/translater/master/dcstore.xml',
+        'details'     => 'https://plugins.dotaddict.org/dc2/details/' . basename(__DIR__),
+        'repository'  => 'https://raw.githubusercontent.com/JcDenis/' . basename(__DIR__) . '/master/dcstore.xml',
     ]
 );

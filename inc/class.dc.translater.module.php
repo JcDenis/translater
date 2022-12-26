@@ -106,7 +106,7 @@ class dcTranslaterModule
                 break;
 
             case 'translater':
-                $tmp = path::real(dcCore::app()->plugins->moduleRoot('translater'));
+                $tmp = path::real(dcCore::app()->plugins->moduleRoot(basename(dirname(__DIR__))));
                 if ($tmp && is_writable($tmp)) {
                     @mkDir($tmp . '/locales');
                     $dir = $tmp . '/locales';
@@ -676,7 +676,7 @@ class dcTranslaterModule
                     $content .= '# Author: ' . html::escapeHTML($info) . "\n";
                 }
             }
-            $content .= '# Translated with translater ' . dcCore::app()->plugins->moduleInfo('translater', 'version') . "\n\n";
+            $content .= '# Translated with translater ' . dcCore::app()->plugins->moduleInfo(basename(dirname(__DIR__)), 'version') . "\n\n";
         }
         $content .= "msgid \"\"\n" .
         "msgstr \"\"\n" .
@@ -767,7 +767,7 @@ class dcTranslaterModule
                     $content .= '// Author: ' . html::escapeHTML($info) . "\n";
                 }
             }
-            $content .= '// Translated with dcTranslater - ' . dcCore::app()->plugins->moduleInfo('translater', 'version') . "\n\n";
+            $content .= '// Translated with dcTranslater - ' . dcCore::app()->plugins->moduleInfo(basename(dirname(__DIR__)), 'version') . "\n\n";
         }
 
         l10n::generatePhpFileFromPo($this->locales . '/' . $lang->code . '/' . $group, $content);

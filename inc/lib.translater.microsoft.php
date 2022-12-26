@@ -27,8 +27,8 @@ class microsoftProposalTool extends translaterProposalTool
     protected function setup()
     {
         $this->setActive(false);
-        $this->client = dcCore::app()->blog->settings->translater->translater_microsoft_proposal_client;
-        $this->secret = dcCore::app()->blog->settings->translater->translater_microsoft_proposal_secret;
+        $this->client = dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->get('microsoft_proposal_client');
+        $this->secret = dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->get('microsoft_proposal_secret');
 
         $this->setName(__('Bing'));
         $this->setDesc(__('Microsoft Bing translation tool'));
@@ -61,8 +61,8 @@ class microsoftProposalTool extends translaterProposalTool
         $secret = empty($_POST['translater_microsoft_proposal_secret']) ?
             '' : $_POST['translater_microsoft_proposal_secret'];
 
-        dcCore::app()->blog->settings->translater->put('translater_microsoft_proposal_client', $client, 'string', '', true, true);
-        dcCore::app()->blog->settings->translater->put('translater_microsoft_proposal_secret', $secret, 'string', '', true, true);
+        dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->put('microsoft_proposal_client', $client, 'string', '', true, true);
+        dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->put('microsoft_proposal_secret', $secret, 'string', '', true, true);
     }
 
     public function translate($str, $from, $to)

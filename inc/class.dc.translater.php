@@ -104,7 +104,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
             __('plugins folder root')            => 'plugin',
             __('public folder root')             => 'public',
             __('cache folder of Dotclear')       => 'cache',
-            __('locales folder of translater')   => 'translater',
+            __('locales folder of translater')   => basename(dirname(__DIR__)),
         ];
         self::$default_distrib_modules = [
             'plugin' => explode(',', DC_DISTRIB_PLUGINS),
@@ -120,7 +120,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
     public function loadSettings(): void
     {
         foreach ($this->getDefaultSettings() as $key => $value) {
-            $this->$key = dcCore::app()->blog->settings->get('translater')->get($key);
+            $this->$key = dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->get($key);
 
             try {
                 settype($this->$key, gettype($value));
@@ -137,8 +137,8 @@ class dcTranslater extends dcTranslaterDefaultSettings
     public function writeSettings($overwrite = true): void
     {
         foreach ($this->getDefaultSettings() as $key => $value) {
-            dcCore::app()->blog->settings->get('translater')->drop($key);
-            dcCore::app()->blog->settings->get('translater')->put($key, $this->$key, gettype($value), '', true, true);
+            dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->drop($key);
+            dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->put($key, $this->$key, gettype($value), '', true, true);
         }
     }
 
@@ -161,6 +161,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
                 if (preg_match('/^translater_(.*?)$/', $record->setting_id, $match)) {
                     $cur             = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
                     $cur->setting_id = $this->{$match[1]} = $match[1];
+                    $cur->setting_ns = basename(dirname(__DIR__));
                     $cur->update(
                         "WHERE setting_id = '" . $record->setting_id . "' and setting_ns = 'translater' " .
                         'AND blog_id ' . (null === $record->blog_id ? 'IS NULL ' : ("= '" . dcCore::app()->con->escape($record->blog_id) . "' "))

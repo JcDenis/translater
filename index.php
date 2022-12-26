@@ -45,17 +45,17 @@ if (!empty($module) && !empty($lang)) {
     }
 }
 
-$breadcrumb = [__('Translater') => dcCore::app()->adminurl->get('translater', ['type' => '-'])];
+$breadcrumb = [__('Translater') => dcCore::app()->adminurl->get(basename(__DIR__), ['type' => '-'])];
 if (empty($type)) {
     $breadcrumb = [__('Translater') => ''];
 } elseif (empty($module)) {
     $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')] = '';
 } elseif (empty($lang)) {
-    $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')] = dcCore::app()->adminurl->get('translater', ['type' => $type]);
+    $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')] = dcCore::app()->adminurl->get(basename(__DIR__), ['type' => $type]);
     $breadcrumb[html::escapeHTML($module->name)]                  = '';
 } elseif (!empty($lang)) {
-    $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')]                  = dcCore::app()->adminurl->get('translater', ['type' => $type]);
-    $breadcrumb[html::escapeHTML($module->name)]                                   = dcCore::app()->adminurl->get('translater', ['type' => $type, 'module' => $module->id]);
+    $breadcrumb[$type == 'plugin' ? __('Plugins') : __('Themes')]                  = dcCore::app()->adminurl->get(basename(__DIR__), ['type' => $type]);
+    $breadcrumb[html::escapeHTML($module->name)]                                   = dcCore::app()->adminurl->get(basename(__DIR__), ['type' => $type, 'module' => $module->id]);
     $breadcrumb[html::escapeHTML(sprintf(__('%s language edition'), $lang->name))] = '';
 }
 
@@ -71,7 +71,7 @@ try {
             }
         }
         dcAdminNotices::addSuccessNotice(__('Backup successfully created'));
-        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcCore::app()->adminurl->redirect(basename(__DIR__), ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_restore_backup') {
@@ -85,7 +85,7 @@ try {
             }
         }
         dcAdminNotices::addSuccessNotice(__('Backup successfully restored'));
-        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcCore::app()->adminurl->redirect(basename(__DIR__), ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_delete_backup') {
@@ -99,7 +99,7 @@ try {
             }
         }
         dcAdminNotices::addSuccessNotice(__('Backup successfully deleted'));
-        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcCore::app()->adminurl->redirect(basename(__DIR__), ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_export_pack') {
@@ -109,7 +109,7 @@ try {
         $module->exportPack($_POST['codes']);
 
         dcAdminNotices::addSuccessNotice(__('Language successfully exported'));
-        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcCore::app()->adminurl->redirect(basename(__DIR__), ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_import_pack') {
@@ -119,7 +119,7 @@ try {
         $module->importPack($_FILES['packfile']);
 
         dcAdminNotices::addSuccessNotice(__('Language successfully imported'));
-        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id]);
+        dcCore::app()->adminurl->redirect(basename(__DIR__), ['type' => $type, 'module' => $module->id]);
     }
 
     if ($action == 'module_add_code') {
@@ -129,7 +129,7 @@ try {
         $module->addLang($_POST['code'], $_POST['from'] ?? '');
 
         dcAdminNotices::addSuccessNotice(__('Language successfully added'));
-        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
+        dcCore::app()->adminurl->redirect(basename(__DIR__), ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
     }
 
     if ($action == 'module_delete_codes') {
@@ -143,7 +143,7 @@ try {
             }
         }
         dcAdminNotices::addSuccessNotice(__('Language successfully deleted'));
-        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
+        dcCore::app()->adminurl->redirect(basename(__DIR__), ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
     }
 
     if ($action == 'module_update_code') {
@@ -160,7 +160,7 @@ try {
         $module->updLang($_POST['code'], $_POST['entries']);
 
         dcAdminNotices::addSuccessNotice(__('Language successfully updated'));
-        dcCore::app()->adminurl->redirect('translater', ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
+        dcCore::app()->adminurl->redirect(basename(__DIR__), ['type' => $type, 'module' => $module->id, 'lang' => $_POST['code']]);
     }
 } catch (Exception $e) {
     dcCore::app()->error->add($e->getMessage());
@@ -169,13 +169,13 @@ try {
 echo
 '<html><head><title>' . __('Translater') . '</title>' .
 dcPage::jsPageTabs() .
-dcPage::cssModuleLoad('translater/css/translater.css')) .
+dcPage::cssModuleLoad(basename(__DIR__) . '/css/translater.css') .
 dcPage::jsJson('translater', [
     'title_add_detail' => __('Use this text'),
-    'image_field'      => dcPage::getPF('translater/img/field.png'),
-    'image_toggle'     => dcPage::getPF('translater/img/toggle.png'),
+    'image_field'      => dcPage::getPF(basename(__DIR__) . '/img/field.png'),
+    'image_toggle'     => dcPage::getPF(basename(__DIR__) . '/img/toggle.png'),
 ]) .
-dcPage::jsModuleLoad('translater/js/translater.js') .
+dcPage::jsModuleLoad(basename(__DIR__) . '/js/translater.js') .
 
 # --BEHAVIOR-- translaterAdminHeaders
 dcCore::app()->callBehavior('translaterAdminHeaders') .
@@ -187,7 +187,7 @@ dcPage::notices();
 
 if (empty($module) && $type != '') {
     // modules list
-    echo '<form id="theme-form" method="post" action="' . dcCore::app()->adminurl->get('translater', ['type' => 'plugin']) . '">';
+    echo '<form id="theme-form" method="post" action="' . dcCore::app()->adminurl->get(basename(__DIR__), ['type' => 'plugin']) . '">';
 
     $res     = '';
     $modules = $translater->getModules($type);
@@ -199,7 +199,7 @@ if (empty($module) && $type != '') {
         if ($module->root_writable) {
             $res .= sprintf(
                 '<tr class="line"><td class="nowrap minimal"><a href="%s" title="%s">%s</a></td>',
-                dcCore::app()->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id]),
+                dcCore::app()->adminurl->get(basename(__DIR__), ['type' => $module->type, 'module' => $module->id]),
                 html::escapeHTML(sprintf(__('Translate module %s'), __($module->name))),
                 html::escapeHTML($module->id)
             );
@@ -215,7 +215,7 @@ if (empty($module) && $type != '') {
                 $codes[$code_id] = sprintf(
                     '<a class="wait maximal nowrap" title="%s" href="%s">%s (%s)</a>',
                     html::escapeHTML(sprintf(__('Edit language %s of module %s'), html::escapeHTML($code_name), __($module->name))),
-                    dcCore::app()->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
+                    dcCore::app()->adminurl->get(basename(__DIR__), ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
                     html::escapeHTML($code_name),
                     $code_id
                 );
@@ -267,7 +267,7 @@ if (empty($module) && $type != '') {
     if (count($codes)) {
         echo
         '<div class="clear fieldset"><h3>' . __('Translations') . '</h3>' .
-        '<form id="module-translations-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '">' .
+        '<form id="module-translations-form" method="post" action="' . dcCore::app()->adminurl->get(basename(__DIR__)) . '">' .
         '<table class="clear maximal">' .
         '<caption>' . __('Existing languages translations') . '</caption>' .
         '<tr>' .
@@ -283,7 +283,7 @@ if (empty($module) && $type != '') {
             '<td class="minimal">' . form::checkbox(['codes[]', 'existing_code_' . $code_id], $code_id, '', '', '', false) . '</td>' .
             '<td class="nowrap">' .
             '<a href="' .
-                dcCore::app()->adminurl->get('translater', ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id])
+                dcCore::app()->adminurl->get(basename(__DIR__), ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id])
                  . '" title="' . sprintf(__('Edit %s language'), html::escapeHTML($code_name)) . '">' . $code_name . '</a>' .
             '</td>' .
             '<td class="nowrap maximal"> ' . $code_id . '</td>';
@@ -317,7 +317,7 @@ if (empty($module) && $type != '') {
         <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
         dcCore::app()->formNonce() .
         dcCore::app()->adminurl->getHiddenFormFields(
-            'translater',
+            basename(__DIR__),
             ['type' => $module->type, 'module' => $module->id]
         ) . '
         </p></div></form><p>&nbsp;</p></div>';
@@ -328,7 +328,7 @@ if (empty($module) && $type != '') {
         // delete / retore backups
         if (!empty($backups)) {
             echo '<div class="fieldset"><h3>' . __('Backups') . '</h3>' .
-            '<form id="module-backups-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '">' .
+            '<form id="module-backups-form" method="post" action="' . dcCore::app()->adminurl->get(basename(__DIR__)) . '">' .
             '<table class="clear">' .
             '<caption>' . __('Existing languages backups') . '</caption>' .
             '<tr>' .
@@ -382,7 +382,7 @@ if (empty($module) && $type != '') {
             <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
             dcCore::app()->formNonce() .
             dcCore::app()->adminurl->getHiddenFormFields(
-                'translater',
+                basename(__DIR__),
                 ['type' => $module->type, 'module' => $module->id]
             ) . '
             </p></div></form><p>&nbsp;</p></div>';
@@ -394,7 +394,7 @@ if (empty($module) && $type != '') {
     // add language
     if (!empty($unused_codes)) {
         echo '<div class="col fieldset"><h3>' . __('Add language') . '</h3>
-        <form id="muodule-code-create-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '">
+        <form id="muodule-code-create-form" method="post" action="' . dcCore::app()->adminurl->get(basename(__DIR__)) . '">
         <p class="field"><label for="code">' . __('Select language:') . '</label>' .
         form::combo(['code'], array_merge(['-' => '-'], $unused_codes), dcCore::app()->auth->getInfo('user_lang')) . '</p>';
         if (empty($codes)) {
@@ -408,7 +408,7 @@ if (empty($module) && $type != '') {
         <p><input type="submit" name="save" value="' . __('Create') . '" />' .
         dcCore::app()->formNonce() .
         dcCore::app()->adminurl->getHiddenFormFields(
-            'translater',
+            basename(__DIR__),
             ['type' => $module->type, 'module' => $module->id, 'action' => 'module_add_code']
         ) . '
         </p></form><p>&nbsp;</p></div>';
@@ -416,14 +416,14 @@ if (empty($module) && $type != '') {
 
     // Import
     echo '<div class="col fieldset"><h3>' . __('Import') . '</h3>
-    <form id="module-pack-import-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '" enctype="multipart/form-data">
+    <form id="module-pack-import-form" method="post" action="' . dcCore::app()->adminurl->get(basename(__DIR__)) . '" enctype="multipart/form-data">
     <p><label for="packfile">' . __('Select languages package to import:') . '<label> ' .
     '<input id="packfile" type="file" name="packfile" /></p>
     <p>
     <input type="submit" name="save" value="' . __('Import') . '" />' .
     dcCore::app()->formNonce() .
     dcCore::app()->adminurl->getHiddenFormFields(
-        'translater',
+        basename(__DIR__),
         ['type' => $module->type, 'module' => $module->id, 'action' => 'module_import_pack']
     ) . '
     </p></form><p>&nbsp;</p></div>';
@@ -437,7 +437,7 @@ if (empty($module) && $type != '') {
 
     echo
     '<div id="lang-form">' .
-    '<form id="lang-edit-form" method="post" action="' . dcCore::app()->adminurl->get('translater') . '">' .
+    '<form id="lang-edit-form" method="post" action="' . dcCore::app()->adminurl->get(basename(__DIR__)) . '">' .
     '<table class="table-outer">' .
     '<caption>' . sprintf(__('List of %s localized strings'), count($lines)) . '</caption>' .
     '<tr>' .
@@ -564,7 +564,7 @@ if (empty($module) && $type != '') {
     dcCore::app()->formNonce() .
     form::hidden(['code'], $lang->code) .
     dcCore::app()->adminurl->getHiddenFormFields(
-        'translater',
+        basename(__DIR__),
         ['type' => $module->type, 'module' => $module->id, 'lang' => $lang->code, 'action' => 'module_update_code']
     ) .
     '</p></div>' .
@@ -580,13 +580,13 @@ if (empty($module) && $type != '') {
             '<h3><ul class="nice">%s</ul></h3>',
             sprintf(
                 $line,
-                dcCore::app()->adminurl->get('translater', ['type' => 'plugin']),
+                dcCore::app()->adminurl->get(basename(__DIR__), ['type' => 'plugin']),
                 $type == 'plugin' ? ' class="active"' : '',
                 __('Translate plugins')
             ) .
             sprintf(
                 $line,
-                dcCore::app()->adminurl->get('translater', ['type' => 'theme']),
+                dcCore::app()->adminurl->get(basename(__DIR__), ['type' => 'theme']),
                 $type == 'theme' ? ' class="active"' : '',
                 __('Translate themes')
             )

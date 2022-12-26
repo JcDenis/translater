@@ -26,10 +26,10 @@ dcCore::app()->addBehaviors([
 
 dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
     __('Translater'),
-    dcCore::app()->adminurl->get('translater'),
-    dcPage::getPF('translater/icon.svg'),
+    dcCore::app()->adminurl->get(basename(__DIR__)),
+    dcPage::getPF(basename(__DIR__) . '/icon.svg'),
     preg_match(
-        '/' . preg_quote(dcCore::app()->adminurl->get('translater')) . '(&.*)?$/',
+        '/' . preg_quote(dcCore::app()->adminurl->get(basename(__DIR__))) . '(&.*)?$/',
         $_SERVER['REQUEST_URI']
     ),
     dcCore::app()->auth->isSuperAdmin()
@@ -97,7 +97,7 @@ class translaterAdminBehaviors
         }
 
         dcCore::app()->adminurl->redirect(
-            'translater',
+            basename(__DIR__),
             ['part' => 'module', 'type' => $type, 'module' => key($_POST['translater'])],
             '#module-lang'
         );
@@ -112,9 +112,9 @@ class translaterAdminBehaviors
     {
         $favs->register('translater', [
             'title'      => __('Translater'),
-            'url'        => dcCore::app()->adminurl->get('translater'),
-            'small-icon' => urldecode(dcPage::getPF('translater/icon.svg')),
-            'large-icon' => urldecode(dcPage::getPF('translater/icon.svg')),
+            'url'        => dcCore::app()->adminurl->get(basename(__DIR__)),
+            'small-icon' => urldecode(dcPage::getPF(basename(__DIR__) . '/icon.svg')),
+            'large-icon' => urldecode(dcPage::getPF(basename(__DIR__) . '/icon.svg')),
             //'permissions' => null,
         ]);
     }

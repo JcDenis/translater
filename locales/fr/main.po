@@ -1,17 +1,14 @@
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: translater 2022.12.26\n"
+"Project-Id-Version: translater 2023.03.15\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2022-12-26T20:46:11+00:00\n"
+"PO-Revision-Date: 2023-03-14T23:25:16+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-msgid "Translater"
-msgstr "Traducteur"
 
 msgid "Translate"
 msgstr "Traduire"
@@ -55,8 +52,8 @@ msgstr "Sauvegardes"
 msgid "Make backups when changes are made"
 msgstr "Faire une sauvegarde quand des changements sont effectués"
 
-msgid "Limit backups to %s files per module"
-msgstr "Limiter les sauvegardes à %s fichiers par module"
+msgid "Limit backups per module to:"
+msgstr "Limiter les sauvegardes par module à :"
 
 msgid "Set to 0 for no limit."
 msgstr "Mettre à 0 pour aucune limite."
@@ -70,86 +67,11 @@ msgstr "Comportements"
 msgid "Default start menu:"
 msgstr "Menu de départ par défaut :"
 
-msgid "Themes"
-msgstr "Thèmes"
-
 msgid "Enable menu on plugins page"
 msgstr "Activer le menu sur la page des plugins"
 
 msgid "Enable menu on themes page"
 msgstr "Activer le menu sur la page des thèmes"
-
-msgid "Failed to find backups folder for module %s"
-msgstr "Impossible de trouver le dossier de sauvegarde pour le module %s"
-
-msgid "Failed to find language %s"
-msgstr "Impossible de trouver la langue %s"
-
-msgid "Failed to find file %s"
-msgstr "Impossible de trouver le fichier %s"
-
-msgid "Failed to delete file %s"
-msgstr "Impossible d'effacer le fichier %s"
-
-msgid "Some languages has not been overwrited %s"
-msgstr "Des langues n'ont pas été écrasées : %s"
-
-msgid "Nothing to import from %s"
-msgstr "Rien à importer"
-
-msgid "Nothing to export"
-msgstr "Rien à exporter"
-
-msgid "Export mask is not set in plugin configuration"
-msgstr "Le masque d'export n'est pas renseigné dans la configuration du plugin"
-
-msgid "Zip file %s is not in translater format"
-msgstr "Le fichier zip n'est pas au format de traduction"
-
-msgid "Unknow language %s"
-msgstr "Langue %s inconnue"
-
-msgid "Language %s already exists"
-msgstr "La langue %s existe déjà"
-
-msgid "Failed to copy file from language %s"
-msgstr "Impossible de copier le fichier depuis la langue %s"
-
-msgid "No string to write, language %s deleted"
-msgstr "Rien à écrire, le fichiers de langue %s est effacé"
-
-msgid "Failed to grant write acces on file %s"
-msgstr "Impossible d'avoir les droits en écriture sur le fichier %s"
-
-msgid "Failed to write file %s"
-msgstr "Impossible d'écrire le fichier %s"
-
-msgid "locales folders of each module"
-msgstr "le fichier locales de chaque module"
-
-msgid "plugins folder root"
-msgstr "la racine du dossier des plugins"
-
-msgid "public folder root"
-msgstr "la racine du dossier public"
-
-msgid "cache folder of Dotclear"
-msgstr "le dossier cache de Dotclear"
-
-msgid "locales folder of translater"
-msgstr "le dossier locales de Traducteur"
-
-msgid "Failed to find module %s"
-msgstr "Impossible de trouver le module %s"
-
-msgid "Failed find language %s"
-msgstr "Impossible de trouver la langue %s"
-
-msgid "Limit of %s backups for module %s exceed"
-msgstr "La limite de %s sauvegardes pour le module %s est atteinte"
-
-msgid "%s language edition"
-msgstr "Edition de la langue %s"
 
 msgid "Nothing to backup"
 msgstr "Rien à sauvegarder"
@@ -168,6 +90,9 @@ msgstr "Rien à effacer"
 
 msgid "Backup successfully deleted"
 msgstr "Sauvegarde effacée avec succès"
+
+msgid "Nothing to export"
+msgstr "Rien à exporter"
 
 msgid "Language successfully exported"
 msgstr "Langue exportée avec succès"
@@ -189,6 +114,12 @@ msgstr "Rien à mettre à jour"
 
 msgid "Language successfully updated"
 msgstr "Langue mise à jour avec succès"
+
+msgid "Themes"
+msgstr "Thèmes"
+
+msgid "%s language edition"
+msgstr "Edition de la langue %s"
 
 msgid "Use this text"
 msgstr "Utiliser ce texte"
@@ -291,4 +222,73 @@ msgstr "Traduire des plugins"
 
 msgid "Translate themes"
 msgstr "Traduire des thèmes"
+
+msgid "locales folders of each module"
+msgstr "le fichier locales de chaque module"
+
+msgid "plugins folder root"
+msgstr "la racine du dossier des plugins"
+
+msgid "public folder root"
+msgstr "la racine du dossier public"
+
+msgid "cache folder of Dotclear"
+msgstr "le dossier cache de Dotclear"
+
+msgid "locales folder of translater"
+msgstr "le dossier locales de Traducteur"
+
+msgid "Failed to find module %s"
+msgstr "Impossible de trouver le module %s"
+
+msgid "Failed find language %s"
+msgstr "Impossible de trouver la langue %s"
+
+msgid "Limit of %s backups for module %s exceed"
+msgstr "La limite de %s sauvegardes pour le module %s est atteinte"
+
+msgid "Failed to find backups folder for module %s"
+msgstr "Impossible de trouver le dossier de sauvegarde pour le module %s"
+
+msgid "Failed to find language %s"
+msgstr "Impossible de trouver la langue %s"
+
+msgid "Failed to find file %s"
+msgstr "Impossible de trouver le fichier %s"
+
+msgid "Failed to delete file %s"
+msgstr "Impossible d'effacer le fichier %s"
+
+msgid "Some languages has not been overwrited %s"
+msgstr "Des langues n'ont pas été écrasées : %s"
+
+msgid "Nothing to import from %s"
+msgstr "Rien à importer"
+
+msgid "Export mask is not set in plugin configuration"
+msgstr "Le masque d'export n'est pas renseigné dans la configuration du plugin"
+
+msgid "Zip file %s is not in translater format"
+msgstr "Le fichier zip n'est pas au format de traduction"
+
+msgid "Unknow language %s"
+msgstr "Langue %s inconnue"
+
+msgid "Language %s already exists"
+msgstr "La langue %s existe déjà"
+
+msgid "Failed to copy file from language %s"
+msgstr "Impossible de copier le fichier depuis la langue %s"
+
+msgid "No string to write, language %s deleted"
+msgstr "Rien à écrire, le fichiers de langue %s est effacé"
+
+msgid "Failed to grant write acces on file %s"
+msgstr "Impossible d'avoir les droits en écriture sur le fichier %s"
+
+msgid "Failed to write file %s"
+msgstr "Impossible d'écrire le fichier %s"
+
+msgid "Translater"
+msgstr "Traducteur"
 

@@ -10,9 +10,12 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return;
-}
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\translater;
+
+use dcCore;
+use form;
 
 /**
  * Microsoft proposal tool.
@@ -27,8 +30,8 @@ class microsoftProposalTool extends translaterProposalTool
     protected function setup()
     {
         $this->setActive(false);
-        $this->client = dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->get('microsoft_proposal_client');
-        $this->secret = dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->get('microsoft_proposal_secret');
+        $this->client = dcCore::app()->blog->settings->get(My::id())->get('microsoft_proposal_client');
+        $this->secret = dcCore::app()->blog->settings->get(My::id())->get('microsoft_proposal_secret');
 
         $this->setName(__('Bing'));
         $this->setDesc(__('Microsoft Bing translation tool'));
@@ -61,8 +64,8 @@ class microsoftProposalTool extends translaterProposalTool
         $secret = empty($_POST['translater_microsoft_proposal_secret']) ?
             '' : $_POST['translater_microsoft_proposal_secret'];
 
-        dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->put('microsoft_proposal_client', $client, 'string', '', true, true);
-        dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->put('microsoft_proposal_secret', $secret, 'string', '', true, true);
+        dcCore::app()->blog->settings->get(My::id())->put('microsoft_proposal_client', $client, 'string', '', true, true);
+        dcCore::app()->blog->settings->get(My::id())->put('microsoft_proposal_secret', $secret, 'string', '', true, true);
     }
 
     public function translate($str, $from, $to)
@@ -82,6 +85,7 @@ class microsoftProposalTool extends translaterProposalTool
     private function doYourFuckingJob($client, $secret, $str, $from, $to)
     {
         try {
+            $translatedStr = '';
             //Client ID of the application.
             $clientID = $client;
             //Client Secret key of the application.

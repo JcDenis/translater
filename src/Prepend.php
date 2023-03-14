@@ -10,18 +10,34 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return;
-}
+declare(strict_types=1);
 
-Clearbricks::lib()->autoload([
-    'dcTranslater'                => __DIR__ . '/inc/class.dc.translater.php',
-    'dcTranslaterDefaultSettings' => __DIR__ . '/inc/class.dc.translater.php',
-    'dcTranslaterModule'          => __DIR__ . '/inc/class.dc.translater.module.php',
-    'dcTranslaterLang'            => __DIR__ . '/inc/class.dc.translater.lang.php',
-    'translaterRest'              => __DIR__ . '/class.translater.rest.php',
-]);
+namespace Dotclear\Plugin\translater;
 
-if (isset(dcCore::app()->adminurl)) {
-    dcCore::app()->adminurl->register(basename(__DIR__), 'plugin.php', ['p' => basename(__DIR__)]);
+use dcCore;
+use dcNsProcess;
+
+class Prepend extends dcNsProcess
+{
+    public static function init(): bool
+    {
+        if (defined('DC_CONTEXT_ADMIN')) {
+            self::$init = dcCore::app()->auth->isSuperAdmin();
+        }
+
+        return self::$init;
+    }
+
+    public static function process(): bool
+    {
+        if (!self::$init) {
+            return false;
+        }
+
+        if (isset(dcCore::app()->adminurl)) {
+            dcCore::app()->adminurl->register(My::id(), 'plugin.php', ['p' => My::id()]);
+        }
+
+        return true;
+    }
 }

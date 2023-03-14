@@ -10,9 +10,14 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return;
-}
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\translater;
+
+use dcCore;
+use html;
+use text;
+use xmlTag;
 
 /**
  * Translater REST service.
@@ -20,7 +25,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
  * Admin service de retrieve translation of a string
  * Queries come from translater jquery tools
  */
-class translaterRest
+class Rest
 {
     public static function getProposal($get)
     {
@@ -40,7 +45,7 @@ class translaterRest
                 throw new Exception(__('Missing params'));
             }
 
-            $translater = new dcTranslater();
+            $translater = new Translater();
 
             if (!empty($str_in)) {
                 if (!$translater->proposal->hasTool($tool)) {

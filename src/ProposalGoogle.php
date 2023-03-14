@@ -10,9 +10,13 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return;
-}
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\translater;
+
+use dcCore;
+use form;
+use netHttp;
 
 /**
  * Google proposal tool.
@@ -22,12 +26,12 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 class googleProposalTool extends translaterProposalTool
 {
     private $api   = 'https://www.googleapis.com/language/translate/v2';
-    private $agent = 'dcTranslater - http://jcd.lv/?q=translater';
+    private $agent = 'Translater - http://jcd.lv/?q=translater';
     private $key   = null; //ex: AsSDqsGsfdSDSQFQsfedj9bnzY390aIg-1d
 
     protected function setup()
     {
-        $this->key = dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->get('google_proposal_key');
+        $this->key = dcCore::app()->blog->settings->get(My::id())->get('google_proposal_key');
 
         $this->setName(__('Google'));
         $this->setDesc(__('Google Translation Tool API'));
@@ -53,7 +57,7 @@ class googleProposalTool extends translaterProposalTool
         $key = empty($_POST['translater_google_proposal_key']) ?
             '' : $_POST['translater_google_proposal_key'];
 
-        dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->put('google_proposal_key', $key, 'string', '', true, true);
+        dcCore::app()->blog->settings->get(My::id())->put('google_proposal_key', $key, 'string', '', true, true);
     }
 
     public function translate($str, $from, $to)

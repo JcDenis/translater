@@ -10,79 +10,24 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return;
-}
+declare(strict_types=1);
 
-class dcTranslaterDefaultSettings
-{
-    /** @var boolean Show tranlsater button on plugins list */
-    public $plugin_menu = false;
-    /** @var boolean Show tranlsater button on themes list */
-    public $theme_menu = false;
-    /** @var boolean Create language backup on save */
-    public $backup_auto = false;
-    /** @var integer Backups number limit */
-    public $backup_limit = 20;
-    /** @var string Backup main folder */
-    public $backup_folder = 'module';
-    /** @var string Default ui start page */
-    public $start_page = '-';
-    /** @var boolean Write .lang.php file (deprecated) */
-    public $write_langphp = false;
-    /** @var boolean SCan also template files for translations */
-    public $scan_tpl = true;
-    /** @var boolean Disable translation of know dotclear strings */
-    public $parse_nodc = true;
-    /** @var boolean Hide official modules */
-    public $hide_default = true;
-    /** @var boolean Add comment to translations files */
-    public $parse_comment = false;
-    /** @var boolean Parse user info to translations files */
-    public $parse_user = false;
-    /** @var string User infos to parse */
-    public $parse_userinfo = 'displayname, email';
-    /** @var boolean Overwrite existing languages on import */
-    public $import_overwrite = false;
-    /** @var string Filename of exported lang */
-    public $export_filename = 'type-module-l10n-timestamp';
-    /** @var string Default service for external proposal tool */
-    public $proposal_tool = 'google';
-    /** @var string Default lang for external proposal tool */
-    public $proposal_lang = 'en';
+namespace Dotclear\Plugin\translater;
 
-    /**
-     * get default settings
-     *
-     * @return array Settings key/value pair
-     */
-    public static function getDefaultSettings()
-    {
-        return get_class_vars('dcTranslaterDefaultSettings');
-    }
-}
+use dcCore;
+use dcThemes;
+use files;
+use l10n;
+use path;
+use text;
 
 /**
  * Translater tools.
  */
-class dcTranslater extends dcTranslaterDefaultSettings
+class Translater
 {
-    /** @var array $allowed_backup_folders List of allowed backup folder */
-    public static $allowed_backup_folders = [];
-
-    /** @var array $allowed_l10n_groups List of place of tranlsations */
-    public static $allowed_l10n_groups = [
-        'main', 'public', 'theme', 'admin', 'date', 'error',
-    ];
-
-    /** @var array $allowed_user_informations List of user info can be parsed */
-    public static $allowed_user_informations = [
-        'firstname', 'displayname', 'name', 'email', 'url',
-    ];
-
-    /** @var array $default_distrib_modules List of distributed plugins and themes */
-    public static $default_distrib_modules = ['plugin' => [], 'theme' => []];
-
+    /** @var array $settings Translater settings */
+    private $settings = [];
     /** @var array $modules List of modules we could work on */
     private $modules = [];
 
@@ -98,18 +43,6 @@ class dcTranslater extends dcTranslaterDefaultSettings
         if ($full) {
             $this->loadModules();
         }
-
-        self::$allowed_backup_folders = [
-            __('locales folders of each module') => 'module',
-            __('plugins folder root')            => 'plugin',
-            __('public folder root')             => 'public',
-            __('cache folder of Dotclear')       => 'cache',
-            __('locales folder of translater')   => basename(dirname(__DIR__)),
-        ];
-        self::$default_distrib_modules = [
-            'plugin' => explode(',', DC_DISTRIB_PLUGINS),
-            'theme'  => explode(',', DC_DISTRIB_THEMES),
-        ];
     }
 
     /// @name settings methods
@@ -119,13 +52,9 @@ class dcTranslater extends dcTranslaterDefaultSettings
      */
     public function loadSettings(): void
     {
-        foreach ($this->getDefaultSettings() as $key => $value) {
-            $this->$key = dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->get($key);
-
-            try {
-                settype($this->$key, gettype($value));
-            } catch (Exception $e) {
-            }
+        foreach (My::defaultSettings() as $key => $value) {
+            $this->settings[$key] = $value;
+            $this->set($key, dcCore::app()->blog->settings->get(My::id())->get($key));
         }
     }
 
@@ -136,43 +65,39 @@ class dcTranslater extends dcTranslaterDefaultSettings
      */
     public function writeSettings($overwrite = true): void
     {
-        foreach ($this->getDefaultSettings() as $key => $value) {
-            dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->drop($key);
-            dcCore::app()->blog->settings->get(basename(dirname(__DIR__)))->put($key, $this->$key, gettype($value), '', true, true);
+        foreach (My::defaultSettings() as $key => $value) {
+            dcCore::app()->blog->settings->get(My::id())->drop($key);
+            dcCore::app()->blog->settings->get(My::id())->put($key, $this->settings[$key], gettype($value), '', true, true);
         }
     }
 
     /**
-     * Upgrade plugin
+     * Read a setting
      *
-     * @return bool Upgrade done
+     * @param string $key The setting id
+     *
+     * @return mixed The setting value
      */
-    public function growUp()
+    public function get(string $key): mixed
     {
-        $current = dcCore::app()->getVersion(basename(dirname(__DIR__)));
+        return $this->settings[$key] ?? null;
+    }
 
-        // use short settings id
-        if ($current && version_compare($current, '2022.12.22', '<')) {
-            $record = dcCore::app()->con->select(
-                'SELECT * FROM ' . dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME . ' ' .
-                "WHERE setting_ns = 'translater' "
-            );
-            while ($record->fetch()) {
-                if (preg_match('/^translater_(.*?)$/', $record->setting_id, $match)) {
-                    $cur             = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
-                    $cur->setting_id = $this->{$match[1]} = $match[1];
-                    $cur->setting_ns = basename(dirname(__DIR__));
-                    $cur->update(
-                        "WHERE setting_id = '" . $record->setting_id . "' and setting_ns = 'translater' " .
-                        'AND blog_id ' . (null === $record->blog_id ? 'IS NULL ' : ("= '" . dcCore::app()->con->escape($record->blog_id) . "' "))
-                    );
-                }
+    /**
+     * Write (temporary) a setting
+     *
+     * @param string $key The setting id
+     * @param mixed $value The setting value
+     */
+    public function set(string $key, mixed $value): void
+    {
+        if (isset($this->settings[$key])) {
+            try {
+                settype($value, gettype($this->settings[$key]));
+                $this->settings[$key] = $value;
+            } catch (Exception $e) {
             }
-
-            return true;
         }
-
-        return false;
     }
     //@}
 
@@ -185,11 +110,13 @@ class dcTranslater extends dcTranslaterDefaultSettings
     {
         $this->modules['theme'] = $this->modules['plugin'] = [];
 
-        $themes = new dcThemes();
-        $themes->loadModules(dcCore::app()->blog->themes_path, null);
+        if (!(dcCore::app()->themes instanceof dcThemes)) {
+            dcCore::app()->themes = new dcThemes();
+            dcCore::app()->themes->loadModules(dcCore::app()->blog->themes_path, null);
+        }
 
         $list = [
-            'theme'  => $themes->getModules(),
+            'theme'  => dcCore::app()->themes->getModules(),
             'plugin' => dcCore::app()->plugins->getModules(),
         ];
         foreach ($list as $type => $modules) {
@@ -199,7 +126,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
                 }
                 $info['id']                = $id;
                 $info['type']              = $type;
-                $this->modules[$type][$id] = new dcTranslaterModule($this, $info);
+                $this->modules[$type][$id] = new TranslaterModule($this, $info);
             }
         }
     }
@@ -224,9 +151,9 @@ class dcTranslater extends dcTranslaterDefaultSettings
      * @param  string   $type       The module type
      * @param  string   $id         The module id
      *
-     * @return dcTranslaterModule   The dcTranslaterModule instance
+     * @return TranslaterModule   The TranslaterModule instance
      */
-    public function getModule(string $type, string $id)
+    public function getModule(string $type, string $id): TranslaterModule
     {
         if (!isset($this->modules[$type][$id])) {
             throw new Exception(
@@ -240,12 +167,12 @@ class dcTranslater extends dcTranslaterDefaultSettings
     /**
      * Return module class of a particular module for a given type of module
      *
-     * @param  dcTranslaterModule   $module     dcTranslaterModule instance
+     * @param  TranslaterModule   $module     TranslaterModule instance
      * @param  string               $lang       The lang iso code
      *
-     * @return dcTranslaterLang                 dcTranslaterLang instance or false
+     * @return TranslaterLang                 TranslaterLang instance or false
      */
-    public function getLang(dcTranslaterModule $module, string $lang)
+    public function getLang(TranslaterModule $module, string $lang): TranslaterLang
     {
         if (!l10n::isCode($lang)) {
             throw new Exception(
@@ -253,7 +180,7 @@ class dcTranslater extends dcTranslaterDefaultSettings
             );
         }
 
-        return new dcTranslaterLang($module, $lang);
+        return new TranslaterLang($module, $lang);
     }
     //@}
 

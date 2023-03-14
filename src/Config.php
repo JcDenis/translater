@@ -10,93 +10,169 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_MODULE')) {
-    return null;
-}
+declare(strict_types=1);
 
-$translater = new dcTranslater();
+namespace Dotclear\Plugin\translater;
 
-if (!empty($_POST['save'])) {
-    try {
-        foreach ($translater->getDefaultSettings() as $key => $value) {
-            $translater->$key = $_POST[$key] ?? '';
+use dcCore;
+use dcNsProcess;
+use dcPage;
+
+use Dotclear\Helper\Html\Form\{
+    Checkbox,
+    Div,
+    Fieldset,
+    Input,
+    Label,
+    Legend,
+    Note,
+    Number,
+    Para,
+    Select
+};
+
+class Config extends dcNsProcess
+{
+    public static function init(): bool
+    {
+        self::$init = defined('DC_CONTEXT_ADMIN');
+
+        return self::$init;
+    }
+
+    public static function process(): bool
+    {
+        if (!self::$init) {
+            return false;
         }
-        $translater->writeSettings();
-        dcAdminNotices::addSuccessNotice(
-            __('Configuration successfully updated.')
-        );
-        dcCore::app()->adminurl->redirect(
-            'admin.plugins',
-            ['module' => basename(__DIR__), 'conf' => 1, 'redir' => dcCore::app()->admin->__get('list')->getRedir()]
-        );
-    } catch (Exception $e) {
-        dcCore::app()->error->add($e->getMessage());
+
+        // nothing to process
+        if (empty($_POST['save'])) {
+            return true;
+        }
+
+        $translater = new Translater();
+
+        try {
+            foreach (My::defaultSettings() as $key => $value) {
+                $translater->set($key, $_POST[$key] ?? '');
+            }
+            $translater->writeSettings();
+
+            dcPage::addSuccessNotice(
+                __('Configuration successfully updated.')
+            );
+            dcCore::app()->adminurl->redirect(
+                'admin.plugins',
+                ['module' => My::id(), 'conf' => 1, 'redir' => dcCore::app()->admin->__get('list')->getRedir()]
+            );
+        } catch (Exception $e) {
+            dcCore::app()->error->add($e->getMessage());
+        }
+
+        return true;
+    }
+
+    public static function render(): void
+    {
+        if (!self::$init) {
+            return;
+        }
+
+        $translater = new Translater();
+
+        echo (new Div())->items([
+            (new Fieldset())->class('fieldset')->legend((new Legend(__('Translation'))))->fields([
+                // write_langphp
+                (new Para())->items([
+                    (new Checkbox('write_langphp', $translater->get('write_langphp')))->value(1),
+                    (new Label(__('Write .lang.php files'), Label::OUTSIDE_LABEL_AFTER))->for('write_langphp')->class('classic'),
+                ]),
+                // scan_tpl
+                (new Para())->items([
+                    (new Checkbox('scan_tpl', $translater->get('scan_tpl')))->value(1),
+                    (new Label(__('Translate also strings of template files'), Label::OUTSIDE_LABEL_AFTER))->for('scan_tpl')->class('classic'),
+                ]),
+                // parse_nodc
+                (new Para())->items([
+                    (new Checkbox('parse_nodc', $translater->get('parse_nodc')))->value(1),
+                    (new Label(__('Translate only unknow strings'), Label::OUTSIDE_LABEL_AFTER))->for('parse_nodc')->class('classic'),
+                ]),
+                // hide_default
+                (new Para())->items([
+                    (new Checkbox('hide_default', $translater->get('hide_default')))->value(1),
+                    (new Label(__('Hide default modules of Dotclear'), Label::OUTSIDE_LABEL_AFTER))->for('hide_default')->class('classic'),
+                ]),
+                // parse_comment
+                (new Para())->items([
+                    (new Checkbox('parse_comment', $translater->get('parse_comment')))->value(1),
+                    (new Label(__('Write comments in files'), Label::OUTSIDE_LABEL_AFTER))->for('parse_comment')->class('classic'),
+                ]),
+                // parse_user
+                (new Para())->items([
+                    (new Checkbox('parse_user', $translater->get('parse_user')))->value(1),
+                    (new Label(__('Write informations about author in files'), Label::OUTSIDE_LABEL_AFTER))->for('parse_user')->class('classic'),
+                ]),
+                // parse_userinfo
+                (new Para())->items([
+                    (new Label(__('User info:')))->for('parse_userinfo'),
+                    (new Input('parse_userinfo'))->size(65)->maxlenght(255)->value($translater->get('parse_userinfo')),
+                ]),
+                (new Note())->text(sprintf(
+                    __('Following informations can be used: %s'),
+                    implode(', ', My::defaultUserInformations())
+                ))->class('form-note'),
+            ]),
+            (new Fieldset())->class('fieldset')->legend((new Legend(__('Import/Export'))))->fields([
+                // import_overwrite
+                (new Para())->items([
+                    (new Checkbox('import_overwrite', $translater->get('import_overwrite')))->value(1),
+                    (new Label(__('Overwrite existing languages'), Label::OUTSIDE_LABEL_AFTER))->for('import_overwrite')->class('classic'),
+                ]),
+                // export_filename
+                (new Para())->items([
+                    (new Label(__('Name of exported package:')))->for('export_filename'),
+                    (new Input('export_filename'))->size(65)->maxlenght(255)->value($translater->get('export_filename')),
+                ]),
+            ]),
+            (new Fieldset())->class('fieldset')->legend((new Legend(__('Backups'))))->fields([
+                // backup_auto
+                (new Para())->items([
+                    (new Checkbox('backup_auto', $translater->get('backup_auto')))->value(1),
+                    (new Label(__('Make backups when changes are made'), Label::OUTSIDE_LABEL_AFTER))->for('backup_auto')->class('classic'),
+                ]),
+                // backup_limit
+                (new Para())->items([
+                    (new Label(__('Limit backups per module to:')))->for('backup_limit')->class('classic'),
+                    (new Number('backup_limit'))->min(0)->max(50)->value($translater->get('backup_limit')),
+                ]),
+                (new Note())->text(__('Set to 0 for no limit.'))->class('form-note'),
+                // backup_folder
+                (new Para())->items([
+                    (new Label(__('Store backups in:')))->for('backup_folder'),
+                    (new Select('backup_folder'))->default($translater->get('backup_folder'))->items(My::backupFoldersCombo()),
+                ]),
+            ]),
+            (new Fieldset())->class('fieldset')->legend((new Legend(__('Behaviors'))))->fields([
+                // start_page
+                (new Para())->items([
+                    (new Label(__('Default start menu:')))->for('start_page'),
+                    (new Select('start_page'))->default($translater->get('start_page'))->items(My::startPageCombo()),
+                ]),
+                // plugin_menu
+                (new Para())->items([
+                    (new Checkbox('plugin_menu', $translater->get('plugin_menu')))->value(1),
+                    (new Label(__('Enable menu on plugins page'), Label::OUTSIDE_LABEL_AFTER))->for('plugin_menu')->class('classic'),
+                ]),
+                // theme_menu
+                (new Para())->items([
+                    (new Checkbox('theme_menu', $translater->get('theme_menu')))->value(1),
+                    (new Label(__('Enable menu on themes page'), Label::OUTSIDE_LABEL_AFTER))->for('theme_menu')->class('classic'),
+                ]),
+
+            ]),
+        ])->render();
+
+        dcPage::helpBlock('translater.config');
     }
 }
-
-echo '
-<div class="fieldset"><h4>' . __('Translation') . '</h4>
-<p><label for="write_langphp">' .
-form::checkbox('write_langphp', '1', $translater->write_langphp) .
-__('Write .lang.php files') . '</label></p>
-<p><label for="scan_tpl">' .
-form::checkbox('scan_tpl', '1', $translater->scan_tpl) .
-__('Translate also strings of template files') . '</label></p>
-<p><label for="parse_nodc">' .
-form::checkbox('parse_nodc', '1', $translater->parse_nodc) .
-__('Translate only unknow strings') . '</label></p>
-<p><label for="hide_default">' .
-form::checkbox('hide_default', '1', $translater->hide_default) .
-__('Hide default modules of Dotclear') . '</label></p>
-<p><label for="parse_comment">' .
-form::checkbox('parse_comment', '1', $translater->parse_comment) .
-__('Write comments in files') . '</label></p>
-<p><label for="parse_user">' .
-form::checkbox('parse_user', '1', $translater->parse_user) .
-__('Write informations about author in files') . '</label></p>
-<p><label for="parse_userinfo">' . __('User info:') . '</label>' .
-form::field('parse_userinfo', 65, 255, $translater->parse_userinfo) . '</p>
-<p class="form-note">' . sprintf(
-    __('Following informations can be used: %s'),
-    implode(', ', $translater::$allowed_user_informations)
-) . '
-</p>
-</div>
-
-<div class="fieldset"><h4>' . __('Import/Export') . '</h4>
-<p><label for="import_overwrite">' .
-form::checkbox('import_overwrite', '1', $translater->import_overwrite) .
-__('Overwrite existing languages') . '</label></p>
-<p><label for="export_filename">' . __('Name of exported package:') . '</label>' .
-form::field('export_filename', 65, 255, $translater->export_filename) . '</p>
-</div>
-
-<div class="fieldset"><h4>' . __('Backups') . '</h4>
-<p><label for="backup_auto">' .
-form::checkbox('backup_auto', '1', $translater->backup_auto) .
-__('Make backups when changes are made') . '</label></p>
-<p><label for="backup_limit" class="classic">' . sprintf(
-    __('Limit backups to %s files per module'),
-    form::number('backup_limit', ['min' => 0, 'max' => 50, 'default' => $translater->backup_limit])
-) . '</label></p>
-<p class="form-note">' . __('Set to 0 for no limit.') . '</p>
-<p><label for="backup_folder">' . __('Store backups in:') . '</label>' .
-form::combo('backup_folder', $translater::$allowed_backup_folders, $translater->backup_folder) . '</p>
-</div>
-
-<div class="fieldset"><h4>' . __('Behaviors') . '</h4>
-<p><label for="start_page">' . __('Default start menu:') . '</label>' .
-form::combo('start_page', [
-    __('Plugins') => 'plugin',
-    __('Themes')  => 'theme',
-    __('Home')    => '-',
-], $translater->start_page) . '</p>
-<p><label for="plugin_menu">' .
-form::checkbox('plugin_menu', '1', $translater->plugin_menu) .
-__('Enable menu on plugins page') . '</label></p>
-<p><label for="theme_menu">' .
-form::checkbox('theme_menu', '1', $translater->theme_menu) .
-__('Enable menu on themes page') . '</label></p>
-</div>';
-
-dcPage::helpBlock('translater.config');

@@ -3,6 +3,10 @@ dev
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2023.03.15
+- update to Dotclear 2.26-dev
+- use namespace
+
 2022.12.26
 - fix wrong dt::str parameter (thx Pierre Van Glabeke)
 - fix backup limit (unlimited)

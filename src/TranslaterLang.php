@@ -130,7 +130,7 @@ class TranslaterLang
     {
         $res      = [];
         $scan_ext = ['php'];
-        if ($this->translater->get('scan_tpl')) {
+        if ($this->translater->scan_tpl) {
             $scan_ext[] = 'html';
         }
 

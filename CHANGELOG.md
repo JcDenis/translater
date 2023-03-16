@@ -3,6 +3,11 @@ dev
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2023.03.16
+- require php 8.1
+- tyring something diferent for settings 
+- fix previously introduced bug
+
 2023.03.15
 - update to Dotclear 2.26-dev
 - use namespace

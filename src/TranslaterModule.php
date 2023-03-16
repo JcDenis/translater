@@ -78,7 +78,7 @@ class TranslaterModule
     public function getBackupRoot(bool $throw = false)
     {
         $dir = false;
-        switch ($this->translater->get('backup_folder')) {
+        switch ($this->translater->backup_folder) {
             case 'module':
                 if ($this->prop['root_writable']) {
                     $dir = $this->prop['locales'];
@@ -199,7 +199,7 @@ class TranslaterModule
         }
 
         if (!empty($res)) {
-            Translater::isBackupLimit($this->prop['id'], $backup, $this->translater->get('backup_limit'), true);
+            Translater::isBackupLimit($this->prop['id'], $backup, $this->translater->backup_limit, true);
 
             @set_time_limit(300);
             $fp  = fopen($backup . '/l10n-' . $this->prop['id'] . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
@@ -300,7 +300,7 @@ class TranslaterModule
         foreach ($files as $file) {
             $f = $this->parseZipFilename($file, true);
 
-            if (!$this->translater->get('import_overwrite')
+            if (!$this->translater->import_overwrite
                 && file_exists($this->prop['locales'] . '/' . $f['lang'] . '/' . $f['group'] . $f['ext'])
             ) {
                 $not_overwrited[] = implode('-', [$f['lang'], $f['group'], $f['ext']]);
@@ -354,7 +354,7 @@ class TranslaterModule
             );
         }
 
-        $filename = files::tidyFileName($this->translater->get('export_filename'));
+        $filename = files::tidyFileName($this->translater->export_filename);
         if (empty($filename)) {
             throw new Exception(
                 __('Export mask is not set in plugin configuration')
@@ -396,7 +396,7 @@ class TranslaterModule
         $filename = files::tidyFileName(dt::str(str_replace(
             ['timestamp', 'module', 'type', 'version'],
             [time(), $this->prop['id'], $this->prop['type'], $this->prop['version']],
-            $this->translater->get('export_filename')
+            $this->translater->export_filename
         )));
 
         header('Content-Disposition: attachment;filename=' . $filename . '.zip');
@@ -577,7 +577,7 @@ class TranslaterModule
             ));
         }
 
-        if ($this->translater->get('backup_auto')) {
+        if ($this->translater->backup_auto) {
             $this->createBackup($lang);
         }
 
@@ -672,18 +672,18 @@ class TranslaterModule
         $lang = new TranslaterLang($this, $lang);
 
         $content = '';
-        if ($this->translater->get('parse_comment')) {
+        if ($this->translater->parse_comment) {
             $content .= '# Language: ' . $lang->get('name') . "\n" .
             '# Module: ' . $this->get('id') . ' - ' . $this->get('version') . "\n" .
             '# Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
 
-            if ($this->translater->get('parse_user') && $this->translater->get('parse_userinfo') != '') {
+            if ($this->translater->parse_user && $this->translater->parse_userinfo != '') {
                 $search  = My::defaultUserInformations();
                 $replace = [];
                 foreach ($search as $n) {
                     $replace[] = dcCore::app()->auth->getInfo('user_' . $n);
                 }
-                $info = trim(str_replace($search, $replace, $this->translater->get('parse_userinfo')));
+                $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
                     $content .= '# Author: ' . html::escapeHTML($info) . "\n";
                 }
@@ -703,7 +703,7 @@ class TranslaterModule
         '"Plural-Forms: nplurals=2; plural=(n > 1);\n"' . "\n\n";
 
         $comments = [];
-        if ($this->translater->get('parse_comment')) {
+        if ($this->translater->parse_comment) {
             $msgids = $lang->getMsgids();
             foreach ($msgids as $msg) {
                 $comments[$msg['msgid']] = ($comments[$msg['msgid']] ?? '') .
@@ -715,7 +715,7 @@ class TranslaterModule
             if (empty($msg['msgstr'][0])) {
                 continue;
             }
-            if ($this->translater->get('parse_comment') && isset($comments[$msg['msgid']])) {
+            if ($this->translater->parse_comment && isset($comments[$msg['msgid']])) {
                 $content .= $comments[$msg['msgid']];
             }
             $content .= 'msgid "' . Translater::poString($msg['msgid'], true) . '"' . "\n";
@@ -757,25 +757,25 @@ class TranslaterModule
      */
     private function setLangphpContent(string $lang, string $group, array $msgs): void
     {
-        if (!$this->translater->get('write_langphp')) {
+        if (!$this->translater->write_langphp) {
             return;
         }
 
         $lang = new TranslaterLang($this, $lang);
 
         $content = '';
-        if ($this->translater->get('parse_comment')) {
+        if ($this->translater->parse_comment) {
             $content .= '// Language: ' . $lang->get('name') . "\n" .
             '// Module: ' . $this->get('id') . ' - ' . $this->get('verison') . "\n" .
             '// Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
 
-            if ($this->translater->get('parse_user') && !empty($this->translater->get('parse_userinfo'))) {
+            if ($this->translater->parse_user && !empty($this->translater->parse_userinfo)) {
                 $search  = My::defaultUserInformations();
                 $replace = [];
                 foreach ($search as $n) {
                     $replace[] = dcCore::app()->auth->getInfo('user_' . $n);
                 }
-                $info = trim(str_replace($search, $replace, $this->translater->get('parse_userinfo')));
+                $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
                     $content .= '// Author: ' . html::escapeHTML($info) . "\n";
                 }

@@ -16,7 +16,7 @@ namespace Dotclear\Plugin\translater;
 
 use adminModulesList;
 use dcCore;
-use Dotclear\Helper\Html\Form\Input;
+use Dotclear\Helper\Html\Form\Submit;
 use html;
 
 class BackendBehaviors
@@ -50,18 +50,18 @@ class BackendBehaviors
     public static function adminModulesGetActions(adminModulesList $list, string $id, array $prop): ?string
     {
         if ($list->getList() != $prop['type'] . '-activate'
-            || !self::translater()->get($prop['type'] . '_menu')
+            || !self::translater()->getSetting($prop['type'] . '_menu')
             || !dcCore::app()->auth->isSuperAdmin()
         ) {
             return null;
         }
-        if (self::translater()->get('hide_default')
+        if (self::translater()->hide_default
             && in_array($id, My::defaultDistribModules($prop['type']))
         ) {
             return null;
         }
 
-        return (new Input(['translater[' . html::escapeHTML($id) . ']', null]))->value(__('Translate'));
+        return (new Submit(['translater[' . html::escapeHTML($id) . ']', null]))->value(__('Translate'))->render();
     }
 
     /**

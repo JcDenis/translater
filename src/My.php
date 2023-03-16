@@ -21,6 +21,9 @@ use dcCore;
  */
 class My
 {
+    // required php version
+    public const PHP_MIN = '8.1';
+
     /**
      * This module id
      */
@@ -96,45 +99,5 @@ class My
         ];
 
         return $types[$type] ?? [];
-    }
-
-    public static function defaultSettings(): array
-    {
-        return [
-            // Show tranlsater button on plugins list
-            'plugin_menu' => false,
-            // Show tranlsater button on themes list
-            'theme_menu' => false,
-            // Create language backup on save
-            'backup_auto' => false,
-            // Backups number limit
-            'backup_limit' => 20,
-            // Backup main folder
-            'backup_folder' => 'module',
-            // Default ui start page
-            'start_page' => '-',
-            // Write .lang.php file (deprecated)
-            'write_langphp' => false,
-            // Scan also template files for translations
-            'scan_tpl' => true,
-            // Disable translation of know dotclear strings
-            'parse_nodc' => true,
-            // Hide official modules
-            'hide_default' => true,
-            // Add comment to translations files
-            'parse_comment' => false,
-            // Parse user info to translations files
-            'parse_user' => false,
-            // User infos to parse
-            'parse_userinfo' => 'displayname, email',
-            // Overwrite existing languages on import
-            'import_overwrite' => false,
-            // Filename of exported lang
-            'export_filename' => 'type-module-l10n-timestamp',
-            // Default service for external proposal tool
-            'proposal_tool' => 'google',
-            // Default lang for external proposal tool
-            'proposal_lang' => 'en',
-        ];
     }
 }

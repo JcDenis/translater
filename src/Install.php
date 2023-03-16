@@ -22,7 +22,9 @@ class Install extends dcNsProcess
 {
     public static function init(): bool
     {
-        self::$init = defined('DC_CONTEXT_ADMIN') && dcCore::app()->newVersion(My::id(), dcCore::app()->plugins->moduleInfo(My::id(), 'version'));
+        self::$init = defined('DC_CONTEXT_ADMIN')
+            && version_compare(phpversion(), My::PHP_MIN, '>=')
+            && dcCore::app()->newVersion(My::id(), dcCore::app()->plugins->moduleInfo(My::id(), 'version'));
 
         return self::$init;
     }
@@ -35,11 +37,6 @@ class Install extends dcNsProcess
 
         try {
             self::growUp();
-
-            foreach (My::defaultSettings() as $key => $value) {
-                dcCore::app()->blog->settings->get(My::id())->drop($key);
-                dcCore::app()->blog->settings->get(My::id())->put($key, $value, gettype($value), '', false, true);
-            }
 
             return true;
         } catch (Exception $e) {

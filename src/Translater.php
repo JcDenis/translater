@@ -24,10 +24,8 @@ use text;
 /**
  * Translater tools.
  */
-class Translater
+class Translater extends Settings
 {
-    /** @var array $settings Translater settings */
-    private $settings = [];
     /** @var array $modules List of modules we could work on */
     private $modules = [];
 
@@ -38,68 +36,12 @@ class Translater
      */
     public function __construct(bool $full = true)
     {
-        $this->loadSettings();
+        parent::__construct();
 
         if ($full) {
             $this->loadModules();
         }
     }
-
-    /// @name settings methods
-    //@{
-    /**
-     * Load settings from db
-     */
-    public function loadSettings(): void
-    {
-        foreach (My::defaultSettings() as $key => $value) {
-            $this->settings[$key] = $value;
-            $this->set($key, dcCore::app()->blog->settings->get(My::id())->get($key));
-        }
-    }
-
-    /**
-     * Write settings to db
-     *
-     * @param  boolean $overwrite Overwrite existing settings
-     */
-    public function writeSettings($overwrite = true): void
-    {
-        foreach (My::defaultSettings() as $key => $value) {
-            dcCore::app()->blog->settings->get(My::id())->drop($key);
-            dcCore::app()->blog->settings->get(My::id())->put($key, $this->settings[$key], gettype($value), '', true, true);
-        }
-    }
-
-    /**
-     * Read a setting
-     *
-     * @param string $key The setting id
-     *
-     * @return mixed The setting value
-     */
-    public function get(string $key): mixed
-    {
-        return $this->settings[$key] ?? null;
-    }
-
-    /**
-     * Write (temporary) a setting
-     *
-     * @param string $key The setting id
-     * @param mixed $value The setting value
-     */
-    public function set(string $key, mixed $value): void
-    {
-        if (isset($this->settings[$key])) {
-            try {
-                settype($value, gettype($this->settings[$key]));
-                $this->settings[$key] = $value;
-            } catch (Exception $e) {
-            }
-        }
-    }
-    //@}
 
     /// @name modules methods
     //@{

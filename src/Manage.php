@@ -27,7 +27,7 @@ class Manage extends dcNsProcess
     public static function init(): bool
     {
         if (defined('DC_CONTEXT_ADMIN')) {
-            self::$init = dcCore::app()->auth->isSuperAdmin();
+            self::$init = dcCore::app()->auth->isSuperAdmin() && version_compare(phpversion(), My::PHP_MIN, '>=');
         }
 
         return self::$init;
@@ -41,7 +41,7 @@ class Manage extends dcNsProcess
 
         // set vars used in process and render methods
         dcCore::app()->admin->translater = new Translater();
-        dcCore::app()->admin->type       = $_REQUEST['type']   ?? dcCore::app()->admin->translater->get('start_page') ?: '';
+        dcCore::app()->admin->type       = $_REQUEST['type']   ?? dcCore::app()->admin->translater->start_page ?: '';
         dcCore::app()->admin->module     = $_REQUEST['module'] ?? '';
         dcCore::app()->admin->lang       = $_REQUEST['lang']   ?? '';
         $action                          = $_POST['action']    ?? '';
@@ -223,7 +223,7 @@ class Manage extends dcNsProcess
             $modules = dcCore::app()->admin->translater->getModules(dcCore::app()->admin->type);
             ksort($modules);
             foreach ($modules as $module) {
-                if (dcCore::app()->admin->translater->get('hide_default') && in_array($module->id, My::defaultDistribModules(dcCore::app()->admin->type))) {
+                if (dcCore::app()->admin->translater->hide_default && in_array($module->id, My::defaultDistribModules(dcCore::app()->admin->type))) {
                     continue;
                 }
                 if ($module->root_writable) {
@@ -390,7 +390,7 @@ class Manage extends dcNsProcess
                                 $backup_code['name'],
                                 $backup_code['code'],
                                 dt::str(
-                                    dcCore::app()->blog->settings->get('system')->get('date_format') . ' ' . dcCore::app()->blog->get('settings')->get('system->time_format'),
+                                    dcCore::app()->blog->settings->get('system')->get('date_format') . ' ' . dcCore::app()->blog->settings->get('system->time_format'),
                                     (int) $backup_code['time'],
                                     dcCore::app()->blog->settings->get('system')->get('blog_timezone')
                                 ),
@@ -491,7 +491,7 @@ class Manage extends dcNsProcess
 
             $i = 1;
             foreach ($lines as $msgid => $rs) {
-                $in_dc    = ($rs['in_dc'] && dcCore::app()->admin->translater->get('parse_nodc'));
+                $in_dc    = ($rs['in_dc'] && dcCore::app()->admin->translater->parse_nodc);
                 $t_msgstr = $t_files = $strin = [];
 
                 foreach ($rs['o_msgstrs'] as $o_msgstr) {

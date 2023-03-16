@@ -84,44 +84,44 @@ class Config extends dcNsProcess
             return;
         }
 
-        $translater = new Translater();
+        $s = new Settings();
 
         echo (new Div())->items([
             (new Fieldset())->class('fieldset')->legend((new Legend(__('Translation'))))->fields([
                 // write_langphp
                 (new Para())->items([
-                    (new Checkbox('write_langphp', $translater->write_langphp))->value(1),
+                    (new Checkbox('write_langphp', $s->write_langphp))->value(1),
                     (new Label(__('Write .lang.php files'), Label::OUTSIDE_LABEL_AFTER))->for('write_langphp')->class('classic'),
                 ]),
                 // scan_tpl
                 (new Para())->items([
-                    (new Checkbox('scan_tpl', $translater->scan_tpl))->value(1),
+                    (new Checkbox('scan_tpl', $s->scan_tpl))->value(1),
                     (new Label(__('Translate also strings of template files'), Label::OUTSIDE_LABEL_AFTER))->for('scan_tpl')->class('classic'),
                 ]),
                 // parse_nodc
                 (new Para())->items([
-                    (new Checkbox('parse_nodc', $translater->parse_nodc))->value(1),
+                    (new Checkbox('parse_nodc', $s->parse_nodc))->value(1),
                     (new Label(__('Translate only unknow strings'), Label::OUTSIDE_LABEL_AFTER))->for('parse_nodc')->class('classic'),
                 ]),
                 // hide_default
                 (new Para())->items([
-                    (new Checkbox('hide_default', $translater->hide_default))->value(1),
+                    (new Checkbox('hide_default', $s->hide_default))->value(1),
                     (new Label(__('Hide default modules of Dotclear'), Label::OUTSIDE_LABEL_AFTER))->for('hide_default')->class('classic'),
                 ]),
                 // parse_comment
                 (new Para())->items([
-                    (new Checkbox('parse_comment', $translater->parse_comment))->value(1),
+                    (new Checkbox('parse_comment', $s->parse_comment))->value(1),
                     (new Label(__('Write comments in files'), Label::OUTSIDE_LABEL_AFTER))->for('parse_comment')->class('classic'),
                 ]),
                 // parse_user
                 (new Para())->items([
-                    (new Checkbox('parse_user', $translater->parse_user))->value(1),
+                    (new Checkbox('parse_user', $s->parse_user))->value(1),
                     (new Label(__('Write informations about author in files'), Label::OUTSIDE_LABEL_AFTER))->for('parse_user')->class('classic'),
                 ]),
                 // parse_userinfo
                 (new Para())->items([
                     (new Label(__('User info:')))->for('parse_userinfo'),
-                    (new Input('parse_userinfo'))->size(65)->maxlenght(255)->value($translater->parse_userinfo),
+                    (new Input('parse_userinfo'))->size(65)->maxlenght(255)->value($s->parse_userinfo),
                 ]),
                 (new Note())->text(sprintf(
                     __('Following informations can be used: %s'),
@@ -131,47 +131,47 @@ class Config extends dcNsProcess
             (new Fieldset())->class('fieldset')->legend((new Legend(__('Import/Export'))))->fields([
                 // import_overwrite
                 (new Para())->items([
-                    (new Checkbox('import_overwrite', $translater->import_overwrite))->value(1),
+                    (new Checkbox('import_overwrite', $s->import_overwrite))->value(1),
                     (new Label(__('Overwrite existing languages'), Label::OUTSIDE_LABEL_AFTER))->for('import_overwrite')->class('classic'),
                 ]),
                 // export_filename
                 (new Para())->items([
                     (new Label(__('Name of exported package:')))->for('export_filename'),
-                    (new Input('export_filename'))->size(65)->maxlenght(255)->value($translater->export_filename),
+                    (new Input('export_filename'))->size(65)->maxlenght(255)->value($s->export_filename),
                 ]),
             ]),
             (new Fieldset())->class('fieldset')->legend((new Legend(__('Backups'))))->fields([
                 // backup_auto
                 (new Para())->items([
-                    (new Checkbox('backup_auto', $translater->backup_auto))->value(1),
+                    (new Checkbox('backup_auto', $s->backup_auto))->value(1),
                     (new Label(__('Make backups when changes are made'), Label::OUTSIDE_LABEL_AFTER))->for('backup_auto')->class('classic'),
                 ]),
                 // backup_limit
                 (new Para())->items([
                     (new Label(__('Limit backups per module to:')))->for('backup_limit')->class('classic'),
-                    (new Number('backup_limit'))->min(0)->max(50)->value($translater->backup_limit),
+                    (new Number('backup_limit'))->min(0)->max(50)->value($s->backup_limit),
                 ]),
                 (new Note())->text(__('Set to 0 for no limit.'))->class('form-note'),
                 // backup_folder
                 (new Para())->items([
                     (new Label(__('Store backups in:')))->for('backup_folder'),
-                    (new Select('backup_folder'))->default($translater->backup_folder)->items(My::backupFoldersCombo()),
+                    (new Select('backup_folder'))->default($s->backup_folder)->items(My::backupFoldersCombo()),
                 ]),
             ]),
             (new Fieldset())->class('fieldset')->legend((new Legend(__('Behaviors'))))->fields([
                 // start_page
                 (new Para())->items([
                     (new Label(__('Default start menu:')))->for('start_page'),
-                    (new Select('start_page'))->default($translater->start_page)->items(My::startPageCombo()),
+                    (new Select('start_page'))->default($s->start_page)->items(My::startPageCombo()),
                 ]),
                 // plugin_menu
                 (new Para())->items([
-                    (new Checkbox('plugin_menu', $translater->plugin_menu))->value(1),
+                    (new Checkbox('plugin_menu', $s->plugin_menu))->value(1),
                     (new Label(__('Enable menu on plugins page'), Label::OUTSIDE_LABEL_AFTER))->for('plugin_menu')->class('classic'),
                 ]),
                 // theme_menu
                 (new Para())->items([
-                    (new Checkbox('theme_menu', $translater->theme_menu))->value(1),
+                    (new Checkbox('theme_menu', $s->theme_menu))->value(1),
                     (new Label(__('Enable menu on themes page'), Label::OUTSIDE_LABEL_AFTER))->for('theme_menu')->class('classic'),
                 ]),
 

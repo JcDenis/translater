@@ -54,7 +54,7 @@ class TranslaterModule
      * @param  string $key The module property key
      * @return mixed       The module property value or null
      */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         return array_key_exists($key, $this->prop) ? $this->prop[$key] : null;
     }
@@ -62,7 +62,7 @@ class TranslaterModule
     /**
      * Magic get
      */
-    public function __get($key)
+    public function __get(string $key): mixed
     {
         return $this->get($key);
     }
@@ -73,9 +73,9 @@ class TranslaterModule
      * Find backup folder of a module
      *
      * @param  boolean $throw Silently failed
-     * @return mixed          The backup folder directory or false
+     * @return string|false   The backup folder directory or false
      */
-    public function getBackupRoot(bool $throw = false)
+    public function getBackupRoot(bool $throw = false): string|false
     {
         $dir = false;
         switch ($this->translater->backup_folder) {

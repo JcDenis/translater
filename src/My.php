@@ -57,7 +57,7 @@ class My
     /**
      * List of possible home tab of the plugin
      */
-    public static function startPageCombo()
+    public static function startPageCombo(): array
     {
         return [
             __('Plugins') => 'plugin',

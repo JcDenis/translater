@@ -44,7 +44,7 @@ class TranslaterLang
      * @param  string $key The lang property key
      * @return mixed       The lang property value or null
      */
-    public function get(string $key)
+    public function get(string $key): mixed
     {
         return array_key_exists($key, $this->prop) ? $this->prop[$key] : null;
     }
@@ -52,7 +52,7 @@ class TranslaterLang
     /**
      * Magic get
      */
-    public function __get($key)
+    public function __get(string $key): mixed
     {
         return $this->get($key);
     }

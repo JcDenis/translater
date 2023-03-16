@@ -16,7 +16,7 @@ namespace Dotclear\Plugin\translater;
 
 class Uninstall
 {
-    protected static $init = false;
+    protected static bool $init = false;
 
     public static function init(): bool
     {

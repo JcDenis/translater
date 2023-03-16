@@ -18,7 +18,10 @@ use dcCore;
 
 class ManageContainer
 {
-    private static ManageContainer $container;
+    /**
+     * @var ManageContainer self instance
+     */
+    private static $container;
 
     public readonly Translater $translater;
     public readonly string|TranslaterModule $module;

@@ -39,7 +39,7 @@ class Config extends dcNsProcess
             if (version_compare(phpversion(), My::PHP_MIN, '>=')) {
                 self::$init = true;
             } else {
-                dcCore::app()->error->add(sprintf(__('Translater required php >= %s'), My::PHP_MIN));
+                dcCore::app()->error->add(sprintf(__('%s required php >= %s'), My::id(), My::PHP_MIN));
             }
         }
 

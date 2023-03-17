@@ -39,7 +39,7 @@ class Manage extends dcNsProcess
             return false;
         }
 
-        $current = ManageContainer::init();
+        $current = ManageVars::init();
 
         // execute action
         try {
@@ -150,7 +150,7 @@ class Manage extends dcNsProcess
             return;
         }
 
-        $current = ManageContainer::init();
+        $current = ManageVars::init();
 
         $breadcrumb = [My::name() => dcCore::app()->adminurl->get(My::id(), ['type' => '-'])];
         if (empty($current->type)) {

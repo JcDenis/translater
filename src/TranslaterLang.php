@@ -14,47 +14,31 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
+use dcModuleDefine;
 use files;
 use l10n;
 use path;
 
 class TranslaterLang
 {
-    /** @var Translater Translater instance */
-    public $translater = null;
-    /** @var TranslaterModule TranslaterModule instance */
-    public $module = null;
+    /** @var string Lang code */
+    public readonly string $code;
 
-    /** @var array Lang properies */
-    private $prop = [];
+    /** @var string Lang name */
+    public readonly string $name;
+
+    /** @var array Lang plural forms */
+    public readonly array $plural;
+
+    /** @var TranslaterModule TranslaterModule instance */
+    private TranslaterModule $module;
 
     public function __construct(TranslaterModule $module, string $lang)
     {
-        $this->translater = $module->translater;
-        $this->module     = $module;
-
-        $this->prop['code']   = $lang;
-        $this->prop['name']   = l10n::getLanguageName($lang);
-        $this->prop['plural'] = explode(':', l10n::getLanguagePluralExpression($lang));
-    }
-
-    /**
-     * Get a lang property
-     *
-     * @param  string $key The lang property key
-     * @return mixed       The lang property value or null
-     */
-    public function get(string $key): mixed
-    {
-        return array_key_exists($key, $this->prop) ? $this->prop[$key] : null;
-    }
-
-    /**
-     * Magic get
-     */
-    public function __get(string $key): mixed
-    {
-        return $this->get($key);
+        $this->module = $module;
+        $this->code   = $lang;
+        $this->name   = l10n::getLanguageName($lang);
+        $this->plural = explode(':', l10n::getLanguagePluralExpression($lang));
     }
 
     /**
@@ -68,13 +52,16 @@ class TranslaterLang
         $m_msgids  = $this->getMsgIds();
         $m_msgstrs = $this->getMsgStrs();
 
-        foreach ($this->translater->getModules() as $module) {
-            if ($module->id != $this->module->get('id')) {
-                $m_o_msgstrs[$module->get('id')] = $this->translater->getlang($module, $this->get('code'))->getMsgStrs();
+        foreach ($this->module->translater->getModules() as $module) {
+            if ($module->id != $this->module->id) {
+                $m_o_msgstrs[$module->id] = $this->module->translater->getlang($module, $this->code)->getMsgStrs();
             }
         }
-        $dc_module               = new TranslaterModule($this->translater, ['id' => 'dotclear', 'root' => DC_ROOT]);
-        $dc_lang                 = new TranslaterLang($dc_module, $this->get('code'));
+
+        # Add Dotclear str
+        $dc_define               = (new dcModuleDefine('dotclear'))->set('root', DC_ROOT);
+        $dc_module               = new TranslaterModule($this->module->translater, $dc_define);
+        $dc_lang                 = new TranslaterLang($dc_module, $this->code);
         $m_o_msgstrs['dotclear'] = $dc_lang->getMsgStrs();
 
         # From id list
@@ -130,17 +117,17 @@ class TranslaterLang
     {
         $res      = [];
         $scan_ext = ['php'];
-        if ($this->translater->scan_tpl) {
+        if ($this->module->translater->scan_tpl) {
             $scan_ext[] = 'html';
         }
 
-        $files = Translater::scandir($this->module->get('root'));
+        $files = Translater::scandir($this->module->root);
         foreach ($files as $file) {
             $extension = files::getExtension($file);
-            if (is_dir($this->module->get('root') . '/' . $file) || !in_array($extension, $scan_ext)) {
+            if (is_dir($this->module->root . DIRECTORY_SEPARATOR . $file) || !in_array($extension, $scan_ext)) {
                 continue;
             }
-            $contents = file_get_contents($this->module->get('root') . '/' . $file);
+            $contents = file_get_contents($this->module->root . '/' . $file);
             $msgs     = [];
             # php files
             if ($extension == 'php') {
@@ -175,16 +162,16 @@ class TranslaterLang
         $res = $exists = $scanned = [];
 
         $langs = $this->module->getLangs(true);
-        if (!isset($langs[$this->get('code')])) {
+        if (!isset($langs[$this->code])) {
             return $res;
         }
 
-        foreach ($langs[$this->get('code')] as $file) {
+        foreach ($langs[$this->code] as $file) {
             if (in_array($file, $scanned)) {
                 continue;
             }
             $scanned[] = $file;
-            $path      = path::clean($this->module->get('locales') . '/' . $file);
+            $path      = path::clean($this->module->locales . DIRECTORY_SEPARATOR . $file);
 
             if (Translater::isPoFile($file)) {
                 $po = l10n::parsePoFile($path);
@@ -197,7 +184,7 @@ class TranslaterLang
                         'msgid'        => $entry['msgid'],
                         'msgid_plural' => $entry['msgid_plural'] ?? '',
                         'msgstr'       => is_array($entry['msgstr']) ? $entry['msgstr'] : [$entry['msgstr']],
-                        'lang'         => $this->get('code'),
+                        'lang'         => $this->code,
                         'type'         => 'po',
                         'path'         => $path,
                         'file'         => basename($file),

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\translater;
 
 use dcCore;
+use dcModuleDefine;
 use dt;
 use html;
 use files;
@@ -28,43 +29,47 @@ use path;
  */
 class TranslaterModule
 {
-    /** @var Translater Translater instance */
-    public $translater = null;
+    /** @var string Module id */
+    public readonly string $id;
 
-    /** @var array Module properies */
-    private $prop = [];
+    /** @var string Module type */
+    public readonly string $type;
+
+    /** @var string Module name */
+    public readonly string $name;
+
+    /** @var string Module author */
+    public readonly string $author;
+
+    /** @var string Module version */
+    public readonly string $version;
+
+    /** @var bool Module root writable */
+    public readonly bool $root_writable;
+
+    /** @var string Module root (cleaned) */
+    public readonly string $root;
+
+    /** @var string Module locales root path */
+    public readonly string $locales;
+
+    /** @var Translater Translater instance */
+    public readonly Translater $translater;
 
     /** @var string Backup file regexp */
     private $backup_file_regexp = '/^l10n-%s-(.*?)-[0-9]*?\.bck\.zip$/';
 
-    public function __construct(Translater $translater, array $module)
+    public function __construct(Translater $translater, dcModuleDefine $define)
     {
-        $this->translater = $translater;
-        $this->prop       = $module;
-
-        $this->prop['root']     = path::real($this->prop['root']);
-        $i                      = path::info($this->prop['root']);
-        $this->prop['basename'] = $i['basename'];
-        $this->prop['locales']  = $this->prop['root'] . '/locales';
-    }
-
-    /**
-     * Get a module property
-     *
-     * @param  string $key The module property key
-     * @return mixed       The module property value or null
-     */
-    public function get(string $key): mixed
-    {
-        return array_key_exists($key, $this->prop) ? $this->prop[$key] : null;
-    }
-
-    /**
-     * Magic get
-     */
-    public function __get(string $key): mixed
-    {
-        return $this->get($key);
+        $this->translater    = $translater;
+        $this->id            = $define->get('id');
+        $this->type          = $define->get('type');
+        $this->name          = $define->get('name');
+        $this->author        = $define->get('author');
+        $this->version       = $define->get('version');
+        $this->root_writable = $define->get('root_writable');
+        $this->root          = path::real($define->get('root'));
+        $this->locales       = $this->root . DIRECTORY_SEPARATOR . 'locales';
     }
 
     /// @name backup methods
@@ -80,8 +85,8 @@ class TranslaterModule
         $dir = false;
         switch ($this->translater->backup_folder) {
             case 'module':
-                if ($this->prop['root_writable']) {
-                    $dir = $this->prop['locales'];
+                if ($this->root_writable) {
+                    $dir = $this->locales;
                 }
 
                 break;
@@ -124,7 +129,7 @@ class TranslaterModule
         if (!$dir && $throw) {
             throw new Exception(sprintf(
                 __('Failed to find backups folder for module %s'),
-                $this->prop['basename']
+                $this->id
             ));
         }
 
@@ -147,7 +152,7 @@ class TranslaterModule
         $res   = [];
         $files = Translater::scandir($backup);
         foreach ($files as $file) {
-            $is_backup = preg_match(sprintf($this->backup_file_regexp, preg_quote($this->prop['id'])), $file, $m);
+            $is_backup = preg_match(sprintf($this->backup_file_regexp, preg_quote($this->id)), $file, $m);
 
             if (is_dir($backup . '/' . $file)
                 || !$is_backup
@@ -164,7 +169,7 @@ class TranslaterModule
                 $res[$m[1]][$file]['path']   = path::info($backup . '/' . $file);
                 $res[$m[1]][$file]['time']   = filemtime($backup . '/' . $file);
                 $res[$m[1]][$file]['size']   = filesize($backup . '/' . $file);
-                $res[$m[1]][$file]['module'] = $this->prop['id'];
+                $res[$m[1]][$file]['module'] = $this->id;
             }
         }
 
@@ -180,8 +185,9 @@ class TranslaterModule
     public function createBackup(string $lang): bool
     {
         $backup = $this->getBackupRoot(true);
+        $dir    = $this->locales . DIRECTORY_SEPARATOR . $lang;
 
-        if (!is_dir($this->prop['locales'] . '/' . $lang)) {
+        if (!is_dir($dir)) {
             throw new Exception(sprintf(
                 __('Failed to find language %s'),
                 $lang
@@ -189,20 +195,20 @@ class TranslaterModule
         }
 
         $res   = [];
-        $files = Translater::scandir($this->prop['locales'] . '/' . $lang);
+        $files = Translater::scandir($dir);
         foreach ($files as $file) {
-            if (!is_dir($this->prop['locales'] . '/' . $lang . '/' . $file)
+            if (!is_dir($dir . DIRECTORY_SEPARATOR . $file)
                 && (Translater::isLangphpFile($file) || Translater::isPoFile($file))
             ) {
-                $res[$this->prop['locales'] . '/' . $lang . '/' . $file] = $this->prop['id'] . '/locales/' . $lang . '/' . $file;
+                $res[$dir . DIRECTORY_SEPARATOR . $file] = implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file]);
             }
         }
 
         if (!empty($res)) {
-            Translater::isBackupLimit($this->prop['id'], $backup, $this->translater->backup_limit, true);
+            Translater::isBackupLimit($this->id, $backup, $this->translater->backup_limit, true);
 
             @set_time_limit(300);
-            $fp  = fopen($backup . '/l10n-' . $this->prop['id'] . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
+            $fp  = fopen($backup . '/l10n-' . $this->id . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
             $zip = new fileZip($fp);
             foreach ($res as $from => $to) {
                 $zip->addFile($from, $to);
@@ -239,7 +245,7 @@ class TranslaterModule
 
         foreach ($zip_files as $zip_file) {
             $f = $this->parseZipFilename($zip_file, true);
-            $zip->unzip($zip_file, $this->prop['locales'] . '/' . $f['lang'] . '/' . $f['group'] . $f['ext']);
+            $zip->unzip($zip_file, implode(DIRECTORY_SEPARATOR, [$this->locales, $f['lang'], $f['group'] . $f['ext']]));
             $done = true;
         }
         $zip->close();
@@ -258,7 +264,7 @@ class TranslaterModule
     {
         $backup = $this->getBackupRoot(true);
 
-        $is_backup = preg_match(sprintf($this->backup_file_regexp, preg_quote($this->prop['id'])), $file, $m);
+        $is_backup = preg_match(sprintf($this->backup_file_regexp, preg_quote($this->id)), $file, $m);
 
         if (!file_exists($backup . '/' . $file)
             || !$is_backup
@@ -301,7 +307,7 @@ class TranslaterModule
             $f = $this->parseZipFilename($file, true);
 
             if (!$this->translater->import_overwrite
-                && file_exists($this->prop['locales'] . '/' . $f['lang'] . '/' . $f['group'] . $f['ext'])
+                && file_exists(implode(DIRECTORY_SEPARATOR, [$this->locales, $f['lang'], $f['group'] . $f['ext']]))
             ) {
                 $not_overwrited[] = implode('-', [$f['lang'], $f['group'], $f['ext']]);
 
@@ -310,8 +316,8 @@ class TranslaterModule
 
             $res[] = [
                 'from' => $file,
-                'root' => $this->prop['locales'] . '/' . $f['lang'],
-                'to'   => $this->prop['locales'] . '/' . $f['lang'] . '/' . $f['group'] . $f['ext'],
+                'root' => implode(DIRECTORY_SEPARATOR, [$this->locales, $f['lang']]),
+                'to'   => implode(DIRECTORY_SEPARATOR, [$this->locales, $f['lang'], $f['group'] . $f['ext']]),
             ];
         }
 
@@ -363,20 +369,20 @@ class TranslaterModule
 
         $res = [];
         foreach ($langs as $lang) {
-            if (!is_dir($this->prop['locales'] . '/' . $lang)) {
+            if (!is_dir($this->locales . DIRECTORY_SEPARATOR . $lang)) {
                 continue;
             }
 
-            $files = Translater::scandir($this->prop['locales'] . '/' . $lang);
+            $files = Translater::scandir($this->locales . DIRECTORY_SEPARATOR . $lang);
             foreach ($files as $file) {
-                if (is_dir($this->prop['locales'] . '/' . $lang . '/' . $file)
+                if (is_dir(implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file]))
                     || !Translater::isLangphpFile($file)
                     && !Translater::isPoFile($file)
                 ) {
                     continue;
                 }
 
-                $res[$this->prop['locales'] . '/' . $lang . '/' . $file] = $this->prop['id'] . '/locales/' . $lang . '/' . $file;
+                $res[implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file])] = implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file]);
             }
         }
 
@@ -395,7 +401,7 @@ class TranslaterModule
 
         $filename = files::tidyFileName(dt::str(str_replace(
             ['timestamp', 'module', 'type', 'version'],
-            [time(), $this->prop['id'], $this->prop['type'], $this->prop['version']],
+            [time(), $this->id, $this->type, $this->version],
             $this->translater->export_filename
         )));
 
@@ -418,7 +424,7 @@ class TranslaterModule
         $is_file = preg_match('/^(.*?)\/locales\/(.*?)\/(.*?)(.po|.lang.php)$/', $file, $f);
 
         if ($is_file) {
-            $module = $f[1] == $this->prop['id'] ? $f[1] : false;
+            $module = $f[1] == $this->id ? $f[1] : false;
             $lang   = l10n::isCode($f[2]) ? $f[2] : false;
             $group  = in_array($f[3], My::l10nGroupsCombo()) ? $f[3] : false;
             $ext    = Translater::isLangphpFile($f[4]) || Translater::isPoFile($f[4]) ? $f[4] : false;
@@ -456,9 +462,9 @@ class TranslaterModule
     {
         $res = [];
 
-        $prefix = preg_match('/(locales(.*))$/', $this->prop['locales']) ? 'locales' : '';
+        $prefix = preg_match('/(locales(.*))$/', $this->locales) ? 'locales' : '';
 
-        $files = Translater::scandir($this->prop['locales']);
+        $files = Translater::scandir($this->locales);
         foreach ($files as $file) {
             if (!preg_match('/.*?locales\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
                 continue;
@@ -522,7 +528,7 @@ class TranslaterModule
             ));
         }
 
-        files::makeDir($this->prop['locales'] . '/' . $lang, true);
+        files::makeDir($this->locales . DIRECTORY_SEPARATOR . $lang, true);
 
         if (!empty($from_lang) && !isset($langs[$from_lang])) {
             throw new Exception(sprintf(
@@ -532,9 +538,9 @@ class TranslaterModule
         }
 
         if (!empty($from_lang) && isset($langs[$from_lang])) {
-            $files = Translater::scandir($this->prop['locales'] . '/' . $from_lang);
+            $files = Translater::scandir($this->locales . DIRECTORY_SEPARATOR . $from_lang);
             foreach ($files as $file) {
-                if (is_dir($this->prop['locales'] . '/' . $from_lang . '/' . $file)
+                if (is_dir(implode(DIRECTORY_SEPARATOR, [$this->locales, $from_lang, $file]))
                     || !Translater::isLangphpFile($file)
                     && !Translater::isPoFile($file)
                 ) {
@@ -542,8 +548,8 @@ class TranslaterModule
                 }
 
                 files::putContent(
-                    $this->prop['locales'] . '/' . $lang . '/' . $file,
-                    file_get_contents($this->prop['locales'] . '/' . $from_lang . '/' . $file)
+                    implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file]),
+                    file_get_contents(implode(DIRECTORY_SEPARATOR, [$this->locales, $from_lang, $file]))
                 );
             }
         } else {
@@ -594,8 +600,8 @@ class TranslaterModule
                 continue;
             }
 
-            $po_file      = $this->prop['locales'] . '/' . $lang . '/' . $group . '.po';
-            $langphp_file = $this->prop['locales'] . '/' . $lang . '/' . $group . '.lang.php';
+            $po_file      = implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $group . '.po']);
+            $langphp_file = implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $group . '.lang.php']);
 
             if (file_exists($po_file)) {
                 unlink($po_file);
@@ -644,17 +650,17 @@ class TranslaterModule
         }
 
         foreach ($files[$lang] as $file) {
-            unlink($this->prop['locales'] . '/' . $file);
+            unlink($this->locales . DIRECTORY_SEPARATOR . $file);
         }
 
-        $dir = Translater::scandir($this->prop['locales'] . '/' . $lang);
+        $dir = Translater::scandir($this->locales . DIRECTORY_SEPARATOR . $lang);
         if (empty($dir)) {
-            rmdir($this->prop['locales'] . '/' . $lang);
+            rmdir($this->locales . DIRECTORY_SEPARATOR . $lang);
         }
 
-        $loc = Translater::scandir($this->prop['locales']);
+        $loc = Translater::scandir($this->locales);
         if (empty($loc)) {
-            rmdir($this->prop['locales']);
+            rmdir($this->locales);
         }
 
         return true;
@@ -673,8 +679,8 @@ class TranslaterModule
 
         $content = '';
         if ($this->translater->parse_comment) {
-            $content .= '# Language: ' . $lang->get('name') . "\n" .
-            '# Module: ' . $this->get('id') . ' - ' . $this->get('version') . "\n" .
+            $content .= '# Language: ' . $lang->name . "\n" .
+            '# Module: ' . $this->id . ' - ' . $this->version . "\n" .
             '# Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
 
             if ($this->translater->parse_user && $this->translater->parse_userinfo != '') {
@@ -693,7 +699,7 @@ class TranslaterModule
         $content .= "msgid \"\"\n" .
         "msgstr \"\"\n" .
         '"Content-Type: text/plain; charset=UTF-8\n"' . "\n" .
-        '"Project-Id-Version: ' . $this->get('id') . ' ' . $this->get('version') . '\n"' . "\n" .
+        '"Project-Id-Version: ' . $this->id . ' ' . $this->version . '\n"' . "\n" .
         '"POT-Creation-Date: \n"' . "\n" .
         '"PO-Revision-Date: ' . date('c') . '\n"' . "\n" .
         '"Last-Translator: ' . dcCore::app()->auth->getInfo('user_cn') . '\n"' . "\n" .
@@ -730,7 +736,7 @@ class TranslaterModule
             $content .= "\n";
         }
 
-        $file = $this->get('locales') . '/' . $lang->get('code') . '/' . $group . '.po';
+        $file = implode(DIRECTORY_SEPARATOR, [$this->locales, $lang->code, $group . '.po']);
         $path = path::info($file);
         if (is_dir($path['dirname']) && !is_writable($path['dirname'])
          || file_exists($file)       && !is_writable($file)) {
@@ -765,8 +771,8 @@ class TranslaterModule
 
         $content = '';
         if ($this->translater->parse_comment) {
-            $content .= '// Language: ' . $lang->get('name') . "\n" .
-            '// Module: ' . $this->get('id') . ' - ' . $this->get('verison') . "\n" .
+            $content .= '// Language: ' . $lang->name . "\n" .
+            '// Module: ' . $this->id . ' - ' . $this->version . "\n" .
             '// Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
 
             if ($this->translater->parse_user && !empty($this->translater->parse_userinfo)) {
@@ -783,7 +789,7 @@ class TranslaterModule
             $content .= '// Translated with Translater - ' . dcCore::app()->plugins->moduleInfo(My::id(), 'version') . "\n\n";
         }
 
-        l10n::generatePhpFileFromPo($this->get('locales') . '/' . $lang->get('code') . '/' . $group, $content);
+        l10n::generatePhpFileFromPo(implode(DIRECTORY_SEPARATOR, [$this->locales, $lang->code, $group]), $content);
     }
     //@}
 }

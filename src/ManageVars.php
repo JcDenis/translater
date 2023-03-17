@@ -16,16 +16,16 @@ namespace Dotclear\Plugin\translater;
 
 use dcCore;
 
-class ManageContainer
+class ManageVars
 {
     /**
-     * @var ManageContainer self instance
+     * @var ManageVars self instance
      */
     private static $container;
 
     public readonly Translater $translater;
-    public readonly string|TranslaterModule $module;
-    public readonly string|TranslaterLang $lang;
+    public readonly ?TranslaterModule $module;
+    public readonly ?TranslaterLang $lang;
     public readonly string $type;
     public readonly string $action;
 
@@ -34,8 +34,8 @@ class ManageContainer
         $this->translater = new Translater();
 
         $type   = $_REQUEST['type']   ?? $this->translater->start_page ?: '';
-        $module = $_REQUEST['module'] ?? '';
-        $lang   = $_REQUEST['lang']   ?? '';
+        $module = $_REQUEST['module'] ?? null;
+        $lang   = $_REQUEST['lang']   ?? null;
         $action = $_POST['action']    ?? '';
 
         // check module type
@@ -48,7 +48,7 @@ class ManageContainer
                 $module = $this->translater->getModule($type, $module);
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
-                $module = '';
+                $module = null;
             }
         }
         //check if module lang exists
@@ -57,7 +57,7 @@ class ManageContainer
                 $lang = $this->translater->getLang($module, $lang);
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
-                $lang = '';
+                $lang = null;
             }
         }
 
@@ -67,7 +67,7 @@ class ManageContainer
         $this->action = $action;
     }
 
-    public static function init(): ManageContainer
+    public static function init(): ManageVars
     {
         if (!(self::$container instanceof self)) {
             self::$container = new self();

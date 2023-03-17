@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\translater;
 
 use dcCore;
+use dcModuleDefine;
 use dcThemes;
 use files;
 use l10n;
@@ -50,25 +51,19 @@ class Translater extends Settings
      */
     private function loadModules(): void
     {
-        $this->modules['theme'] = $this->modules['plugin'] = [];
+        $this->modules = ['theme' => [], 'plugin' => []];
 
         if (!(dcCore::app()->themes instanceof dcThemes)) {
             dcCore::app()->themes = new dcThemes();
             dcCore::app()->themes->loadModules(dcCore::app()->blog->themes_path, null);
         }
 
-        $list = [
-            'theme'  => dcCore::app()->themes->getModules(),
-            'plugin' => dcCore::app()->plugins->getModules(),
-        ];
-        foreach ($list as $type => $modules) {
-            foreach ($modules as $id => $info) {
-                if (!$info['root_writable']) {
-//                    continue;
-                }
-                $info['id']                = $id;
-                $info['type']              = $type;
-                $this->modules[$type][$id] = new TranslaterModule($this, $info);
+        foreach ([
+            dcCore::app()->themes->getDefines(['state' => dcModuleDefine::STATE_ENABLED]),
+            dcCore::app()->plugins->getDefines(['state' => dcModuleDefine::STATE_ENABLED]),
+        ] as $modules) {
+            foreach ($modules as $define) {
+                $this->modules[$define->get('type')][$define->get('id')] = new TranslaterModule($this, $define);
             }
         }
     }

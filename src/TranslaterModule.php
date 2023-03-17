@@ -69,7 +69,7 @@ class TranslaterModule
         $this->version       = $define->get('version');
         $this->root_writable = $define->get('root_writable');
         $this->root          = path::real($define->get('root'));
-        $this->locales       = $this->root . DIRECTORY_SEPARATOR . 'locales';
+        $this->locales       = $this->root . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;
     }
 
     /// @name backup methods
@@ -120,8 +120,8 @@ class TranslaterModule
             case 'translater':
                 $tmp = path::real(dcCore::app()->plugins->moduleRoot(My::id()));
                 if ($tmp && is_writable($tmp)) {
-                    @mkDir($tmp . '/locales');
-                    $dir = $tmp . '/locales';
+                    @mkDir($tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER);
+                    $dir = $tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;
                 }
 
                 break;
@@ -421,7 +421,7 @@ class TranslaterModule
      */
     public function parseZipFilename(string $file = '', bool $throw = false): array
     {
-        $is_file = preg_match('/^(.*?)\/locales\/(.*?)\/(.*?)(.po|.lang.php)$/', $file, $f);
+        $is_file = preg_match('/^(.*?)\/' . preg_quote(My::LOCALES_FOLDER) . '\/(.*?)\/(.*?)(.po|.lang.php)$/', $file, $f);
 
         if ($is_file) {
             $module = $f[1] == $this->id ? $f[1] : false;
@@ -462,11 +462,11 @@ class TranslaterModule
     {
         $res = [];
 
-        $prefix = preg_match('/(locales(.*))$/', $this->locales) ? 'locales' : '';
+        $prefix = preg_match('/(' . preg_quote(My::LOCALES_FOLDER) . '(.*))$/', $this->locales) ? My::LOCALES_FOLDER : '';
 
         $files = Translater::scandir($this->locales);
         foreach ($files as $file) {
-            if (!preg_match('/.*?locales\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
+            if (!preg_match('/.*?' . preg_quote(My::LOCALES_FOLDER) . '\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
                 continue;
             }
 

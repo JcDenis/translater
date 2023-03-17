@@ -21,8 +21,11 @@ use dcCore;
  */
 class My
 {
-    // required php version
+    /** @var string Required php version */
     public const PHP_MIN = '8.1';
+
+    /** @var string Locales folder name */
+    public const LOCALES_FOLDER = 'locales';
 
     /**
      * This module id

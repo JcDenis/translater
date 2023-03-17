@@ -63,12 +63,6 @@ class Settings
     // Filename of exported lang
     public readonly string $export_filename;
 
-    // Default service for external proposal tool
-    public readonly bool $proposal_tool;
-
-    // Default lang for external proposal tool
-    public readonly bool $proposal_lang;
-
     /**
      * Constructor set up plugin settings
      */
@@ -91,8 +85,6 @@ class Settings
         $this->parse_userinfo   = (string) ($s->get('parse_userinfo') ?? 'displayname, email');
         $this->import_overwrite = (bool) ($s->get('import_overwrite') ?? false);
         $this->export_filename  = (string) ($s->get('export_filename') ?? 'type-module-l10n-timestamp');
-        $this->proposal_tool    = (bool) ($s->get('proposal_tool') ?? 'google');
-        $this->proposal_lang    = (bool) ($s->get('proposal_lang') ?? 'en');
     }
 
     public function getSetting(string $key): mixed

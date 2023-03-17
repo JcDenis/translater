@@ -599,7 +599,7 @@ class Manage extends dcNsProcess
 
     private static function redirect(string $msg, ?string $lang = null): void
     {
-        $current = ManageContainer::init();
+        $current = ManageVars::init();
 
         $redir = [
             'type'   => $current->type,

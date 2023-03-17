@@ -3,9 +3,16 @@ dev
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2023.03.17
+- use container for Manage vars
+- use modules define
+- use readonly properties for modules, langs, settings, manage page
+- fix init check
+- fix previously introduced bug
+
 2023.03.16
 - require php 8.1
-- tyring something diferent for settings 
+- use container for settings
 - fix previously introduced bug
 
 2023.03.15

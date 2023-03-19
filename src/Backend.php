@@ -43,7 +43,7 @@ class Backend extends dcNsProcess
             'adminDashboardFavoritesV2'  => function (dcFavorites $favs): void {
                 $favs->register(My::id(), [
                     'title'      => My::name(),
-                    'url'        => dcCore::app()->adminurl->get(My::id()),
+                    'url'        => dcCore::app()->adminurl?->get(My::id()),
                     'small-icon' => urldecode(dcPage::getPF(My::id() . '/icon.svg')),
                     'large-icon' => urldecode(dcPage::getPF(My::id() . '/icon.svg')),
                     //'permissions' => null,
@@ -53,13 +53,13 @@ class Backend extends dcNsProcess
 
         dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
             My::name(),
-            dcCore::app()->adminurl->get(My::id()),
+            dcCore::app()->adminurl?->get(My::id()),
             dcPage::getPF(My::id() . '/icon.svg'),
             preg_match(
-                '/' . preg_quote(dcCore::app()->adminurl->get(My::id())) . '(&.*)?$/',
+                '/' . preg_quote((string) dcCore::app()->adminurl?->get(My::id())) . '(&.*)?$/',
                 $_SERVER['REQUEST_URI']
             ),
-            dcCore::app()->auth->isSuperAdmin()
+            dcCore::app()->auth?->isSuperAdmin()
         );
 
         return true;

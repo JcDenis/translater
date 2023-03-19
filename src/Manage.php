@@ -92,7 +92,7 @@ class Manage extends dcNsProcess
             }
 
             if ($current->action == 'module_import_pack') {
-                if (empty($_FILES['packfile']['name'])) {
+                if (empty($current->module) || empty($_FILES['packfile']['name'])) {
                     throw new Exception(__('Nothing to import'));
                 }
                 $current->module->importPack($_FILES['packfile']);
@@ -146,23 +146,23 @@ class Manage extends dcNsProcess
 
     public static function render(): void
     {
-        if (!self::$init) {
+        if (!static::$init) {
             return;
         }
 
         $current = ManageVars::init();
 
-        $breadcrumb = [My::name() => dcCore::app()->adminurl->get(My::id(), ['type' => '-'])];
+        $breadcrumb = [My::name() => dcCore::app()->adminurl?->get(My::id(), ['type' => '-'])];
         if (empty($current->type)) {
             $breadcrumb = [My::name() => ''];
         } elseif (empty($current->module)) {
             $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')] = '';
         } elseif (empty($current->lang)) {
-            $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')] = dcCore::app()->adminurl->get(My::id(), ['type' => $current->type]);
+            $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')] = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type]);
             $breadcrumb[html::escapeHTML($current->module->name)]                  = '';
         } elseif (!empty($current->lang)) {
-            $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')]                  = dcCore::app()->adminurl->get(My::id(), ['type' => $current->type]);
-            $breadcrumb[html::escapeHTML($current->module->name)]                                   = dcCore::app()->adminurl->get(My::id(), ['type' => $current->type, 'module' => $current->module->id]);
+            $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')]                  = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type]);
+            $breadcrumb[html::escapeHTML($current->module->name)]                                   = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type, 'module' => $current->module->id]);
             $breadcrumb[html::escapeHTML(sprintf(__('%s language edition'), $current->lang->name))] = '';
         }
 
@@ -187,7 +187,7 @@ class Manage extends dcNsProcess
 
         if (empty($current->module) && $current->type != '') {
             // modules list
-            echo '<form id="theme-form" method="post" action="' . dcCore::app()->adminurl->get(My::id(), ['type' => 'plugin']) . '">';
+            echo '<form id="theme-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id(), ['type' => 'plugin']) . '">';
 
             $res     = '';
             $modules = $current->translater->getModules($current->type);
@@ -199,7 +199,7 @@ class Manage extends dcNsProcess
                 if ($module->root_writable) {
                     $res .= sprintf(
                         '<tr class="line"><td class="nowrap minimal"><a href="%s" title="%s">%s</a></td>',
-                        dcCore::app()->adminurl->get(My::id(), ['type' => $module->type, 'module' => $module->id]),
+                        dcCore::app()->adminurl?->get(My::id(), ['type' => $module->type, 'module' => $module->id]),
                         html::escapeHTML(sprintf(__('Translate module %s'), __($module->name))),
                         html::escapeHTML($module->id)
                     );
@@ -215,7 +215,7 @@ class Manage extends dcNsProcess
                         $codes[$code_id] = sprintf(
                             '<a class="wait maximal nowrap" title="%s" href="%s">%s (%s)</a>',
                             html::escapeHTML(sprintf(__('Edit language %s of module %s'), html::escapeHTML($code_name), __($module->name))),
-                            dcCore::app()->adminurl->get(My::id(), ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
+                            dcCore::app()->adminurl?->get(My::id(), ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
                             html::escapeHTML($code_name),
                             $code_id
                         );
@@ -267,7 +267,7 @@ class Manage extends dcNsProcess
             if (count($codes)) {
                 echo
                 '<div class="clear fieldset"><h3>' . __('Translations') . '</h3>' .
-                '<form id="module-translations-form" method="post" action="' . dcCore::app()->adminurl->get(My::id()) . '">' .
+                '<form id="module-translations-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">' .
                 '<table class="clear maximal">' .
                 '<caption>' . __('Existing languages translations') . '</caption>' .
                 '<tr>' .
@@ -283,7 +283,7 @@ class Manage extends dcNsProcess
                     '<td class="minimal">' . form::checkbox(['codes[]', 'existing_code_' . $code_id], $code_id, '', '', '', false) . '</td>' .
                     '<td class="nowrap">' .
                     '<a href="' .
-                        dcCore::app()->adminurl->get(My::id(), ['type' => $current->module->type, 'module' => $current->module->id, 'lang' => $code_id])
+                        dcCore::app()->adminurl?->get(My::id(), ['type' => $current->module->type, 'module' => $current->module->id, 'lang' => $code_id])
                          . '" title="' . sprintf(__('Edit %s language'), html::escapeHTML($code_name)) . '">' . $code_name . '</a>' .
                     '</td>' .
                     '<td class="nowrap maximal"> ' . $code_id . '</td>';
@@ -297,7 +297,7 @@ class Manage extends dcNsProcess
                         echo
                         '<td class="nowrap">' . count($backups[$code_id]) . '</td>' .
                         '<td class="nowrap"> ' .
-                        dt::str('%Y-%m-%d %H:%M', (int) $time[$code_id], dcCore::app()->blog->settings->get('system')->get('blog_timezone')) .
+                        dt::str('%Y-%m-%d %H:%M', (int) $time[$code_id], (string) dcCore::app()->blog?->settings->get('system')->get('blog_timezone')) .
                         '</td>';
                     } else {
                         echo '<td class="nowrap">' . __('no backups') . '</td><td class="maximal nowrap">-</td>';
@@ -316,7 +316,7 @@ class Manage extends dcNsProcess
                 ]) . ' 
                 <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
                 dcCore::app()->formNonce() .
-                dcCore::app()->adminurl->getHiddenFormFields(
+                dcCore::app()->adminurl?->getHiddenFormFields(
                     My::id(),
                     ['type' => $current->module->type, 'module' => $current->module->id]
                 ) . '
@@ -328,7 +328,7 @@ class Manage extends dcNsProcess
                 // delete / retore backups
                 if (!empty($backups)) {
                     echo '<div class="fieldset"><h3>' . __('Backups') . '</h3>' .
-                    '<form id="module-backups-form" method="post" action="' . dcCore::app()->adminurl->get(My::id()) . '">' .
+                    '<form id="module-backups-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">' .
                     '<table class="clear">' .
                     '<caption>' . __('Existing languages backups') . '</caption>' .
                     '<tr>' .
@@ -360,9 +360,9 @@ class Manage extends dcNsProcess
                                 $backup_code['name'],
                                 $backup_code['code'],
                                 dt::str(
-                                    dcCore::app()->blog->settings->get('system')->get('date_format') . ' ' . dcCore::app()->blog->settings->get('system')->get('time_format'),
+                                    dcCore::app()->blog?->settings->get('system')->get('date_format') . ' ' . dcCore::app()->blog?->settings->get('system')->get('time_format'),
                                     (int) $backup_code['time'],
-                                    dcCore::app()->blog->settings->get('system')->get('blog_timezone')
+                                    dcCore::app()->blog?->settings->get('system')->get('blog_timezone')
                                 ),
                                 $backup_code['path']['basename'],
                                 files::size($backup_code['size'])
@@ -381,7 +381,7 @@ class Manage extends dcNsProcess
                     ]) . '
                     <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
                     dcCore::app()->formNonce() .
-                    dcCore::app()->adminurl->getHiddenFormFields(
+                    dcCore::app()->adminurl?->getHiddenFormFields(
                         My::id(),
                         ['type' => $current->module->type, 'module' => $current->module->id]
                     ) . '
@@ -394,9 +394,9 @@ class Manage extends dcNsProcess
             // add language
             if (!empty($unused_codes)) {
                 echo '<div class="col fieldset"><h3>' . __('Add language') . '</h3>
-                <form id="muodule-code-create-form" method="post" action="' . dcCore::app()->adminurl->get(My::id()) . '">
+                <form id="muodule-code-create-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">
                 <p class="field"><label for="code">' . __('Select language:') . '</label>' .
-                form::combo(['code'], array_merge(['-' => '-'], $unused_codes), dcCore::app()->auth->getInfo('user_lang')) . '</p>';
+                form::combo(['code'], array_merge(['-' => '-'], $unused_codes), (string) dcCore::app()->auth?->getInfo('user_lang')) . '</p>';
                 if (empty($codes)) {
                     echo '<p>' . form::hidden(['from'], '') . '</p>';
                 } else {
@@ -407,7 +407,7 @@ class Manage extends dcNsProcess
                 echo '
                 <p><input type="submit" name="save" value="' . __('Create') . '" />' .
                 dcCore::app()->formNonce() .
-                dcCore::app()->adminurl->getHiddenFormFields(
+                dcCore::app()->adminurl?->getHiddenFormFields(
                     My::id(),
                     ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_add_code']
                 ) . '
@@ -416,13 +416,13 @@ class Manage extends dcNsProcess
 
             // Import
             echo '<div class="col fieldset"><h3>' . __('Import') . '</h3>
-            <form id="module-pack-import-form" method="post" action="' . dcCore::app()->adminurl->get(My::id()) . '" enctype="multipart/form-data">
+            <form id="module-pack-import-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '" enctype="multipart/form-data">
             <p><label for="packfile">' . __('Select languages package to import:') . '<label> ' .
             '<input id="packfile" type="file" name="packfile" /></p>
             <p>
             <input type="submit" name="save" value="' . __('Import') . '" />' .
             dcCore::app()->formNonce() .
-            dcCore::app()->adminurl->getHiddenFormFields(
+            dcCore::app()->adminurl?->getHiddenFormFields(
                 My::id(),
                 ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_import_pack']
             ) . '
@@ -437,7 +437,7 @@ class Manage extends dcNsProcess
 
             echo
             '<div id="lang-form">' .
-            '<form id="lang-edit-form" method="post" action="' . dcCore::app()->adminurl->get(My::id()) . '">' .
+            '<form id="lang-edit-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">' .
             '<table class="table-outer">' .
             '<caption>' . sprintf(__('List of %s localized strings'), count($lines)) . '</caption>' .
             '<tr>' .
@@ -475,7 +475,7 @@ class Manage extends dcNsProcess
                     foreach ($v as $str) {
                         $res[] = sprintf($table_li, html::escapeHTML($str['module'] . ':' . $str['file']));
                     }
-                    $t_msgstr[] = sprintf($table_ul, html::escapeHTML($k), implode('', $res));
+                    $t_msgstr[] = sprintf($table_ul, html::escapeHTML((string) $k), implode('', $res));
                 }
 
                 if (!empty($rs['files'][0])) {
@@ -519,7 +519,7 @@ class Manage extends dcNsProcess
                             foreach ($v as $str) {
                                 $res[] = sprintf($table_li, html::escapeHTML($str['module'] . ':' . $str['file']));
                             }
-                            $t_msgstr[] = sprintf($table_ul, html::escapeHTML($k), implode('', $res));
+                            $t_msgstr[] = sprintf($table_ul, html::escapeHTML((string) $k), implode('', $res));
                         }
 
                         echo sprintf(
@@ -562,9 +562,9 @@ class Manage extends dcNsProcess
             '<input id="do-action" type="submit" value="' . __('Save') . ' (s)" accesskey="s" /></p>' .
             dcCore::app()->formNonce() .
             form::hidden(['code'], $current->lang->code) .
-            dcCore::app()->adminurl->getHiddenFormFields(
+            dcCore::app()->adminurl?->getHiddenFormFields(
                 My::id(),
-                ['type' => $current->module->type, 'module' => $current->module->id, 'lang' => $current->lang->code, 'action' => 'module_update_code']
+                ['type' => $current->module?->type, 'module' => $current->module?->id, 'lang' => $current->lang->code, 'action' => 'module_update_code']
             ) .
             '</p></div>' .
             '</form>' .
@@ -579,13 +579,13 @@ class Manage extends dcNsProcess
                     '<h3><ul class="nice">%s</ul></h3>',
                     sprintf(
                         $line,
-                        dcCore::app()->adminurl->get(My::id(), ['type' => 'plugin']),
+                        dcCore::app()->adminurl?->get(My::id(), ['type' => 'plugin']),
                         $current->type == 'plugin' ? ' class="active"' : '',
                         __('Translate plugins')
                     ) .
                     sprintf(
                         $line,
-                        dcCore::app()->adminurl->get(My::id(), ['type' => 'theme']),
+                        dcCore::app()->adminurl?->get(My::id(), ['type' => 'theme']),
                         $current->type == 'theme' ? ' class="active"' : '',
                         __('Translate themes')
                     )
@@ -603,13 +603,13 @@ class Manage extends dcNsProcess
 
         $redir = [
             'type'   => $current->type,
-            'module' => $current->module->id,
+            'module' => $current->module?->id,
         ];
         if ($lang) {
             $redir['lang'] = $lang;
         }
 
         dcPage::addSuccessNotice($msg);
-        dcCore::app()->adminurl->redirect(My::id(), $redir);
+        dcCore::app()->adminurl?->redirect(My::id(), $redir);
     }
 }

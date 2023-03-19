@@ -131,11 +131,11 @@ class TranslaterLang
             $msgs     = [];
             # php files
             if ($extension == 'php') {
-                $msgs = Translater::extractPhpMsgs($contents);
+                $msgs = Translater::extractPhpMsgs((string) $contents);
 
             # tpl files
             } elseif ($extension == 'html') {
-                $msgs = Translater::extractTplMsgs($contents);
+                $msgs = Translater::extractTplMsgs((string) $contents);
             }
             foreach ($msgs as $msg) {
                 $res[] = [

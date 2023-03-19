@@ -44,6 +44,14 @@ class My
     }
 
     /**
+     * Check php version
+     */
+    public static function phpCompliant(): bool
+    {
+        return version_compare(phpversion(), self::PHP_MIN, '>=');
+    }
+
+    /**
      * List of allowed backup folder
      */
     public static function backupFoldersCombo(): array

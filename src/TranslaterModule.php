@@ -68,7 +68,7 @@ class TranslaterModule
         $this->author        = $define->get('author');
         $this->version       = $define->get('version');
         $this->root_writable = $define->get('root_writable');
-        $this->root          = path::real($define->get('root'));
+        $this->root          = (string) path::real($define->get('root'), false);
         $this->locales       = $this->root . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;
     }
 
@@ -94,15 +94,15 @@ class TranslaterModule
             case 'plugin':
                 $exp = explode(PATH_SEPARATOR, DC_PLUGINS_ROOT);
                 $tmp = path::real(array_pop($exp));
-                if ($tmp && is_writable($tmp)) {
+                if ($tmp !== false && is_writable($tmp)) {
                     $dir = $tmp;
                 }
 
                 break;
 
             case 'public':
-                $tmp = path::real(dcCore::app()->blog->public_path);
-                if ($tmp && is_writable($tmp)) {
+                $tmp = path::real((string) dcCore::app()->blog?->public_path);
+                if ($tmp !== false && is_writable($tmp)) {
                     $dir = $tmp;
                 }
 
@@ -110,7 +110,7 @@ class TranslaterModule
 
             case 'cache':
                 $tmp = path::real(DC_TPL_CACHE);
-                if ($tmp && is_writable($tmp)) {
+                if ($tmp !== false && is_writable($tmp)) {
                     @mkDir($tmp . '/l10n');
                     $dir = $tmp . '/l10n';
                 }
@@ -119,7 +119,7 @@ class TranslaterModule
 
             case 'translater':
                 $tmp = path::real(dcCore::app()->plugins->moduleRoot(My::id()));
-                if ($tmp && is_writable($tmp)) {
+                if ($tmp !== false && is_writable($tmp)) {
                     @mkDir($tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER);
                     $dir = $tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;
                 }
@@ -185,8 +185,11 @@ class TranslaterModule
     public function createBackup(string $lang): bool
     {
         $backup = $this->getBackupRoot(true);
-        $dir    = $this->locales . DIRECTORY_SEPARATOR . $lang;
+        if (!$backup) {
+            return false;
+        }
 
+        $dir = $this->locales . DIRECTORY_SEPARATOR . $lang;
         if (!is_dir($dir)) {
             throw new Exception(sprintf(
                 __('Failed to find language %s'),
@@ -549,7 +552,7 @@ class TranslaterModule
 
                 files::putContent(
                     implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file]),
-                    file_get_contents(implode(DIRECTORY_SEPARATOR, [$this->locales, $from_lang, $file]))
+                    (string) file_get_contents(implode(DIRECTORY_SEPARATOR, [$this->locales, $from_lang, $file]))
                 );
             }
         } else {
@@ -619,6 +622,7 @@ class TranslaterModule
         }
 
         foreach ($rs as $group => $msgs) {
+            $group = (string) $group;
             $this->setPoContent($lang, $group, $msgs);
             $this->setLangphpContent($lang, $group, $msgs);
         }
@@ -687,7 +691,7 @@ class TranslaterModule
                 $search  = My::defaultUserInformations();
                 $replace = [];
                 foreach ($search as $n) {
-                    $replace[] = dcCore::app()->auth->getInfo('user_' . $n);
+                    $replace[] = dcCore::app()->auth?->getInfo('user_' . $n);
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
@@ -702,7 +706,7 @@ class TranslaterModule
         '"Project-Id-Version: ' . $this->id . ' ' . $this->version . '\n"' . "\n" .
         '"POT-Creation-Date: \n"' . "\n" .
         '"PO-Revision-Date: ' . date('c') . '\n"' . "\n" .
-        '"Last-Translator: ' . dcCore::app()->auth->getInfo('user_cn') . '\n"' . "\n" .
+        '"Last-Translator: ' . dcCore::app()->auth?->getInfo('user_cn') . '\n"' . "\n" .
         '"Language-Team: \n"' . "\n" .
         '"MIME-Version: 1.0\n"' . "\n" .
         '"Content-Transfer-Encoding: 8bit\n"' . "\n" .
@@ -779,7 +783,7 @@ class TranslaterModule
                 $search  = My::defaultUserInformations();
                 $replace = [];
                 foreach ($search as $n) {
-                    $replace[] = dcCore::app()->auth->getInfo('user_' . $n);
+                    $replace[] = dcCore::app()->auth?->getInfo('user_' . $n);
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {

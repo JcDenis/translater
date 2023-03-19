@@ -68,23 +68,23 @@ class Settings
      */
     public function __construct()
     {
-        $s = dcCore::app()->blog->settings->get(My::id());
+        $s = dcCore::app()->blog?->settings->get(My::id());
 
-        $this->plugin_menu      = (bool) ($s->get('plugin_menu') ?? false);
-        $this->theme_menu       = (bool) ($s->get('theme_menu') ?? false);
-        $this->backup_auto      = (bool) ($s->get('backup_auto') ?? false);
-        $this->backup_limit     = (int) ($s->get('backup_limit') ?? 20);
-        $this->backup_folder    = (string) ($s->get('backup_folder') ?? 'module');
-        $this->start_page       = (string) ($s->get('start_page') ?? '-');
-        $this->write_langphp    = (bool) ($s->get('write_langphp') ?? false);
-        $this->scan_tpl         = (bool) ($s->get('scan_tpl') ?? true);
-        $this->parse_nodc       = (bool) ($s->get('parse_nodc') ?? true);
-        $this->hide_default     = (bool) ($s->get('hide_default') ?? true);
-        $this->parse_comment    = (bool) ($s->get('parse_comment') ?? false);
-        $this->parse_user       = (bool) ($s->get('parse_user') ?? false);
-        $this->parse_userinfo   = (string) ($s->get('parse_userinfo') ?? 'displayname, email');
-        $this->import_overwrite = (bool) ($s->get('import_overwrite') ?? false);
-        $this->export_filename  = (string) ($s->get('export_filename') ?? 'type-module-l10n-timestamp');
+        $this->plugin_menu      = (bool) ($s?->get('plugin_menu') ?? false);
+        $this->theme_menu       = (bool) ($s?->get('theme_menu') ?? false);
+        $this->backup_auto      = (bool) ($s?->get('backup_auto') ?? false);
+        $this->backup_limit     = (int) ($s?->get('backup_limit') ?? 20);
+        $this->backup_folder    = (string) ($s?->get('backup_folder') ?? 'module');
+        $this->start_page       = (string) ($s?->get('start_page') ?? '-');
+        $this->write_langphp    = (bool) ($s?->get('write_langphp') ?? false);
+        $this->scan_tpl         = (bool) ($s?->get('scan_tpl') ?? true);
+        $this->parse_nodc       = (bool) ($s?->get('parse_nodc') ?? true);
+        $this->hide_default     = (bool) ($s?->get('hide_default') ?? true);
+        $this->parse_comment    = (bool) ($s?->get('parse_comment') ?? false);
+        $this->parse_user       = (bool) ($s?->get('parse_user') ?? false);
+        $this->parse_userinfo   = (string) ($s?->get('parse_userinfo') ?? 'displayname, email');
+        $this->import_overwrite = (bool) ($s?->get('import_overwrite') ?? false);
+        $this->export_filename  = (string) ($s?->get('export_filename') ?? 'type-module-l10n-timestamp');
     }
 
     public function getSetting(string $key): mixed
@@ -103,8 +103,8 @@ class Settings
     public function writeSetting(string $key, mixed $value): bool
     {
         if (property_exists($this, $key) && settype($value, gettype($this->{$key})) === true) {
-            dcCore::app()->blog->settings->get(My::id())->drop($key);
-            dcCore::app()->blog->settings->get(My::id())->put($key, $value, gettype($this->{$key}), '', true, true);
+            dcCore::app()->blog?->settings->get(My::id())->drop($key);
+            dcCore::app()->blog?->settings->get(My::id())->put($key, $value, gettype($this->{$key}), '', true, true);
 
             return true;
         }

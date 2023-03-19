@@ -63,7 +63,7 @@ class Config extends dcNsProcess
             dcPage::addSuccessNotice(
                 __('Configuration successfully updated.')
             );
-            dcCore::app()->adminurl->redirect(
+            dcCore::app()->adminurl?->redirect(
                 'admin.plugins',
                 ['module' => My::id(), 'conf' => 1, 'redir' => dcCore::app()->admin->__get('list')->getRedir()]
             );

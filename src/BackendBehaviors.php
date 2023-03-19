@@ -51,7 +51,7 @@ class BackendBehaviors
     {
         if ($list->getList() != $prop['type'] . '-activate'
             || !self::translater()->getSetting($prop['type'] . '_menu')
-            || !dcCore::app()->auth->isSuperAdmin()
+            || !dcCore::app()->auth?->isSuperAdmin()
         ) {
             return null;
         }
@@ -77,7 +77,7 @@ class BackendBehaviors
             return;
         }
 
-        dcCore::app()->adminurl->redirect(
+        dcCore::app()->adminurl?->redirect(
             My::id(),
             ['part' => 'module', 'type' => $type, 'module' => key($_POST['translater'])],
             '#module-lang'

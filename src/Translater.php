@@ -55,7 +55,7 @@ class Translater extends Settings
 
         if (!(dcCore::app()->themes instanceof dcThemes)) {
             dcCore::app()->themes = new dcThemes();
-            dcCore::app()->themes->loadModules(dcCore::app()->blog->themes_path, null);
+            dcCore::app()->themes->loadModules((string) dcCore::app()->blog?->themes_path, null);
         }
 
         foreach ([

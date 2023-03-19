@@ -20,6 +20,7 @@ _translater_ requires:
 
  * super admin permissions
  * Dotclear 2.26
+ * PHP >= 8.1
 
 ## USAGE
 

@@ -3,6 +3,10 @@ dev
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2023.03.19
+- fix init check
+- fix some phpstan warnings
+
 2023.03.17
 - use container for Manage vars
 - use modules define

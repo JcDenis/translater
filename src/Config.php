@@ -17,7 +17,6 @@ namespace Dotclear\Plugin\translater;
 use dcCore;
 use dcNsProcess;
 use dcPage;
-
 use Dotclear\Helper\Html\Form\{
     Checkbox,
     Div,
@@ -30,6 +29,8 @@ use Dotclear\Helper\Html\Form\{
     Para,
     Select
 };
+use Dotclear\Helper\Html\Html;
+use Exception;
 
 class Config extends dcNsProcess
 {

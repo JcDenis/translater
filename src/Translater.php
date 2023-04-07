@@ -17,10 +17,11 @@ namespace Dotclear\Plugin\translater;
 use dcCore;
 use dcModuleDefine;
 use dcThemes;
-use files;
+use Dotclear\Helper\File\Files;
+use Dotclear\Helper\File\Path;
+use Dotclear\Helper\Text;
+use Exception;
 use l10n;
-use path;
-use text;
 
 /**
  * Translater tools.
@@ -133,12 +134,12 @@ class Translater extends Settings
      */
     public static function scandir(string $path, string $dir = '', array $res = []): array
     {
-        $path = (string) path::real($path, false);
+        $path = (string) Path::real($path, false);
         if (empty($path) || !is_dir($path) || !is_readable($path)) {
             return [];
         }
 
-        $files = files::scandir($path);
+        $files = Files::scandir($path);
         foreach ($files as $file) {
             if (in_array($file, ['.', '..'])) {
                 continue;
@@ -163,7 +164,7 @@ class Translater extends Settings
      */
     public static function encodeMsg(string $str): string
     {
-        return text::toUTF8(stripslashes(trim($str)));
+        return Text::toUTF8(stripslashes(trim($str)));
     }
 
     /**
@@ -195,7 +196,7 @@ class Translater extends Settings
      */
     public static function isPoFile(string $file): bool
     {
-        return files::getExtension($file) == 'po';
+        return Files::getExtension($file) == 'po';
     }
 
     /**
@@ -206,7 +207,7 @@ class Translater extends Settings
      */
     public static function isLangphpFile(string $file): bool
     {
-        return files::getExtension($file) == 'php' && stristr($file, '.lang.php');
+        return Files::getExtension($file) == 'php' && stristr($file, '.lang.php');
     }
 
     /**

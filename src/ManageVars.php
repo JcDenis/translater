@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\translater;
 
 use dcCore;
+use Exception;
 
 class ManageVars
 {

@@ -17,10 +17,23 @@ namespace Dotclear\Plugin\translater;
 use dcCore;
 use dcNsProcess;
 use dcPage;
+use Dotclear\Helper\File\Files;
+use Dotclear\Helper\Html\Form\{
+    Checkbox,
+    File,
+    Form,
+    Hidden,
+    Input,
+    Label,
+    Note,
+    Para,
+    Select,
+    Submit,
+    Text
+};
+use Dotclear\Helper\Html\Html;
+use Exception;
 use dt;
-use html;
-use files;
-use form;
 
 class Manage extends dcNsProcess
 {
@@ -159,11 +172,11 @@ class Manage extends dcNsProcess
             $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')] = '';
         } elseif (empty($current->lang)) {
             $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')] = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type]);
-            $breadcrumb[html::escapeHTML($current->module->name)]                  = '';
+            $breadcrumb[Html::escapeHTML($current->module->name)]                  = '';
         } elseif (!empty($current->lang)) {
             $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')]                  = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type]);
-            $breadcrumb[html::escapeHTML($current->module->name)]                                   = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type, 'module' => $current->module->id]);
-            $breadcrumb[html::escapeHTML(sprintf(__('%s language edition'), $current->lang->name))] = '';
+            $breadcrumb[Html::escapeHTML($current->module->name)]                                   = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type, 'module' => $current->module->id]);
+            $breadcrumb[Html::escapeHTML(sprintf(__('%s language edition'), $current->lang->name))] = '';
         }
 
         dcPage::openModule(
@@ -200,13 +213,13 @@ class Manage extends dcNsProcess
                     $res .= sprintf(
                         '<tr class="line"><td class="nowrap minimal"><a href="%s" title="%s">%s</a></td>',
                         dcCore::app()->adminurl?->get(My::id(), ['type' => $module->type, 'module' => $module->id]),
-                        html::escapeHTML(sprintf(__('Translate module %s'), __($module->name))),
-                        html::escapeHTML($module->id)
+                        Html::escapeHTML(sprintf(__('Translate module %s'), __($module->name))),
+                        Html::escapeHTML($module->id)
                     );
                 } else {
                     $res .= sprintf(
                         '<tr class="line offline"><td class="nowrap">%s</td>',
-                        html::escapeHTML($module->id)
+                        Html::escapeHTML($module->id)
                     );
                 }
                 $codes = $module->getLangs();
@@ -214,19 +227,19 @@ class Manage extends dcNsProcess
                     if ($module->root_writable) {
                         $codes[$code_id] = sprintf(
                             '<a class="wait maximal nowrap" title="%s" href="%s">%s (%s)</a>',
-                            html::escapeHTML(sprintf(__('Edit language %s of module %s'), html::escapeHTML($code_name), __($module->name))),
+                            Html::escapeHTML(sprintf(__('Edit language %s of module %s'), Html::escapeHTML($code_name), __($module->name))),
                             dcCore::app()->adminurl?->get(My::id(), ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
-                            html::escapeHTML($code_name),
+                            Html::escapeHTML($code_name),
                             $code_id
                         );
                     } else {
-                        $codes[$code_id] = html::escapeHTML($code_name) . '(' . $code_id . ')';
+                        $codes[$code_id] = Html::escapeHTML($code_name) . '(' . $code_id . ')';
                     }
                 }
                 $res .= sprintf(
                     '<td class="nowrap maximal">%s</td><td class="nowrap minimal">%s</td><td class="nowrap minimal count">%s</td></tr>',
                     implode(', ', $codes),
-                    html::escapeHTML(__($module->name)),
+                    Html::escapeHTML(__($module->name)),
                     $module->version
                 );
             }
@@ -280,11 +293,11 @@ class Manage extends dcNsProcess
                 foreach ($codes as $code_name => $code_id) {
                     echo
                     '<tr class="line">' .
-                    '<td class="minimal">' . form::checkbox(['codes[]', 'existing_code_' . $code_id], $code_id, '', '', '', false) . '</td>' .
+                    '<td class="minimal">' . (new Checkbox(['codes[]', 'existing_code_' . $code_id]))->value($code_id)->render() . '</td>' .
                     '<td class="nowrap">' .
                     '<a href="' .
                         dcCore::app()->adminurl?->get(My::id(), ['type' => $current->module->type, 'module' => $current->module->id, 'lang' => $code_id])
-                         . '" title="' . sprintf(__('Edit %s language'), html::escapeHTML($code_name)) . '">' . $code_name . '</a>' .
+                         . '" title="' . sprintf(__('Edit %s language'), Html::escapeHTML($code_name)) . '">' . $code_name . '</a>' .
                     '</td>' .
                     '<td class="nowrap maximal"> ' . $code_id . '</td>';
 
@@ -306,21 +319,23 @@ class Manage extends dcNsProcess
                 }
                 echo '</table>
                 <div class="two-cols">
-                <p class="col checkboxes-helpers"></p>
+                <p class="col checkboxes-helpers"></p>' .
 
-                <p class="col right">' . __('Selected languages action:') . ' ' .
-                form::combo('action', [
-                    __('Backup languages') => 'module_create_backups',
-                    __('Delete languages') => 'module_delete_codes',
-                    __('Export languages') => 'module_export_pack',
-                ]) . ' 
-                <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
-                dcCore::app()->formNonce() .
-                dcCore::app()->adminurl?->getHiddenFormFields(
-                    My::id(),
-                    ['type' => $current->module->type, 'module' => $current->module->id]
-                ) . '
-                </p></div></form><p>&nbsp;</p></div>';
+                (new Para())->class('col right')->items(array_merge([
+                    (new Text('', __('Selected languages action:'))),
+                    (new Select('action'))->items([
+                        __('Backup languages') => 'module_create_backups',
+                        __('Delete languages') => 'module_delete_codes',
+                        __('Export languages') => 'module_export_pack',
+                    ]),
+                    (new Submit('do-action'))->value(__('ok')),
+                    dcCore::app()->formNonce(false),
+                    ], dcCore::app()->adminurl?->hiddenFormFields(
+                        My::id(),
+                        ['type' => $current->module->type, 'module' => $current->module->id]
+                    )
+                ))->render() .
+                '</div></form><p>&nbsp;</p></div>';
             }
 
             // backups
@@ -355,7 +370,7 @@ class Manage extends dcNsProcess
                             $form_id = 'form_file_' . $backup_code['code'] . $backup_code['time'];
                             echo sprintf(
                                 $table_line,
-                                form::checkbox(['files[]', $form_id], $backup_file, '', '', '', false),
+                                (new Checkbox(['files[]', $form_id]))->value($backup_file)->render(),
                                 $form_id,
                                 $backup_code['name'],
                                 $backup_code['code'],
@@ -365,27 +380,29 @@ class Manage extends dcNsProcess
                                     dcCore::app()->blog?->settings->get('system')->get('blog_timezone')
                                 ),
                                 $backup_code['path']['basename'],
-                                files::size($backup_code['size'])
+                                Files::size($backup_code['size'])
                             );
                         }
                     }
                     echo '
                     </table>
                     <div class="two-cols">
-                    <p class="col checkboxes-helpers"></p>
+                    <p class="col checkboxes-helpers"></p>' .
 
-                    <p class="col right">' . __('Selected backups action:') . ' ' .
-                    form::combo('action', [
-                        __('Restore backups') => 'module_restore_backup',
-                        __('Delete backups')  => 'module_delete_backup',
-                    ]) . '
-                    <input id="do-action" type="submit" value="' . __('ok') . '" /></p>' .
-                    dcCore::app()->formNonce() .
-                    dcCore::app()->adminurl?->getHiddenFormFields(
-                        My::id(),
-                        ['type' => $current->module->type, 'module' => $current->module->id]
-                    ) . '
-                    </p></div></form><p>&nbsp;</p></div>';
+                    (new Para())->class('col right')->items(array_merge([
+                        (new Text('', __('Selected backups action:'))),
+                        (new Select('action'))->items([
+                            __('Restore backups') => 'module_restore_backup',
+                            __('Delete backups')  => 'module_delete_backup',
+                        ]),
+                        (new Submit('do-action'))->value(__('ok')),
+                        dcCore::app()->formNonce(false),
+                        ], dcCore::app()->adminurl?->hiddenFormFields(
+                            My::id(),
+                            ['type' => $current->module->type, 'module' => $current->module->id]
+                        )
+                    ))->render() .
+                    '</div></form><p>&nbsp;</p></div>';
                 }
             }
 
@@ -394,39 +411,52 @@ class Manage extends dcNsProcess
             // add language
             if (!empty($unused_codes)) {
                 echo '<div class="col fieldset"><h3>' . __('Add language') . '</h3>
-                <form id="muodule-code-create-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">
-                <p class="field"><label for="code">' . __('Select language:') . '</label>' .
-                form::combo(['code'], array_merge(['-' => '-'], $unused_codes), (string) dcCore::app()->auth?->getInfo('user_lang')) . '</p>';
+                <form id="muodule-code-create-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">' .
+                (new Para())->class('field')->items([
+                    (new Label(__('Select language:')))->for('code'),
+                    (new Select(['code']))->default((string) dcCore::app()->auth?->getInfo('user_lang'))->items(array_merge(['-' => '-'], $unused_codes)),
+                ])->render();
+
                 if (empty($codes)) {
-                    echo '<p>' . form::hidden(['from'], '') . '</p>';
+                    echo (new Para())->items([(new Hidden(['from'], ''))])->render();
                 } else {
                     echo
-                    '<p class="field"><label for="from">' . __('Copy from language:') . '</label>' .
-                    form::combo(['from'], array_merge(['-' => ''], $codes)) . ' (' . __('optionnal') . ')</p>';
+                    (new Para())->class('field')->items([
+                        (new Label(__('Copy from language:')))->for('from'),
+                        (new Select(['from']))->items(array_merge(['-' => ''], $codes)),
+                        (new Note())->class('form-note')->text(__('optionnal')),
+                    ])->render();
                 }
-                echo '
-                <p><input type="submit" name="save" value="' . __('Create') . '" />' .
-                dcCore::app()->formNonce() .
-                dcCore::app()->adminurl?->getHiddenFormFields(
-                    My::id(),
-                    ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_add_code']
-                ) . '
-                </p></form><p>&nbsp;</p></div>';
+                echo 
+                (new Para())->items(array_merge([
+                    (new Submit(['save']))->value(__('Create')),
+                    dcCore::app()->formNonce(false),
+                    ], dcCore::app()->adminurl?->hiddenFormFields(
+                        My::id(),
+                        ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_add_code']
+                    )
+                ))->render() .
+                '</form><p>&nbsp;</p></div>';
             }
 
             // Import
-            echo '<div class="col fieldset"><h3>' . __('Import') . '</h3>
-            <form id="module-pack-import-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '" enctype="multipart/form-data">
-            <p><label for="packfile">' . __('Select languages package to import:') . '<label> ' .
-            '<input id="packfile" type="file" name="packfile" /></p>
-            <p>
-            <input type="submit" name="save" value="' . __('Import') . '" />' .
-            dcCore::app()->formNonce() .
-            dcCore::app()->adminurl?->getHiddenFormFields(
-                My::id(),
-                ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_import_pack']
-            ) . '
-            </p></form><p>&nbsp;</p></div>';
+            echo '<div class="col fieldset"><h3>' . __('Import') . '</h3>' .
+            (new Form('module-pack-import-form'))->method('post')->action(dcCore::app()->adminurl?->get(My::id()))->extra('enctype="multipart/form-data"')->fields([
+                (new Para())->items([
+                    (new Label(__('Select languages package to import:')))->for('packfile'),
+                    (new File('packfile')),
+
+                ]),
+                (new Para())->items(array_merge([
+                    (new Submit(['save']))->value(__('Import')),
+                    dcCore::app()->formNonce(false),
+                    ], dcCore::app()->adminurl?->hiddenFormFields(
+                        My::id(),
+                        ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_import_pack']
+                    )
+                )),
+            ])->render() .
+            '<p>&nbsp;</p></div>';
 
             echo '</div>';
 
@@ -473,9 +503,9 @@ class Manage extends dcNsProcess
                 foreach ($strin as $k => $v) {
                     $res = [];
                     foreach ($v as $str) {
-                        $res[] = sprintf($table_li, html::escapeHTML($str['module'] . ':' . $str['file']));
+                        $res[] = sprintf($table_li, Html::escapeHTML($str['module'] . ':' . $str['file']));
                     }
-                    $t_msgstr[] = sprintf($table_ul, html::escapeHTML((string) $k), implode('', $res));
+                    $t_msgstr[] = sprintf($table_ul, Html::escapeHTML((string) $k), implode('', $res));
                 }
 
                 if (!empty($rs['files'][0])) {
@@ -494,11 +524,11 @@ class Manage extends dcNsProcess
                 echo sprintf(
                     $table_line,
                     $in_dc ? ' offline' : ' translaterline',
-                    form::checkbox(['entries[' . $i . '][check]'], 1),
-                    form::combo(['entries[' . $i . '][group]'], My::l10nGroupsCombo(), $rs['group'], '', '', $in_dc),
-                    html::escapeHTML($msgid),
-                    form::hidden(['entries[' . $i . '][msgid]'], html::escapeHTML($msgid)) .
-                    form::field(['entries[' . $i . '][msgstr][0]'], 48, 255, html::escapeHTML($rs['msgstr'][0]), '', '', $in_dc),
+                    (new Checkbox(['entries[' . $i . '][check]']))->value(1)->render(),
+                    (new Select(['entries[' . $i . '][group]']))->default($rs['group'])->items(My::l10nGroupsCombo())->disabled($in_dc)->render(),
+                    Html::escapeHTML($msgid),
+                    (new Hidden(['entries[' . $i . '][msgid]'], Html::escapeHTML($msgid)))->render() .
+                    (new Input(['entries[' . $i . '][msgstr][0]']))->size(48)->maxlenght(255)->value(Html::escapeHTML($rs['msgstr'][0]))->disabled($in_dc)->render(),
                     implode('', $t_msgstr),
                     implode('', $t_files)
                 );
@@ -517,9 +547,9 @@ class Manage extends dcNsProcess
                         foreach ($strin as $k => $v) {
                             $res = [];
                             foreach ($v as $str) {
-                                $res[] = sprintf($table_li, html::escapeHTML($str['module'] . ':' . $str['file']));
+                                $res[] = sprintf($table_li, Html::escapeHTML($str['module'] . ':' . $str['file']));
                             }
-                            $t_msgstr[] = sprintf($table_ul, html::escapeHTML((string) $k), implode('', $res));
+                            $t_msgstr[] = sprintf($table_ul, Html::escapeHTML((string) $k), implode('', $res));
                         }
 
                         echo sprintf(
@@ -528,8 +558,8 @@ class Manage extends dcNsProcess
                             '+',
                             sprintf(__('Plural "%s"'), $plural),
                             sprintf(__('Plural form of "%s"'), $rs['plural']),
-                            form::hidden(['entries[' . $i . '][msgid_plural]'], html::escapeHTML($rs['plural'])) .
-                            form::field(['entries[' . $i . '][msgstr][' . ($j + 1) . ']'], 48, 255, html::escapeHTML($rs['msgstr'][$j + 1] ?? ''), '', '', $in_dc),
+                            (new Hidden(['entries[' . $i . '][msgid_plural]'], Html::escapeHTML($rs['plural'])))->render() .
+                            (new Input(['entries[' . $i . '][msgstr][' . ($j + 1) . ']']))->size(48)->maxlenght(255)->value(Html::escapeHTML($rs['msgstr'][$j + 1] ?? ''))->disbaled($in_dc)->render(),
                             implode('', $t_msgstr),
                             ''
                         );
@@ -540,10 +570,10 @@ class Manage extends dcNsProcess
             echo sprintf(
                 $table_line,
                 ' offline',
-                form::checkbox(['entries[' . $i . '][check]'], 1),
-                form::combo(['entries[' . $i . '][group]'], My::l10nGroupsCombo(), 'main'),
-                form::field(['entries[' . $i . '][msgid]'], 48, 255, ''),
-                form::field(['entries[' . $i . '][msgstr][0]'], 48, 255, ''),
+                (new Checkbox(['entries[' . $i . '][check]']))->value(1)->render(),
+                (new Select(['entries[' . $i . '][group]']))->items(My::l10nGroupsCombo())->default('main')->render(),
+                (new Input(['entries[' . $i . '][msgid]']))->size(48)->maxlenght(255)->render(),
+                (new Input(['entries[' . $i . '][msgstr][0]']))->size(48)->maxlenght(255)->render(),
                 '',
                 ''
             );
@@ -553,20 +583,23 @@ class Manage extends dcNsProcess
             '<div class="two-cols">' .
             '<div class="col left">' .
             '<p class="checkboxes-helpers"></p>' .
-            '<p><label for="update_group">' .
-            form::checkbox('update_group', 1) .
-            __('Change the group of the selected translations to:') . ' ' .
-            form::combo('multigroup', My::l10nGroupsCombo()) . '</label></p>' .
+
+            (new Para())->items([
+                (new Checkbox('update_group'))->value(1),
+                (new Label(__('Change the group of the selected translations to:'), Label::OUTSIDE_LABEL_AFTER))->for('update_group')->class('classic'),
+                (new Select('multigroup'))->items(My::l10nGroupsCombo()),
+            ])->render() .
             '</div>' .
-            '<p class="col right">' .
-            '<input id="do-action" type="submit" value="' . __('Save') . ' (s)" accesskey="s" /></p>' .
-            dcCore::app()->formNonce() .
-            form::hidden(['code'], $current->lang->code) .
-            dcCore::app()->adminurl?->getHiddenFormFields(
-                My::id(),
-                ['type' => $current->module?->type, 'module' => $current->module?->id, 'lang' => $current->lang->code, 'action' => 'module_update_code']
-            ) .
-            '</p></div>' .
+            (new Para())->class('col right')->items(array_merge([
+                (new Submit('do-action'))->value(__('Save') . ' (s)')->accesskey('s'),
+                dcCore::app()->formNonce(false),
+                (new Hidden(['code'], $current->lang->code)),
+                ], dcCore::app()->adminurl?->hiddenFormFields(
+                    My::id(),
+                    ['type' => $current->module?->type, 'module' => $current->module?->id, 'lang' => $current->lang->code, 'action' => 'module_update_code']
+                )
+            ))->render() .
+            '</div>' .
             '</form>' .
             '<p>&nbsp;</p>' .
             '</div>';

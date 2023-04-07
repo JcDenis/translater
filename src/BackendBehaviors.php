@@ -17,7 +17,7 @@ namespace Dotclear\Plugin\translater;
 use adminModulesList;
 use dcCore;
 use Dotclear\Helper\Html\Form\Submit;
-use html;
+use Dotclear\Helper\Html\Html;
 
 class BackendBehaviors
 {
@@ -61,7 +61,7 @@ class BackendBehaviors
             return null;
         }
 
-        return (new Submit(['translater[' . html::escapeHTML($id) . ']', null]))->value(__('Translate'))->render();
+        return (new Submit(['translater[' . Html::escapeHTML($id) . ']', null]))->value(__('Translate'))->render();
     }
 
     /**

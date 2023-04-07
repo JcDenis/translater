@@ -17,6 +17,7 @@ namespace Dotclear\Plugin\translater;
 use dcCore;
 use dcNamespace;
 use dcNsProcess;
+use Exception;
 
 class Install extends dcNsProcess
 {
@@ -62,13 +63,13 @@ class Install extends dcNsProcess
                 "WHERE setting_ns = 'translater' "
             );
             while ($record->fetch()) {
-                if (preg_match('/^translater_(.*?)$/', $record->setting_id, $match)) {
+                if (preg_match('/^translater_(.*?)$/', $record->f('setting_id'), $match)) {
                     $cur             = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
-                    $cur->setting_id = $match[1];
-                    $cur->setting_ns = My::id();
+                    $cur->setField('setting_id', $match[1]);
+                    $cur->setField('setting_ns', My::id());
                     $cur->update(
-                        "WHERE setting_id = '" . $record->setting_id . "' and setting_ns = 'translater' " .
-                        'AND blog_id ' . (null === $record->blog_id ? 'IS NULL ' : ("= '" . dcCore::app()->con->escape($record->blog_id) . "' "))
+                        "WHERE setting_id = '" . $record->f('setting_id') . "' and setting_ns = 'translater' " .
+                        'AND blog_id ' . (null === $record->f('blog_id') ? 'IS NULL ' : ("= '" . dcCore::app()->con->escapeStr((string) $record->f('blog_id')) . "' "))
                     );
                 }
             }

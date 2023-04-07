@@ -16,13 +16,14 @@ namespace Dotclear\Plugin\translater;
 
 use dcCore;
 use dcModuleDefine;
+use Dotclear\Helper\File\Files;
+use Dotclear\Helper\File\Path;
+use Dotclear\Helper\File\Zip\Unzip;
+use Dotclear\Helper\File\Zip\Zip;
+use Dotclear\Helper\Html\Html;
+use Exception;
 use dt;
-use html;
-use files;
-use fileZip;
-use fileUnzip;
 use l10n;
-use path;
 
 /**
  * Translater tools.
@@ -68,7 +69,7 @@ class TranslaterModule
         $this->author        = $define->get('author');
         $this->version       = $define->get('version');
         $this->root_writable = $define->get('root_writable');
-        $this->root          = (string) path::real($define->get('root'), false);
+        $this->root          = (string) Path::real($define->get('root'), false);
         $this->locales       = $this->root . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;
     }
 
@@ -93,7 +94,7 @@ class TranslaterModule
 
             case 'plugin':
                 $exp = explode(PATH_SEPARATOR, DC_PLUGINS_ROOT);
-                $tmp = path::real(array_pop($exp));
+                $tmp = Path::real(array_pop($exp));
                 if ($tmp !== false && is_writable($tmp)) {
                     $dir = $tmp;
                 }
@@ -101,7 +102,7 @@ class TranslaterModule
                 break;
 
             case 'public':
-                $tmp = path::real((string) dcCore::app()->blog?->public_path);
+                $tmp = Path::real((string) dcCore::app()->blog?->public_path);
                 if ($tmp !== false && is_writable($tmp)) {
                     $dir = $tmp;
                 }
@@ -109,7 +110,7 @@ class TranslaterModule
                 break;
 
             case 'cache':
-                $tmp = path::real(DC_TPL_CACHE);
+                $tmp = Path::real(DC_TPL_CACHE);
                 if ($tmp !== false && is_writable($tmp)) {
                     @mkDir($tmp . '/l10n');
                     $dir = $tmp . '/l10n';
@@ -118,7 +119,7 @@ class TranslaterModule
                 break;
 
             case 'translater':
-                $tmp = path::real(dcCore::app()->plugins->moduleRoot(My::id()));
+                $tmp = Path::real(dcCore::app()->plugins->moduleRoot(My::id()));
                 if ($tmp !== false && is_writable($tmp)) {
                     @mkDir($tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER);
                     $dir = $tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;
@@ -166,7 +167,7 @@ class TranslaterModule
             } else {
                 $res[$m[1]][$file]['code']   = $m[1];
                 $res[$m[1]][$file]['name']   = l10n::getLanguageName($m[1]);
-                $res[$m[1]][$file]['path']   = path::info($backup . '/' . $file);
+                $res[$m[1]][$file]['path']   = Path::info($backup . '/' . $file);
                 $res[$m[1]][$file]['time']   = filemtime($backup . '/' . $file);
                 $res[$m[1]][$file]['size']   = filesize($backup . '/' . $file);
                 $res[$m[1]][$file]['module'] = $this->id;
@@ -211,12 +212,10 @@ class TranslaterModule
             Translater::isBackupLimit($this->id, $backup, $this->translater->backup_limit, true);
 
             @set_time_limit(300);
-            $fp  = fopen($backup . '/l10n-' . $this->id . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
-            $zip = new fileZip($fp);
+            $zip = new Zip($backup . '/l10n-' . $this->id . '-' . $lang . '-' . time() . '.bck.zip');
             foreach ($res as $from => $to) {
                 $zip->addFile($from, $to);
             }
-            $zip->write();
             $zip->close();
             unset($zip);
 
@@ -243,7 +242,7 @@ class TranslaterModule
             ));
         }
 
-        $zip       = new fileUnzip($backup . '/' . $file);
+        $zip       = new Unzip($backup . '/' . $file);
         $zip_files = $zip->getFilesList();
 
         foreach ($zip_files as $zip_file) {
@@ -276,7 +275,7 @@ class TranslaterModule
             return false;
         }
 
-        if (!files::isDeletable($backup . '/' . $file)) {
+        if (!Files::isDeletable($backup . '/' . $file)) {
             throw new Exception(sprintf(
                 __('Failed to delete file %s'),
                 $file
@@ -296,14 +295,14 @@ class TranslaterModule
      */
     public function importPack(array $zip_file): bool
     {
-        files::uploadStatus($zip_file);
+        Files::uploadStatus($zip_file);
 
         $imported       = false;
         $not_overwrited = [];
         $res            = [];
 
         # Load Unzip object
-        $zip   = new fileUnzip($zip_file['tmp_name']);
+        $zip   = new Unzip($zip_file['tmp_name']);
         $files = $zip->getFilesList();
 
         foreach ($files as $file) {
@@ -326,7 +325,7 @@ class TranslaterModule
 
         foreach ($res as $rs) {
             if (!is_dir($rs['root'])) {
-                files::makeDir($rs['root'], true);
+                Files::makeDir($rs['root'], true);
             }
 
             $zip->unzip($rs['from'], $rs['to']);
@@ -363,7 +362,7 @@ class TranslaterModule
             );
         }
 
-        $filename = files::tidyFileName($this->translater->export_filename);
+        $filename = Files::tidyFileName($this->translater->export_filename);
         if (empty($filename)) {
             throw new Exception(
                 __('Export mask is not set in plugin configuration')
@@ -396,13 +395,12 @@ class TranslaterModule
         }
 
         @set_time_limit(300);
-        $fp  = fopen('php://output', 'wb');
-        $zip = new fileZip($fp);
+        $zip = new Zip('php://output');
         foreach ($res as $from => $to) {
             $zip->addFile($from, $to);
         }
 
-        $filename = files::tidyFileName(dt::str(str_replace(
+        $filename = Files::tidyFileName(dt::str(str_replace(
             ['timestamp', 'module', 'type', 'version'],
             [time(), $this->id, $this->type, $this->version],
             $this->translater->export_filename
@@ -410,7 +408,7 @@ class TranslaterModule
 
         header('Content-Disposition: attachment;filename=' . $filename . '.zip');
         header('Content-Type: application/x-zip');
-        $zip->write();
+        $zip->close();
         unset($zip);
         exit;
     }
@@ -531,7 +529,7 @@ class TranslaterModule
             ));
         }
 
-        files::makeDir($this->locales . DIRECTORY_SEPARATOR . $lang, true);
+        Files::makeDir($this->locales . DIRECTORY_SEPARATOR . $lang, true);
 
         if (!empty($from_lang) && !isset($langs[$from_lang])) {
             throw new Exception(sprintf(
@@ -550,7 +548,7 @@ class TranslaterModule
                     continue;
                 }
 
-                files::putContent(
+                Files::putContent(
                     implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file]),
                     (string) file_get_contents(implode(DIRECTORY_SEPARATOR, [$this->locales, $from_lang, $file]))
                 );
@@ -695,7 +693,7 @@ class TranslaterModule
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
-                    $content .= '# Author: ' . html::escapeHTML($info) . "\n";
+                    $content .= '# Author: ' . Html::escapeHTML($info) . "\n";
                 }
             }
             $content .= '# Translated with translater ' . dcCore::app()->plugins->moduleInfo(My::id(), 'version') . "\n\n";
@@ -741,7 +739,7 @@ class TranslaterModule
         }
 
         $file = implode(DIRECTORY_SEPARATOR, [$this->locales, $lang->code, $group . '.po']);
-        $path = path::info($file);
+        $path = Path::info($file);
         if (is_dir($path['dirname']) && !is_writable($path['dirname'])
          || file_exists($file)       && !is_writable($file)) {
             throw new Exception(sprintf(
@@ -750,7 +748,7 @@ class TranslaterModule
             ));
         }
 
-        if (!($f = @files::putContent($file, $content))) {
+        if (!($f = @Files::putContent($file, $content))) {
             throw new Exception(sprintf(
                 __('Failed to write file %s'),
                 $file
@@ -787,7 +785,7 @@ class TranslaterModule
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
-                    $content .= '// Author: ' . html::escapeHTML($info) . "\n";
+                    $content .= '// Author: ' . Html::escapeHTML($info) . "\n";
                 }
             }
             $content .= '// Translated with Translater - ' . dcCore::app()->plugins->moduleInfo(My::id(), 'version') . "\n\n";

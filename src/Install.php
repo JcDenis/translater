@@ -64,7 +64,7 @@ class Install extends dcNsProcess
             );
             while ($record->fetch()) {
                 if (preg_match('/^translater_(.*?)$/', $record->f('setting_id'), $match)) {
-                    $cur             = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
+                    $cur = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
                     $cur->setField('setting_id', $match[1]);
                     $cur->setField('setting_ns', My::id());
                     $cur->update(

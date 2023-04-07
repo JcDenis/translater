@@ -321,16 +321,18 @@ class Manage extends dcNsProcess
                 <div class="two-cols">
                 <p class="col checkboxes-helpers"></p>' .
 
-                (new Para())->class('col right')->items(array_merge([
-                    (new Text('', __('Selected languages action:'))),
-                    (new Select('action'))->items([
-                        __('Backup languages') => 'module_create_backups',
-                        __('Delete languages') => 'module_delete_codes',
-                        __('Export languages') => 'module_export_pack',
-                    ]),
-                    (new Submit('do-action'))->value(__('ok')),
-                    dcCore::app()->formNonce(false),
-                    ], dcCore::app()->adminurl?->hiddenFormFields(
+                (new Para())->class('col right')->items(array_merge(
+                    [
+                        (new Text('', __('Selected languages action:'))),
+                        (new Select('action'))->items([
+                            __('Backup languages') => 'module_create_backups',
+                            __('Delete languages') => 'module_delete_codes',
+                            __('Export languages') => 'module_export_pack',
+                        ]),
+                        (new Submit('do-action'))->value(__('ok')),
+                        dcCore::app()->formNonce(false),
+                    ],
+                    dcCore::app()->adminurl?->hiddenFormFields(
                         My::id(),
                         ['type' => $current->module->type, 'module' => $current->module->id]
                     )
@@ -389,15 +391,17 @@ class Manage extends dcNsProcess
                     <div class="two-cols">
                     <p class="col checkboxes-helpers"></p>' .
 
-                    (new Para())->class('col right')->items(array_merge([
-                        (new Text('', __('Selected backups action:'))),
-                        (new Select('action'))->items([
-                            __('Restore backups') => 'module_restore_backup',
-                            __('Delete backups')  => 'module_delete_backup',
-                        ]),
-                        (new Submit('do-action'))->value(__('ok')),
-                        dcCore::app()->formNonce(false),
-                        ], dcCore::app()->adminurl?->hiddenFormFields(
+                    (new Para())->class('col right')->items(array_merge(
+                        [
+                            (new Text('', __('Selected backups action:'))),
+                            (new Select('action'))->items([
+                                __('Restore backups') => 'module_restore_backup',
+                                __('Delete backups')  => 'module_delete_backup',
+                            ]),
+                            (new Submit('do-action'))->value(__('ok')),
+                            dcCore::app()->formNonce(false),
+                        ],
+                        dcCore::app()->adminurl?->hiddenFormFields(
                             My::id(),
                             ['type' => $current->module->type, 'module' => $current->module->id]
                         )
@@ -427,11 +431,13 @@ class Manage extends dcNsProcess
                         (new Note())->class('form-note')->text(__('optionnal')),
                     ])->render();
                 }
-                echo 
-                (new Para())->items(array_merge([
-                    (new Submit(['save']))->value(__('Create')),
-                    dcCore::app()->formNonce(false),
-                    ], dcCore::app()->adminurl?->hiddenFormFields(
+                echo
+                (new Para())->items(array_merge(
+                    [
+                        (new Submit(['save']))->value(__('Create')),
+                        dcCore::app()->formNonce(false),
+                    ],
+                    dcCore::app()->adminurl?->hiddenFormFields(
                         My::id(),
                         ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_add_code']
                     )
@@ -447,10 +453,12 @@ class Manage extends dcNsProcess
                     (new File('packfile')),
 
                 ]),
-                (new Para())->items(array_merge([
-                    (new Submit(['save']))->value(__('Import')),
-                    dcCore::app()->formNonce(false),
-                    ], dcCore::app()->adminurl?->hiddenFormFields(
+                (new Para())->items(array_merge(
+                    [
+                        (new Submit(['save']))->value(__('Import')),
+                        dcCore::app()->formNonce(false),
+                    ],
+                    dcCore::app()->adminurl?->hiddenFormFields(
                         My::id(),
                         ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_import_pack']
                     )
@@ -590,11 +598,13 @@ class Manage extends dcNsProcess
                 (new Select('multigroup'))->items(My::l10nGroupsCombo()),
             ])->render() .
             '</div>' .
-            (new Para())->class('col right')->items(array_merge([
-                (new Submit('do-action'))->value(__('Save') . ' (s)')->accesskey('s'),
-                dcCore::app()->formNonce(false),
-                (new Hidden(['code'], $current->lang->code)),
-                ], dcCore::app()->adminurl?->hiddenFormFields(
+            (new Para())->class('col right')->items(array_merge(
+                [
+                    (new Submit('do-action'))->value(__('Save') . ' (s)')->accesskey('s'),
+                    dcCore::app()->formNonce(false),
+                    (new Hidden(['code'], $current->lang->code)),
+                ],
+                dcCore::app()->adminurl?->hiddenFormFields(
                     My::id(),
                     ['type' => $current->module?->type, 'module' => $current->module?->id, 'lang' => $current->lang->code, 'action' => 'module_update_code']
                 )

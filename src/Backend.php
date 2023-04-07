@@ -44,8 +44,8 @@ class Backend extends dcNsProcess
                 $favs->register(My::id(), [
                     'title'      => My::name(),
                     'url'        => dcCore::app()->adminurl?->get(My::id()),
-                    'small-icon' => urldecode(dcPage::getPF(My::id() . '/icon.svg')),
-                    'large-icon' => urldecode(dcPage::getPF(My::id() . '/icon.svg')),
+                    'small-icon' => dcPage::getPF(My::id() . '/icon.svg'),
+                    'large-icon' => dcPage::getPF(My::id() . '/icon.svg'),
                     //'permissions' => null,
                 ]);
             },

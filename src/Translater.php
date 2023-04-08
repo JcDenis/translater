@@ -19,9 +19,9 @@ use dcModuleDefine;
 use dcThemes;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\File\Path;
+use Dotclear\Helper\L10n;
 use Dotclear\Helper\Text;
 use Exception;
-use l10n;
 
 /**
  * Translater tools.
@@ -112,7 +112,7 @@ class Translater extends Settings
      */
     public function getLang(TranslaterModule $module, string $lang): TranslaterLang
     {
-        if (!l10n::isCode($lang)) {
+        if (!L10n::isCode($lang)) {
             throw new Exception(
                 sprintf(__('Failed find language %s'), $lang)
             );

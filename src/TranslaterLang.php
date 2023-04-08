@@ -17,7 +17,7 @@ namespace Dotclear\Plugin\translater;
 use dcModuleDefine;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\File\Path;
-use l10n;
+use Dotclear\Helper\L10n;
 
 class TranslaterLang
 {
@@ -37,8 +37,8 @@ class TranslaterLang
     {
         $this->module = $module;
         $this->code   = $lang;
-        $this->name   = l10n::getLanguageName($lang);
-        $this->plural = explode(':', l10n::getLanguagePluralExpression($lang));
+        $this->name   = L10n::getLanguageName($lang);
+        $this->plural = explode(':', L10n::getLanguagePluralExpression($lang));
     }
 
     /**
@@ -174,7 +174,7 @@ class TranslaterLang
             $path      = Path::clean($this->module->locales . DIRECTORY_SEPARATOR . $file);
 
             if (Translater::isPoFile($file)) {
-                $po = l10n::parsePoFile($path);
+                $po = L10n::parsePoFile($path);
                 if (!is_array($po)) {
                     continue;
                 }

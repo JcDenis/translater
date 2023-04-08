@@ -21,9 +21,9 @@ use Dotclear\Helper\File\Path;
 use Dotclear\Helper\File\Zip\Unzip;
 use Dotclear\Helper\File\Zip\Zip;
 use Dotclear\Helper\Html\Html;
+use Dotclear\Helper\L10n;
 use Exception;
 use dt;
-use l10n;
 
 /**
  * Translater tools.
@@ -157,7 +157,7 @@ class TranslaterModule
 
             if (is_dir($backup . '/' . $file)
                 || !$is_backup
-                || !l10n::isCode($m[1])
+                || !L10n::isCode($m[1])
             ) {
                 continue;
             }
@@ -166,7 +166,7 @@ class TranslaterModule
                 $res[] = $file;
             } else {
                 $res[$m[1]][$file]['code']   = $m[1];
-                $res[$m[1]][$file]['name']   = l10n::getLanguageName($m[1]);
+                $res[$m[1]][$file]['name']   = L10n::getLanguageName($m[1]);
                 $res[$m[1]][$file]['path']   = Path::info($backup . '/' . $file);
                 $res[$m[1]][$file]['time']   = filemtime($backup . '/' . $file);
                 $res[$m[1]][$file]['size']   = filesize($backup . '/' . $file);
@@ -270,7 +270,7 @@ class TranslaterModule
 
         if (!file_exists($backup . '/' . $file)
             || !$is_backup
-            || !l10n::isCode($m[1])
+            || !L10n::isCode($m[1])
         ) {
             return false;
         }
@@ -426,7 +426,7 @@ class TranslaterModule
 
         if ($is_file) {
             $module = $f[1] == $this->id ? $f[1] : false;
-            $lang   = l10n::isCode($f[2]) ? $f[2] : false;
+            $lang   = L10n::isCode($f[2]) ? $f[2] : false;
             $group  = in_array($f[3], My::l10nGroupsCombo()) ? $f[3] : false;
             $ext    = Translater::isLangphpFile($f[4]) || Translater::isPoFile($f[4]) ? $f[4] : false;
         }
@@ -471,14 +471,14 @@ class TranslaterModule
                 continue;
             }
 
-            if (!l10n::isCode($m[1])) {
+            if (!L10n::isCode($m[1])) {
                 continue;
             }
 
             if ($return_path) {
                 $res[$m[1]][] = $file; // Path
             } else {
-                $res[$m[1]] = l10n::getLanguageName($m[1]); // Lang name
+                $res[$m[1]] = L10n::getLanguageName($m[1]); // Lang name
             }
         }
 
@@ -502,7 +502,7 @@ class TranslaterModule
      */
     public function getUnusedLangs(): array
     {
-        return array_diff(l10n::getISOcodes(true, false), $this->getUsedLangs());
+        return array_diff(L10n::getISOcodes(true, false), $this->getUsedLangs());
     }
 
     /**
@@ -514,7 +514,7 @@ class TranslaterModule
      */
     public function addLang(string $lang, string $from_lang = ''): bool
     {
-        if (!l10n::isCode($lang)) {
+        if (!L10n::isCode($lang)) {
             throw new Exception(sprintf(
                 __('Unknow language %s'),
                 $lang
@@ -569,7 +569,7 @@ class TranslaterModule
      */
     public function updLang(string $lang, array $msgs): void
     {
-        if (!l10n::isCode($lang)) {
+        if (!L10n::isCode($lang)) {
             throw new Exception(sprintf(
                 __('Unknow language %s'),
                 $lang
@@ -636,7 +636,7 @@ class TranslaterModule
     public function delLang(string $lang, bool $del_empty_dir = true): bool
     {
         # Path is right formed
-        if (!l10n::isCode($lang)) {
+        if (!L10n::isCode($lang)) {
             throw new Exception(sprintf(
                 __('Unknow language %s'),
                 $lang
@@ -791,7 +791,7 @@ class TranslaterModule
             $content .= '// Translated with Translater - ' . dcCore::app()->plugins->moduleInfo(My::id(), 'version') . "\n\n";
         }
 
-        l10n::generatePhpFileFromPo(implode(DIRECTORY_SEPARATOR, [$this->locales, $lang->code, $group]), $content);
+        L10n::generatePhpFileFromPo(implode(DIRECTORY_SEPARATOR, [$this->locales, $lang->code, $group]), $content);
     }
     //@}
 }

@@ -31,9 +31,9 @@ use Dotclear\Helper\Html\Form\{
     Submit,
     Text
 };
+use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Html;
 use Exception;
-use dt;
 
 class Manage extends dcNsProcess
 {
@@ -204,7 +204,7 @@ class Manage extends dcNsProcess
 
             $res     = '';
             $modules = $current->translater->getModules($current->type);
-            ksort($modules);
+            uasort($modules, fn ($a, $b) => strtolower($a->name) <=> strtolower($b->name));
             foreach ($modules as $module) {
                 if ($current->translater->hide_default && in_array($module->id, My::defaultDistribModules($current->type))) {
                     continue;
@@ -310,7 +310,7 @@ class Manage extends dcNsProcess
                         echo
                         '<td class="nowrap">' . count($backups[$code_id]) . '</td>' .
                         '<td class="nowrap"> ' .
-                        dt::str('%Y-%m-%d %H:%M', (int) $time[$code_id], (string) dcCore::app()->blog?->settings->get('system')->get('blog_timezone')) .
+                        Date::str('%Y-%m-%d %H:%M', (int) $time[$code_id], (string) dcCore::app()->blog?->settings->get('system')->get('blog_timezone')) .
                         '</td>';
                     } else {
                         echo '<td class="nowrap">' . __('no backups') . '</td><td class="maximal nowrap">-</td>';
@@ -332,7 +332,7 @@ class Manage extends dcNsProcess
                         (new Submit('do-action'))->value(__('ok')),
                         dcCore::app()->formNonce(false),
                     ],
-                    dcCore::app()->adminurl?->hiddenFormFields(
+                    is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
                         My::id(),
                         ['type' => $current->module->type, 'module' => $current->module->id]
                     )
@@ -376,7 +376,7 @@ class Manage extends dcNsProcess
                                 $form_id,
                                 $backup_code['name'],
                                 $backup_code['code'],
-                                dt::str(
+                                Date::str(
                                     dcCore::app()->blog?->settings->get('system')->get('date_format') . ' ' . dcCore::app()->blog?->settings->get('system')->get('time_format'),
                                     (int) $backup_code['time'],
                                     dcCore::app()->blog?->settings->get('system')->get('blog_timezone')
@@ -401,7 +401,7 @@ class Manage extends dcNsProcess
                             (new Submit('do-action'))->value(__('ok')),
                             dcCore::app()->formNonce(false),
                         ],
-                        dcCore::app()->adminurl?->hiddenFormFields(
+                        is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
                             My::id(),
                             ['type' => $current->module->type, 'module' => $current->module->id]
                         )
@@ -437,7 +437,7 @@ class Manage extends dcNsProcess
                         (new Submit(['save']))->value(__('Create')),
                         dcCore::app()->formNonce(false),
                     ],
-                    dcCore::app()->adminurl?->hiddenFormFields(
+                    is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
                         My::id(),
                         ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_add_code']
                     )
@@ -458,7 +458,7 @@ class Manage extends dcNsProcess
                         (new Submit(['save']))->value(__('Import')),
                         dcCore::app()->formNonce(false),
                     ],
-                    dcCore::app()->adminurl?->hiddenFormFields(
+                    is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
                         My::id(),
                         ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_import_pack']
                     )
@@ -604,7 +604,7 @@ class Manage extends dcNsProcess
                     dcCore::app()->formNonce(false),
                     (new Hidden(['code'], $current->lang->code)),
                 ],
-                dcCore::app()->adminurl?->hiddenFormFields(
+                is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
                     My::id(),
                     ['type' => $current->module?->type, 'module' => $current->module?->id, 'lang' => $current->lang->code, 'action' => 'module_update_code']
                 )

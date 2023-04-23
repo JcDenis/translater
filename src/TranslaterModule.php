@@ -16,6 +16,7 @@ namespace Dotclear\Plugin\translater;
 
 use dcCore;
 use dcModuleDefine;
+use Dotclear\Helper\Date;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\File\Path;
 use Dotclear\Helper\File\Zip\Unzip;
@@ -23,7 +24,6 @@ use Dotclear\Helper\File\Zip\Zip;
 use Dotclear\Helper\Html\Html;
 use Dotclear\Helper\L10n;
 use Exception;
-use dt;
 
 /**
  * Translater tools.
@@ -400,7 +400,7 @@ class TranslaterModule
             $zip->addFile($from, $to);
         }
 
-        $filename = Files::tidyFileName(dt::str(str_replace(
+        $filename = Files::tidyFileName(Date::str(str_replace(
             ['timestamp', 'module', 'type', 'version'],
             [time(), $this->id, $this->type, $this->version],
             $this->translater->export_filename
@@ -683,7 +683,7 @@ class TranslaterModule
         if ($this->translater->parse_comment) {
             $content .= '# Language: ' . $lang->name . "\n" .
             '# Module: ' . $this->id . ' - ' . $this->version . "\n" .
-            '# Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
+            '# Date: ' . Date::str('%Y-%m-%d %H:%M:%S') . "\n";
 
             if ($this->translater->parse_user && $this->translater->parse_userinfo != '') {
                 $search  = My::defaultUserInformations();
@@ -775,7 +775,7 @@ class TranslaterModule
         if ($this->translater->parse_comment) {
             $content .= '// Language: ' . $lang->name . "\n" .
             '// Module: ' . $this->id . ' - ' . $this->version . "\n" .
-            '// Date: ' . dt::str('%Y-%m-%d %H:%M:%S') . "\n";
+            '// Date: ' . Date::str('%Y-%m-%d %H:%M:%S') . "\n";
 
             if ($this->translater->parse_user && !empty($this->translater->parse_userinfo)) {
                 $search  = My::defaultUserInformations();

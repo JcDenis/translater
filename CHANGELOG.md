@@ -3,6 +3,12 @@ dev
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
 
+2023.04.23
+- require dotclear 2.26
+- require php 8.1+
+- use latest dotclear namespace
+- fix nullsafe warnings
+
 2023.03.19
 - fix init check
 - fix some phpstan warnings

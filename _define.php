@@ -20,7 +20,10 @@ $this->registerModule(
     'Jean-Christian Denis & contributors',
     '2023.04.23',
     [
-        'requires'    => [['core', '2.26']],
+        'requires'    => [
+            ['php', '8.1'],
+            ['core', '2.26'],
+        ],
         'permissions' => null,
         'type'        => 'plugin',
         'support'     => 'http://forum.dotclear.org/viewtopic.php?id=39220',

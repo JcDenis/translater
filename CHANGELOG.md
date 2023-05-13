@@ -2,6 +2,13 @@ dev
 - [ ] help translation
 - [ ] source translation
 - [ ] fix third-party API (temp removed)
+- [ ] fix multiline translations
+
+2023.05.13
+- require dotclear 2.26
+- require php 8.1+
+- use define php_min
+- fix settings
 
 2023.04.23
 - require dotclear 2.26

@@ -4,6 +4,11 @@ dev
 - [ ] fix third-party API (temp removed)
 - [ ] fix multiline translations
 
+2023.06.18
+- require dotclear 2.26
+- require php 8.1+
+- fix settings (again)
+
 2023.05.13
 - require dotclear 2.26
 - require php 8.1+

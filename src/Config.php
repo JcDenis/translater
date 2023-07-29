@@ -15,8 +15,11 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\translater;
 
 use dcCore;
-use dcNsProcess;
-use dcPage;
+use Dotclear\Core\Process;
+use Dotclear\Core\Backend\{
+    Notices,
+    Page
+};
 use Dotclear\Helper\Html\Form\{
     Checkbox,
     Div,
@@ -31,19 +34,16 @@ use Dotclear\Helper\Html\Form\{
 };
 use Exception;
 
-class Config extends dcNsProcess
+class Config extends Process
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_CONTEXT_ADMIN')
-            && dcCore::app()->auth?->isSuperAdmin();
-
-        return static::$init;
+        return self::status(My::checkContext(My::CONFIG));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
@@ -63,10 +63,10 @@ class Config extends dcNsProcess
                 }
             }
 
-            dcPage::addSuccessNotice(
+            Notices::addSuccessNotice(
                 __('Configuration successfully updated.')
             );
-            dcCore::app()->adminurl?->redirect(
+            dcCore::app()->admin->url->redirect(
                 'admin.plugins',
                 ['module' => My::id(), 'conf' => 1, 'redir' => dcCore::app()->admin->__get('list')->getRedir()]
             );
@@ -79,7 +79,7 @@ class Config extends dcNsProcess
 
     public static function render(): void
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return;
         }
 
@@ -177,6 +177,6 @@ class Config extends dcNsProcess
             ]),
         ])->render();
 
-        dcPage::helpBlock('translater.config');
+        Page::helpBlock('translater.config');
     }
 }

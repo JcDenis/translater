@@ -14,52 +14,38 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcAdmin;
 use dcCore;
-use dcFavorites;
-use dcNsProcess;
-use dcPage;
+use Dotclear\Core\Process;
+use Dotclear\Core\Backend\Favorites;
 
-class Backend extends dcNsProcess
+class Backend extends Process
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_CONTEXT_ADMIN')
-            && dcCore::app()->auth?->isSuperAdmin();
-
-        return static::$init;
+        return self::status(My::checkContext(My::BACKEND));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
+
+        My::addBackendMenuItem();
 
         dcCore::app()->addBehaviors([
             'adminModulesListGetActions' => [BackendBehaviors::class, 'adminModulesGetActions'],
             'adminModulesListDoActions'  => [BackendBehaviors::class, 'adminModulesDoActions'],
-            'adminDashboardFavoritesV2'  => function (dcFavorites $favs): void {
+            'adminDashboardFavoritesV2'  => function (Favorites $favs): void {
                 $favs->register(My::id(), [
                     'title'      => My::name(),
-                    'url'        => dcCore::app()->adminurl?->get(My::id()),
-                    'small-icon' => dcPage::getPF(My::id() . '/icon.svg'),
-                    'large-icon' => dcPage::getPF(My::id() . '/icon.svg'),
+                    'url'        => My::manageUrl(),
+                    'small-icon' => My::icons(),
+                    'large-icon' => My::icons(),
                     //'permissions' => null,
                 ]);
             },
         ]);
-
-        dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
-            My::name(),
-            dcCore::app()->adminurl?->get(My::id()),
-            dcPage::getPF(My::id() . '/icon.svg'),
-            preg_match(
-                '/' . preg_quote((string) dcCore::app()->adminurl?->get(My::id())) . '(&.*)?$/',
-                $_SERVER['REQUEST_URI']
-            ),
-            dcCore::app()->auth?->isSuperAdmin()
-        );
 
         return true;
     }

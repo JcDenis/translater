@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use adminModulesList;
 use dcCore;
+use Dotclear\Core\Backend\ModulesList;
 use Dotclear\Helper\Html\Form\Submit;
 use Dotclear\Helper\Html\Html;
 
@@ -27,7 +27,7 @@ class BackendBehaviors
     /**
      * Create instance of Translater once
      *
-     * @return Translater     Translater instance
+     * @return  Translater  Translater instance
      */
     private static function translater(): Translater
     {
@@ -41,13 +41,13 @@ class BackendBehaviors
     /**
      * Add button to go to module translation
      *
-     * @param  adminModulesList     $list   adminModulesList instance
-     * @param  string               $id     Module id
-     * @param  array                $prop   Module properties
+     * @param   ModulesList     $list   ModulesList instance
+     * @param   string          $id     Module id
+     * @param   array           $prop   Module properties
      *
-     * @return string                       HTML submit button
+     * @return  string                       HTML submit button
      */
-    public static function adminModulesGetActions(adminModulesList $list, string $id, array $prop): ?string
+    public static function adminModulesGetActions(ModulesList $list, string $id, array $prop): ?string
     {
         if ($list->getList() != $prop['type'] . '-activate'
             || !self::translater()->getSetting($prop['type'] . '_menu')
@@ -67,20 +67,16 @@ class BackendBehaviors
     /**
      * Redirect to module translation
      *
-     * @param  adminModulesList     $list       adminModulesList instance
-     * @param  array                $modules    Selected modules ids
-     * @param  string               $type       List type (plugin|theme)
+     * @param   ModulesList     $list       ModulesList instance
+     * @param   array           $modules    Selected modules ids
+     * @param   string          $type       List type (plugin|theme)
      */
-    public static function adminModulesDoActions(adminModulesList $list, array $modules, string $type): void
+    public static function adminModulesDoActions(ModulesList $list, array $modules, string $type): void
     {
         if (empty($_POST['translater']) || !is_array($_POST['translater'])) {
             return;
         }
 
-        dcCore::app()->adminurl?->redirect(
-            My::id(),
-            ['part' => 'module', 'type' => $type, 'module' => key($_POST['translater'])],
-            '#module-lang'
-        );
+        My::redirect(['part' => 'module', 'type' => $type, 'module' => key($_POST['translater'])], '#module-lang');
     }
 }

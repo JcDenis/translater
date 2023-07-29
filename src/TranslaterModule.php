@@ -119,7 +119,7 @@ class TranslaterModule
                 break;
 
             case 'translater':
-                $tmp = Path::real(dcCore::app()->plugins->moduleRoot(My::id()));
+                $tmp = Path::real(My::path());
                 if ($tmp !== false && is_writable($tmp)) {
                     @mkDir($tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER);
                     $dir = $tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;

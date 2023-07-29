@@ -15,8 +15,11 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\translater;
 
 use dcCore;
-use dcNsProcess;
-use dcPage;
+use Dotclear\Core\Process;
+use Dotclear\Core\Backend\{
+    Notices,
+    Page
+};
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\Html\Form\{
     Checkbox,
@@ -35,19 +38,16 @@ use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Html;
 use Exception;
 
-class Manage extends dcNsProcess
+class Manage extends Process
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_CONTEXT_ADMIN')
-            && dcCore::app()->auth?->isSuperAdmin();
-
-        return static::$init;
+        return self::status(My::checkContext(My::MANAGE));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
@@ -131,7 +131,7 @@ class Manage extends dcNsProcess
                     }
                 }
 
-                self::redirect(__('Language successfully deleted'), $_POST['code']);
+                self::redirect(__('Language successfully deleted'));
             }
 
             if ($current->action == 'module_update_code') {
@@ -158,48 +158,48 @@ class Manage extends dcNsProcess
 
     public static function render(): void
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return;
         }
 
         $current = ManageVars::init();
 
-        $breadcrumb = [My::name() => dcCore::app()->adminurl?->get(My::id(), ['type' => '-'])];
+        $breadcrumb = [My::name() => My::manageUrl(['type' => '-'])];
         if (empty($current->type)) {
             $breadcrumb = [My::name() => ''];
         } elseif (empty($current->module)) {
             $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')] = '';
         } elseif (empty($current->lang)) {
-            $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')] = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type]);
+            $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')] = My::manageUrl(['type' => $current->type]);
             $breadcrumb[Html::escapeHTML($current->module->name)]                  = '';
         } elseif (!empty($current->lang)) {
-            $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')]                  = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type]);
-            $breadcrumb[Html::escapeHTML($current->module->name)]                                   = dcCore::app()->adminurl?->get(My::id(), ['type' => $current->type, 'module' => $current->module->id]);
+            $breadcrumb[$current->type == 'plugin' ? __('Plugins') : __('Themes')]                  = My::manageUrl(['type' => $current->type]);
+            $breadcrumb[Html::escapeHTML($current->module->name)]                                   = My::manageUrl(['type' => $current->type, 'module' => $current->module->id]);
             $breadcrumb[Html::escapeHTML(sprintf(__('%s language edition'), $current->lang->name))] = '';
         }
 
-        dcPage::openModule(
+        Page::openModule(
             My::name(),
-            dcPage::jsPageTabs() .
-            dcPage::cssModuleLoad(My::id() . '/css/backend.css') .
-            dcPage::jsJson('translater', [
+            Page::jsPageTabs() .
+            My::cssLoad('backend') .
+            Page::jsJson('translater', [
                 'title_add_detail' => __('Use this text'),
-                'image_field'      => dcPage::getPF(My::id() . '/img/field.png'),
-                'image_toggle'     => dcPage::getPF(My::id() . '/img/toggle.png'),
+                'image_field'      => My::fileURL('/img/field.png'),
+                'image_toggle'     => My::fileURL('/img/toggle.png'),
             ]) .
-            dcPage::jsModuleLoad(My::id() . '/js/backend.js') .
+            My::jsLoad('backend') .
 
             # --BEHAVIOR-- translaterAdminHeaders
             dcCore::app()->callBehavior('translaterAdminHeaders')
         );
 
         echo
-        dcPage::breadcrumb($breadcrumb) .
-        dcPage::notices();
+        Page::breadcrumb($breadcrumb) .
+        Notices::getNotices();
 
         if (empty($current->module) && $current->type != '') {
             // modules list
-            echo '<form id="theme-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id(), ['type' => 'plugin']) . '">';
+            echo '<form id="theme-form" method="post" action="' . My::manageUrl(['type' => 'plugin']) . '">';
 
             $res     = '';
             $modules = $current->translater->getModules($current->type);
@@ -211,7 +211,7 @@ class Manage extends dcNsProcess
                 if ($module->root_writable) {
                     $res .= sprintf(
                         '<tr class="line"><td class="nowrap minimal"><a href="%s" title="%s">%s</a></td>',
-                        dcCore::app()->adminurl?->get(My::id(), ['type' => $module->type, 'module' => $module->id]),
+                        My::manageUrl(['type' => $module->type, 'module' => $module->id]),
                         Html::escapeHTML(sprintf(__('Translate module %s'), __($module->name))),
                         Html::escapeHTML($module->id)
                     );
@@ -227,7 +227,7 @@ class Manage extends dcNsProcess
                         $codes[$code_id] = sprintf(
                             '<a class="wait maximal nowrap" title="%s" href="%s">%s (%s)</a>',
                             Html::escapeHTML(sprintf(__('Edit language %s of module %s'), Html::escapeHTML($code_name), __($module->name))),
-                            dcCore::app()->adminurl?->get(My::id(), ['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
+                            My::manageUrl(['type' => $module->type, 'module' => $module->id, 'lang' => $code_id]),
                             Html::escapeHTML($code_name),
                             $code_id
                         );
@@ -260,7 +260,7 @@ class Manage extends dcNsProcess
             }
             echo '</form>';
 
-            dcPage::helpBlock('translater.type');
+            Page::helpBlock('translater.type');
         } elseif (!empty($current->module) && empty($current->lang)) {
             $codes        = $current->module->getUsedLangs();
             $backups      = $current->module->getBackups();
@@ -279,7 +279,7 @@ class Manage extends dcNsProcess
             if (count($codes)) {
                 echo
                 '<div class="clear fieldset"><h3>' . __('Translations') . '</h3>' .
-                '<form id="module-translations-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">' .
+                '<form id="module-translations-form" method="post" action="' . My::manageUrl() . '">' .
                 '<table class="clear maximal">' .
                 '<caption>' . __('Existing languages translations') . '</caption>' .
                 '<tr>' .
@@ -295,7 +295,7 @@ class Manage extends dcNsProcess
                     '<td class="minimal">' . (new Checkbox(['codes[]', 'existing_code_' . $code_id]))->value($code_id)->render() . '</td>' .
                     '<td class="nowrap">' .
                     '<a href="' .
-                        dcCore::app()->adminurl?->get(My::id(), ['type' => $current->module->type, 'module' => $current->module->id, 'lang' => $code_id])
+                        My::manageUrl(['type' => $current->module->type, 'module' => $current->module->id, 'lang' => $code_id])
                          . '" title="' . sprintf(__('Edit %s language'), Html::escapeHTML($code_name)) . '">' . $code_name . '</a>' .
                     '</td>' .
                     '<td class="nowrap maximal"> ' . $code_id . '</td>';
@@ -320,22 +320,19 @@ class Manage extends dcNsProcess
                 <div class="two-cols">
                 <p class="col checkboxes-helpers"></p>' .
 
-                (new Para())->class('col right')->items(array_merge(
-                    [
-                        (new Text('', __('Selected languages action:'))),
-                        (new Select('action'))->items([
-                            __('Backup languages') => 'module_create_backups',
-                            __('Delete languages') => 'module_delete_codes',
-                            __('Export languages') => 'module_export_pack',
-                        ]),
-                        (new Submit('do-action'))->value(__('ok')),
-                        dcCore::app()->formNonce(false),
-                    ],
-                    is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
-                        My::id(),
-                        ['type' => $current->module->type, 'module' => $current->module->id]
-                    )
-                ))->render() .
+                (new Para())->class('col right')->items([
+                    (new Text('', __('Selected languages action:'))),
+                    (new Select('action'))->items([
+                        __('Backup languages') => 'module_create_backups',
+                        __('Delete languages') => 'module_delete_codes',
+                        __('Export languages') => 'module_export_pack',
+                    ]),
+                    (new Submit('do-action'))->value(__('ok')),
+                    ... My::hiddenFields([
+                        'type'   => $current->module->type,
+                        'module' => $current->module->id,
+                    ]),
+                ])->render() .
                 '</div></form><p>&nbsp;</p></div>';
             }
 
@@ -344,7 +341,7 @@ class Manage extends dcNsProcess
                 // delete / retore backups
                 if (!empty($backups)) {
                     echo '<div class="fieldset"><h3>' . __('Backups') . '</h3>' .
-                    '<form id="module-backups-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">' .
+                    '<form id="module-backups-form" method="post" action="' . My::manageUrl() . '">' .
                     '<table class="clear">' .
                     '<caption>' . __('Existing languages backups') . '</caption>' .
                     '<tr>' .
@@ -390,21 +387,18 @@ class Manage extends dcNsProcess
                     <div class="two-cols">
                     <p class="col checkboxes-helpers"></p>' .
 
-                    (new Para())->class('col right')->items(array_merge(
-                        [
-                            (new Text('', __('Selected backups action:'))),
-                            (new Select('action'))->items([
-                                __('Restore backups') => 'module_restore_backup',
-                                __('Delete backups')  => 'module_delete_backup',
-                            ]),
-                            (new Submit('do-action'))->value(__('ok')),
-                            dcCore::app()->formNonce(false),
-                        ],
-                        is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
-                            My::id(),
-                            ['type' => $current->module->type, 'module' => $current->module->id]
-                        )
-                    ))->render() .
+                    (new Para())->class('col right')->items([
+                        (new Text('', __('Selected backups action:'))),
+                        (new Select('action'))->items([
+                            __('Restore backups') => 'module_restore_backup',
+                            __('Delete backups')  => 'module_delete_backup',
+                        ]),
+                        (new Submit('do-action'))->value(__('ok')),
+                        ... My::hiddenFields([
+                            'type'   => $current->module->type,
+                            'module' => $current->module->id,
+                        ]),
+                    ])->render() .
                     '</div></form><p>&nbsp;</p></div>';
                 }
             }
@@ -414,7 +408,7 @@ class Manage extends dcNsProcess
             // add language
             if (!empty($unused_codes)) {
                 echo '<div class="col fieldset"><h3>' . __('Add language') . '</h3>
-                <form id="muodule-code-create-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">' .
+                <form id="module-code-create-form" method="post" action="' . My::manageUrl() . '">' .
                 (new Para())->class('field')->items([
                     (new Label(__('Select language:')))->for('code'),
                     (new Select(['code']))->default((string) dcCore::app()->auth?->getInfo('user_lang'))->items(array_merge(['-' => '-'], $unused_codes)),
@@ -431,50 +425,46 @@ class Manage extends dcNsProcess
                     ])->render();
                 }
                 echo
-                (new Para())->items(array_merge(
-                    [
-                        (new Submit(['save']))->value(__('Create')),
-                        dcCore::app()->formNonce(false),
-                    ],
-                    is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
-                        My::id(),
-                        ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_add_code']
-                    )
-                ))->render() .
+                (new Para())->items([
+                    (new Submit(['save']))->value(__('Create')),
+                    ... My::hiddenFields([
+                        'type'   => $current->module->type,
+                        'module' => $current->module->id,
+                        'action' => 'module_add_code',
+                    ]),
+                ])->render() .
                 '</form><p>&nbsp;</p></div>';
             }
 
             // Import
             echo '<div class="col fieldset"><h3>' . __('Import') . '</h3>' .
-            (new Form('module-pack-import-form'))->method('post')->action(dcCore::app()->adminurl?->get(My::id()))->extra('enctype="multipart/form-data"')->fields([
+            (new Form('module-pack-import-form'))->method('post')->action(My::manageUrl())->extra('enctype="multipart/form-data"')->fields([
                 (new Para())->items([
                     (new Label(__('Select languages package to import:')))->for('packfile'),
                     (new File('packfile')),
 
                 ]),
-                (new Para())->items(array_merge(
-                    [
-                        (new Submit(['save']))->value(__('Import')),
-                        dcCore::app()->formNonce(false),
-                    ],
-                    is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
-                        My::id(),
-                        ['type' => $current->module->type, 'module' => $current->module->id, 'action' => 'module_import_pack']
-                    )
-                )),
+                (new Para())->items([
+                    (new Submit(['save']))->value(__('Import')),
+                    ... My::hiddenFields([
+                        'type'   => $current->module->type,
+                        'module' => $current->module->id,
+                        'action' => 'module_import_pack',
+                    ]),
+                ]),
             ])->render() .
             '<p>&nbsp;</p></div>';
 
             echo '</div>';
 
-            dcPage::helpBlock('translater.module');
+            Page::helpBlock('translater.module');
         } elseif (!empty($current->lang)) {
             $lines               = $current->lang->getMessages();
             $allowed_l10n_groups = [];
 
             echo
             '<div id="lang-form">' .
-            '<form id="lang-edit-form" method="post" action="' . dcCore::app()->adminurl?->get(My::id()) . '">' .
+            '<form id="lang-edit-form" method="post" action="' . My::manageUrl() . '">' .
             '<table class="table-outer">' .
             '<caption>' . sprintf(__('List of %s localized strings'), count($lines)) . '</caption>' .
             '<tr>' .
@@ -597,23 +587,22 @@ class Manage extends dcNsProcess
                 (new Select('multigroup'))->items(My::l10nGroupsCombo()),
             ])->render() .
             '</div>' .
-            (new Para())->class('col right')->items(array_merge(
-                [
-                    (new Submit('do-action'))->value(__('Save') . ' (s)')->accesskey('s'),
-                    dcCore::app()->formNonce(false),
-                    (new Hidden(['code'], $current->lang->code)),
-                ],
-                is_null(dcCore::app()->adminurl) ? [] : dcCore::app()->adminurl->hiddenFormFields(
-                    My::id(),
-                    ['type' => $current->module?->type, 'module' => $current->module?->id, 'lang' => $current->lang->code, 'action' => 'module_update_code']
-                )
-            ))->render() .
+            (new Para())->class('col right')->items([
+                (new Submit('do-action'))->value(__('Save') . ' (s)')->accesskey('s'),
+                ... My::hiddenFields([
+                    'type'   => $current->module->type,
+                    'module' => $current->module->id,
+                    'action' => 'module_update_code',
+                    'lang'   => $current->lang->code,
+                    'code'   => $current->lang->code, //?
+                ]),
+            ])->render() .
             '</div>' .
             '</form>' .
             '<p>&nbsp;</p>' .
             '</div>';
 
-            dcPage::helpBlock('translater.lang');
+            Page::helpBlock('translater.lang');
         } else {
             $line = '<li><a href="%s"%s>%s</a></li>';
             echo '<h4><i>' . __('Translate your Dotclear plugins and themes') . '</i></h4>' .
@@ -621,22 +610,22 @@ class Manage extends dcNsProcess
                     '<h3><ul class="nice">%s</ul></h3>',
                     sprintf(
                         $line,
-                        dcCore::app()->adminurl?->get(My::id(), ['type' => 'plugin']),
+                        My::manageUrl(['type' => 'plugin']),
                         $current->type == 'plugin' ? ' class="active"' : '',
                         __('Translate plugins')
                     ) .
                     sprintf(
                         $line,
-                        dcCore::app()->adminurl?->get(My::id(), ['type' => 'theme']),
+                        My::manageUrl(['type' => 'theme']),
                         $current->type == 'theme' ? ' class="active"' : '',
                         __('Translate themes')
                     )
                 );
 
-            dcPage::helpBlock('translater.index');
+            Page::helpBlock('translater.index');
         }
 
-        dcPage::closeModule();
+        Page::closeModule();
     }
 
     private static function redirect(string $msg, ?string $lang = null): void
@@ -651,7 +640,7 @@ class Manage extends dcNsProcess
             $redir['lang'] = $lang;
         }
 
-        dcPage::addSuccessNotice($msg);
-        dcCore::app()->adminurl?->redirect(My::id(), $redir);
+        Notices::addSuccessNotice($msg);
+        My::manageUrl($redir);
     }
 }

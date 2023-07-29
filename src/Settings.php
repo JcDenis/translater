@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
-
 class Settings
 {
     // Show tranlsater button on plugins list
@@ -68,7 +66,7 @@ class Settings
      */
     public function __construct()
     {
-        $s = dcCore::app()->blog?->settings->get(My::id());
+        $s = My::settings();
 
         $this->plugin_menu      = (bool) ($s?->get('plugin_menu') ?? false);
         $this->theme_menu       = (bool) ($s?->get('theme_menu') ?? false);
@@ -103,8 +101,8 @@ class Settings
     public function writeSetting(string $key, mixed $value): bool
     {
         if (property_exists($this, $key) && settype($value, gettype($this->{$key})) === true) {
-            dcCore::app()->blog?->settings->get(My::id())->drop($key);
-            dcCore::app()->blog?->settings->get(My::id())->put($key, $value, gettype($this->{$key}), '', true, true);
+            My::settings()->drop($key);
+            My::settings()->put($key, $value, gettype($this->{$key}), '', true, true);
 
             return true;
         }

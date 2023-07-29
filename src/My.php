@@ -15,41 +15,20 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\translater;
 
 use dcCore;
+use Dotclear\Module\MyPlugin;
 
 /**
  * Plugin definitions
  */
-class My
+class My extends MyPlugin
 {
     /** @var    string  Locales folder name */
     public const LOCALES_FOLDER = 'locales';
 
-    /**
-     * This module id.
-     */
-    public static function id(): string
+    public static function checkCustomContext(int $context): ?bool
     {
-        return basename(dirname(__DIR__));
+        return dcCore::app()->auth->isSuperAdmin();
     }
-
-    /**
-     * This module name.
-     */
-    public static function name(): string
-    {
-        $name = dcCore::app()->plugins->moduleInfo(self::id(), 'name');
-
-        return __(is_string($name) ? $name : self::id());
-    }
-
-    /**
-     * This module path.
-     */
-    public static function path(): string
-    {
-        return dirname(__DIR__);
-    }
-
     /**
      * List of allowed backup folder
      */

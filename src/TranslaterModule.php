@@ -1,21 +1,10 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
-use dcModuleDefine;
+use Dotclear\App;
 use Dotclear\Helper\Date;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\File\Path;
@@ -23,46 +12,91 @@ use Dotclear\Helper\File\Zip\Unzip;
 use Dotclear\Helper\File\Zip\Zip;
 use Dotclear\Helper\Html\Html;
 use Dotclear\Helper\L10n;
+use Dotclear\Module\ModuleDefine;
 use Exception;
 
 /**
- * Translater tools.
+ * @brief       translater module tools class.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class TranslaterModule
 {
-    /** @var string Module id */
+    /**
+     * Module id.
+     *
+     * @var     string  $id
+     */
     public readonly string $id;
 
-    /** @var string Module type */
+    /**
+     * Module type.
+     *
+     * @var     string  $type
+     */
     public readonly string $type;
 
-    /** @var string Module name */
+    /**
+     * Module name.
+     *
+     * @var     string  $name
+     */
     public readonly string $name;
 
-    /** @var string Module author */
+    /**
+     * Module author.
+     *
+     * @var     string  $author
+     */
     public readonly string $author;
 
-    /** @var string Module version */
+    /**
+     * Module version.
+     *
+     * @var     string  $version
+     */
     public readonly string $version;
 
-    /** @var bool Module root writable */
+    /**
+     * Module root writable.
+     *
+     * @var     bool  $root_writable
+     */
     public readonly bool $root_writable;
 
-    /** @var string Module root (cleaned) */
+    /**
+     * Module root (cleaned).
+     *
+     * @var     string  $root
+     */
     public readonly string $root;
 
-    /** @var string Module locales root path */
+    /**
+     * Module locales root path.
+     *
+     * @var     string  $locales
+     */
     public readonly string $locales;
 
-    /** @var Translater Translater instance */
-    public readonly Translater $translater;
-
-    /** @var string Backup file regexp */
+    /**
+     * Backup file regexp.
+     *
+     * @var     string  $backup_file_regexp
+     */
     private $backup_file_regexp = '/^l10n-%s-(.*?)-[0-9]*?\.bck\.zip$/';
 
-    public function __construct(Translater $translater, dcModuleDefine $define)
-    {
-        $this->translater    = $translater;
+    /**
+     * Constructor.
+     *
+     * @param   Translater      $translater     The tanslater instance
+     * @param   ModuleDefine    $define         The module define
+     */
+    public function __construct(
+        public readonly Translater $translater,
+        ModuleDefine $define
+    ) {
         $this->id            = $define->get('id');
         $this->type          = $define->get('type');
         $this->name          = $define->get('name');
@@ -76,10 +110,11 @@ class TranslaterModule
     /// @name backup methods
     //@{
     /**
-     * Find backup folder of a module
+     * Find backup folder of a module.
      *
-     * @param  boolean $throw Silently failed
-     * @return string|false   The backup folder directory or false
+     * @param   bool    $throw  Silently failed
+     *
+     * @return  string|false    The backup folder directory or false
      */
     public function getBackupRoot(bool $throw = false): string|false
     {
@@ -93,7 +128,7 @@ class TranslaterModule
                 break;
 
             case 'plugin':
-                $exp = explode(PATH_SEPARATOR, DC_PLUGINS_ROOT);
+                $exp = explode(PATH_SEPARATOR, App::config()->pluginsRoot());
                 $tmp = Path::real(array_pop($exp));
                 if ($tmp !== false && is_writable($tmp)) {
                     $dir = $tmp;
@@ -102,7 +137,7 @@ class TranslaterModule
                 break;
 
             case 'public':
-                $tmp = Path::real((string) dcCore::app()->blog?->public_path);
+                $tmp = Path::real(App::blog()->publicPath());
                 if ($tmp !== false && is_writable($tmp)) {
                     $dir = $tmp;
                 }
@@ -110,7 +145,7 @@ class TranslaterModule
                 break;
 
             case 'cache':
-                $tmp = Path::real(DC_TPL_CACHE);
+                $tmp = Path::real(App::config()->cacheRoot());
                 if ($tmp !== false && is_writable($tmp)) {
                     @mkDir($tmp . '/l10n');
                     $dir = $tmp . '/l10n';
@@ -138,12 +173,11 @@ class TranslaterModule
     }
 
     /**
-     * Get a list of available backups
+     * Get a list of available backups.
      *
-     * @param  boolean $return_filename Return only filenames
-     * @return array                    The module backups info
+     * @return  array<string, array<string, array<string, string|array<string, string>>>>   The module backups info
      */
-    public function getBackups(bool $return_filename = false): array
+    public function getBackups(): array
     {
         $backup = $this->getBackupRoot();
         if (!$backup) {
@@ -162,26 +196,53 @@ class TranslaterModule
                 continue;
             }
 
-            if ($return_filename) {
-                $res[] = $file;
-            } else {
-                $res[$m[1]][$file]['code']   = $m[1];
-                $res[$m[1]][$file]['name']   = L10n::getLanguageName($m[1]);
-                $res[$m[1]][$file]['path']   = Path::info($backup . '/' . $file);
-                $res[$m[1]][$file]['time']   = filemtime($backup . '/' . $file);
-                $res[$m[1]][$file]['size']   = filesize($backup . '/' . $file);
-                $res[$m[1]][$file]['module'] = $this->id;
-            }
+            $res[$m[1]][$file]['code']   = $m[1];
+            $res[$m[1]][$file]['name']   = L10n::getLanguageName($m[1]);
+            $res[$m[1]][$file]['path']   = Path::info($backup . '/' . $file);
+            $res[$m[1]][$file]['time']   = (string) filemtime($backup . '/' . $file);
+            $res[$m[1]][$file]['size']   = (string) filesize($backup . '/' . $file);
+            $res[$m[1]][$file]['module'] = $this->id;
         }
 
         return $res;
     }
 
     /**
-     * Create a backup
+     * Get a list of available backups filemnames.
      *
-     * @param  string $lang The backup lang
-     * @return boolean      True on success
+     * @return  array<int, string>    The module backups info
+     */
+    public function getBackupsFilename(): array
+    {
+        $backup = $this->getBackupRoot();
+        if (!$backup) {
+            return [];
+        }
+
+        $res   = [];
+        $files = Translater::scandir($backup);
+        foreach ($files as $file) {
+            $is_backup = preg_match(sprintf($this->backup_file_regexp, preg_quote($this->id)), $file, $m);
+
+            if (is_dir($backup . '/' . $file)
+                || !$is_backup
+                || !L10n::isCode($m[1])
+            ) {
+                continue;
+            }
+
+            $res[] = $file;
+        }
+
+        return $res;
+    }
+
+    /**
+     * Create a backup.
+     *
+     * @param   string  $lang   The backup lang
+     *
+     * @return  bool    True on success
      */
     public function createBackup(string $lang): bool
     {
@@ -226,10 +287,11 @@ class TranslaterModule
     }
 
     /**
-     * Retore a backup
+     * Retore a backup.
      *
-     * @param  string $file   The backup filename
-     * @return boolean        True on success
+     * @param   string  $file   The backup filename
+     *
+     * @return  bool    True on success
      */
     public function restoreBackup(string $file): bool
     {
@@ -257,10 +319,11 @@ class TranslaterModule
     }
 
     /**
-     * Delete a module backup
+     * Delete a module backup.
      *
-     * @param  string $file The backup filename
-     * @return boolean       True on success
+     * @param   string  $file   The backup filename
+     *
+     * @return  bool    True on success
      */
     public function deleteBackup(string $file): bool
     {
@@ -288,10 +351,11 @@ class TranslaterModule
     }
 
     /**
-     * Import a language pack
+     * Import a language pack.
      *
-     * @param  array $zip_file The uploaded file info
-     * @return boolean         True on success
+     * @param   array<string, mixed>    $zip_file   The uploaded file info
+     *
+     * @return  bool    True on success
      */
     public function importPack(array $zip_file): bool
     {
@@ -350,9 +414,9 @@ class TranslaterModule
     }
 
     /**
-     * Export (to output) language pack
+     * Export (to output) language pack.
      *
-     * @param  array $langs     Langs to export
+     * @param  array<int, string>   $langs  Langs to export
      */
     public function exportPack(array $langs): void
     {
@@ -414,11 +478,12 @@ class TranslaterModule
     }
 
     /**
-     * Parse zip filename to module, lang info
+     * Parse zip filename to module, lang info.
      *
-     * @param  string  $file  The zip filename
-     * @param  boolean $throw Silently failed
-     * @return array          Array of file info
+     * @param   string  $file   The zip filename
+     * @param   bool    $throw  Silently failed
+     *
+     * @return  array<string, string>   Array of file info
      */
     public function parseZipFilename(string $file = '', bool $throw = false): array
     {
@@ -454,12 +519,11 @@ class TranslaterModule
     /// @name lang methods
     //@{
     /**
-     * List available langs of a module
+     * List available langs of a module.
      *
-     * @param  boolean $return_path Return path or name
-     * @return array                The lang list
+     * @return  array<string, string>   The lang list
      */
-    public function getLangs(bool $return_path = false): array
+    public function getLangs(): array
     {
         $res = [];
 
@@ -475,20 +539,42 @@ class TranslaterModule
                 continue;
             }
 
-            if ($return_path) {
-                $res[$m[1]][] = $file; // Path
-            } else {
-                $res[$m[1]] = L10n::getLanguageName($m[1]); // Lang name
+            $res[$m[1]] = L10n::getLanguageName($m[1]); // Lang name
+        }
+
+        return $res;
+    }
+    /**
+     * List available langs path of a module.
+     *
+     * @return  array<string, array<int, string>>   The lang list
+     */
+    public function getLangsPath(): array
+    {
+        $res = [];
+
+        $prefix = preg_match('/(' . preg_quote(My::LOCALES_FOLDER) . '(.*))$/', $this->locales) ? My::LOCALES_FOLDER : '';
+
+        $files = Translater::scandir($this->locales);
+        foreach ($files as $file) {
+            if (!preg_match('/.*?' . preg_quote(My::LOCALES_FOLDER) . '\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
+                continue;
             }
+
+            if (!L10n::isCode($m[1])) {
+                continue;
+            }
+
+            $res[$m[1]][] = $file; // Path
         }
 
         return $res;
     }
 
     /**
-     * List of used langs of a module
+     * List of used langs of a module.
      *
-     * @return array The list of iso names and codes
+     * @return  array<string, string>   The list of iso names and codes
      */
     public function getUsedLangs(): array
     {
@@ -496,9 +582,9 @@ class TranslaterModule
     }
 
     /**
-     * List of unsused langs of a module
+     * List of unsused langs of a module.
      *
-     * @return array The list of iso names and codes
+     * @return  array<string, string>   The list of iso names and codes
      */
     public function getUnusedLangs(): array
     {
@@ -506,11 +592,12 @@ class TranslaterModule
     }
 
     /**
-     * Add a lang to a module
+     * Add a lang to a module.
      *
-     * @param string $lang      The lang id
-     * @param string $from_lang The lang to copy from
-     * @return boolean          True on success
+     * @param   string  $lang       The lang id
+     * @param   string  $from_lang  The lang to copy from
+     *
+     * @return  bool    True on success
      */
     public function addLang(string $lang, string $from_lang = ''): bool
     {
@@ -562,10 +649,10 @@ class TranslaterModule
     }
 
     /**
-     * Update an existing lang
+     * Update an existing lang.
      *
-     * @param  string $lang   The lang
-     * @param  array $msgs    The messages
+     * @param   string                  $lang   The lang
+     * @param   array<string, mixed>    $msgs   The messages
      */
     public function updLang(string $lang, array $msgs): void
     {
@@ -627,11 +714,12 @@ class TranslaterModule
     }
 
     /**
-     * Delete a lang
+     * Delete a lang.
      *
-     * @param  string  $lang          The lang code
-     * @param  boolean $del_empty_dir Also remove empty locales dir
-     * @return boolean                True on success
+     * @param   string  $lang           The lang code
+     * @param   bool    $del_empty_dir  Also remove empty locales dir
+     *
+     * @return  bool    True on success
      */
     public function delLang(string $lang, bool $del_empty_dir = true): bool
     {
@@ -643,7 +731,7 @@ class TranslaterModule
             ));
         }
 
-        $files = $this->getLangs(true);
+        $files = $this->getLangsPath();
         if (!isset($files[$lang])) {
             throw new Exception(sprintf(
                 __('Failed to find language %s'),
@@ -669,11 +757,11 @@ class TranslaterModule
     }
 
     /**
-     * Construct and parse a .po file
+     * Construct and parse a po file.
      *
-     * @param string $lang   The lang code
-     * @param string $group  The lang group
-     * @param array $msgs    The strings
+     * @param   string              $lang   The lang code
+     * @param   string              $group  The lang group
+     * @param   array<int, mixed>   $msgs   The strings
      */
     private function setPoContent(string $lang, string $group, array $msgs): void
     {
@@ -689,14 +777,14 @@ class TranslaterModule
                 $search  = My::defaultUserInformations();
                 $replace = [];
                 foreach ($search as $n) {
-                    $replace[] = dcCore::app()->auth?->getInfo('user_' . $n);
+                    $replace[] = App::auth()->getInfo('user_' . $n);
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
                     $content .= '# Author: ' . Html::escapeHTML($info) . "\n";
                 }
             }
-            $content .= '# Translated with translater ' . dcCore::app()->plugins->moduleInfo(My::id(), 'version') . "\n\n";
+            $content .= '# Translated with translater ' . App::plugins()->moduleInfo(My::id(), 'version') . "\n\n";
         }
         $content .= "msgid \"\"\n" .
         "msgstr \"\"\n" .
@@ -704,7 +792,7 @@ class TranslaterModule
         '"Project-Id-Version: ' . $this->id . ' ' . $this->version . '\n"' . "\n" .
         '"POT-Creation-Date: \n"' . "\n" .
         '"PO-Revision-Date: ' . date('c') . '\n"' . "\n" .
-        '"Last-Translator: ' . dcCore::app()->auth?->getInfo('user_cn') . '\n"' . "\n" .
+        '"Last-Translator: ' . App::auth()->getInfo('user_cn') . '\n"' . "\n" .
         '"Language-Team: \n"' . "\n" .
         '"MIME-Version: 1.0\n"' . "\n" .
         '"Content-Transfer-Encoding: 8bit\n"' . "\n" .
@@ -757,11 +845,11 @@ class TranslaterModule
     }
 
     /**
-     * Construct and write a .lang.php file
+     * Construct and write a .lang.php file.
      *
-     * @param string $lang   The lang code
-     * @param string $group  The lang group
-     * @param array $msgs    The strings
+     * @param   string              $lang   The lang code
+     * @param   string              $group  The lang group
+     * @param   array<int, mixed>   $msgs   The strings
      */
     private function setLangphpContent(string $lang, string $group, array $msgs): void
     {
@@ -781,14 +869,14 @@ class TranslaterModule
                 $search  = My::defaultUserInformations();
                 $replace = [];
                 foreach ($search as $n) {
-                    $replace[] = dcCore::app()->auth?->getInfo('user_' . $n);
+                    $replace[] = App::auth()->getInfo('user_' . $n);
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
                     $content .= '// Author: ' . Html::escapeHTML($info) . "\n";
                 }
             }
-            $content .= '// Translated with Translater - ' . dcCore::app()->plugins->moduleInfo(My::id(), 'version') . "\n\n";
+            $content .= '// Translated with Translater - ' . App::plugins()->moduleInfo(My::id(), 'version') . "\n\n";
         }
 
         L10n::generatePhpFileFromPo(implode(DIRECTORY_SEPARATOR, [$this->locales, $lang->code, $group]), $content);

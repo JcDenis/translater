@@ -1,36 +1,37 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Module\MyPlugin;
 
 /**
- * Plugin definitions
+ * @brief       translater My helper.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class My extends MyPlugin
 {
-    /** @var    string  Locales folder name */
+    /**
+     * Locales folder name.
+     *
+     * @var     string  LOCALES_FOLDER
+     */
     public const LOCALES_FOLDER = 'locales';
 
     public static function checkCustomContext(int $context): ?bool
     {
-        return in_array($context, [My::BACKEND, My::MANAGE, My::MENU]) ? dcCore::app()->auth->isSuperAdmin() : null;
+        return in_array($context, [My::BACKEND, My::MANAGE, My::MENU]) ? App::auth()->isSuperAdmin() : null;
     }
+
     /**
-     * List of allowed backup folder
+     * List of allowed backup folder.
+     *
+     * @return  array<string, string>
      */
     public static function backupFoldersCombo(): array
     {
@@ -44,7 +45,9 @@ class My extends MyPlugin
     }
 
     /**
-     * List of possible home tab of the plugin
+     * List of possible home tab of the plugin.
+     *
+     * @return  array<string, string>
      */
     public static function startPageCombo(): array
     {
@@ -56,7 +59,9 @@ class My extends MyPlugin
     }
 
     /**
-     * List of place of tranlsations
+     * List of place of tranlsations.
+     *
+     * @return  array<string, string>
      */
     public static function l10nGroupsCombo(): array
     {
@@ -68,7 +73,9 @@ class My extends MyPlugin
     }
 
     /**
-     * List of user info can be parsed
+     * List of user info can be parsed.
+     *
+     * @return  array<int, string>
      */
     public static function defaultUserInformations(): array
     {
@@ -78,13 +85,17 @@ class My extends MyPlugin
     }
 
     /**
-     * List of distributed plugins and themes
+     * List of distributed plugins and themes.
+     *
+     * @param   string  $type   The modules type
+     *
+     * @return  array<int, string>
      */
     public static function defaultDistribModules(string $type): array
     {
         $types = [
-            'plugin' => explode(',', DC_DISTRIB_PLUGINS),
-            'theme'  => explode(',', DC_DISTRIB_THEMES),
+            'plugin' => explode(',', App::config()->distributedPlugins()),
+            'theme'  => explode(',', App::config()->distributedThemes()),
         ];
 
         return $types[$type] ?? [];

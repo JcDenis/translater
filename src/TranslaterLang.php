@@ -1,50 +1,56 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcModuleDefine;
+use Dotclear\App;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\File\Path;
 use Dotclear\Helper\L10n;
+use Dotclear\Module\ModuleDefine;
 
+/**
+ * @brief       translater lang tools class.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class TranslaterLang
 {
-    /** @var string Lang code */
-    public readonly string $code;
-
-    /** @var string Lang name */
+    /**
+     * Lang name.
+     *
+     * @var     string  $name
+     */
     public readonly string $name;
 
-    /** @var array Lang plural forms */
+    /**
+     * Lang plural forms.
+     *
+     * @var     array<int, string>  $plural
+     */
     public readonly array $plural;
 
-    /** @var TranslaterModule TranslaterModule instance */
-    private TranslaterModule $module;
-
-    public function __construct(TranslaterModule $module, string $lang)
-    {
-        $this->module = $module;
-        $this->code   = $lang;
-        $this->name   = L10n::getLanguageName($lang);
-        $this->plural = explode(':', L10n::getLanguagePluralExpression($lang));
+    /**
+     * Constructor.
+     *
+     * @param   TranslaterModule    $module     The module
+     * @param   string              $code       The lang code
+     */
+    public function __construct(
+        private TranslaterModule $module,
+        public readonly string $code
+    ) {
+        $this->name   = L10n::getLanguageName($code);
+        $this->plural = explode(':', L10n::getLanguagePluralExpression($code));
     }
 
     /**
-     * Get a lang messages
+     * Get a lang messages.
      *
-     * @return array The messages ids and translations
+     * @return  array<string, array<string, mixed>>   The messages ids and translations
      */
     public function getMessages(): array
     {
@@ -59,7 +65,7 @@ class TranslaterLang
         }
 
         # Add Dotclear str
-        $dc_define               = (new dcModuleDefine('dotclear'))->set('root', DC_ROOT);
+        $dc_define               = (new ModuleDefine('dotclear'))->set('root', App::config()->dotclearRoot());
         $dc_module               = new TranslaterModule($this->module->translater, $dc_define);
         $dc_lang                 = new TranslaterLang($dc_module, $this->code);
         $m_o_msgstrs['dotclear'] = $dc_lang->getMsgStrs();
@@ -76,7 +82,7 @@ class TranslaterLang
 
         # From str list
         foreach ($m_msgstrs as $rs) {
-            if (!isset($res[$rs['msgid']])) {
+            if (!is_string($rs['msgid']) || !isset($res[$rs['msgid']])) {
                 $res[$rs['msgid']]['files'][]   = [];
                 $res[$rs['msgid']]['in_dc']     = false;
                 $res[$rs['msgid']]['o_msgstrs'] = [];
@@ -90,7 +96,7 @@ class TranslaterLang
         # From others str list
         foreach ($m_o_msgstrs as $o_module => $o_msgstrs) {
             foreach ($o_msgstrs as $rs) {
-                if (!isset($res[$rs['msgid']])) {
+                if (!is_string($rs['msgid']) || !isset($res[$rs['msgid']])) {
                     continue;
                 }
 
@@ -109,9 +115,9 @@ class TranslaterLang
     }
 
     /**
-     * Get messages ids
+     * Get messages ids.
      *
-     * @return array The messages ids
+     * @return array<int, array<string, mixed>>     The messages ids
      */
     public function getMsgIds(): array
     {
@@ -129,12 +135,11 @@ class TranslaterLang
             }
             $contents = file_get_contents($this->module->root . '/' . $file);
             $msgs     = [];
-            # php files
             if ($extension == 'php') {
+                # php files
                 $msgs = Translater::extractPhpMsgs((string) $contents);
-
-            # tpl files
             } elseif ($extension == 'html') {
+                # tpl files
                 $msgs = Translater::extractTplMsgs((string) $contents);
             }
             foreach ($msgs as $msg) {
@@ -153,15 +158,15 @@ class TranslaterLang
     }
 
     /**
-     * Get messages translations
+     * Get messages translations.
      *
-     * @return array The messages translations
+     * @return  array<int, array<string, string|array<int, string>>>   The messages translations
      */
     public function getMsgStrs(): array
     {
         $res = $exists = $scanned = [];
 
-        $langs = $this->module->getLangs(true);
+        $langs = $this->module->getLangsPath();
         if (!isset($langs[$this->code])) {
             return $res;
         }

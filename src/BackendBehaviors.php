@@ -1,37 +1,38 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\ModulesList;
 use Dotclear\Helper\Html\Form\Submit;
 use Dotclear\Helper\Html\Html;
 
+/**
+ * @brief       translater backend behaviors class.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class BackendBehaviors
 {
-    /** @var Translater Translater instance */
+    /**
+     * Translater instance.
+     *
+     * @var     ?Translater     $translater
+     */
     private static $translater = null;
 
     /**
-     * Create instance of Translater once
+     * Create instance of Translater once.
      *
      * @return  Translater  Translater instance
      */
     private static function translater(): Translater
     {
-        if (!is_a(self::$translater, Translater::class)) {
+        if (is_null(self::$translater)) {
             self::$translater = new Translater(false);
         }
 
@@ -39,19 +40,22 @@ class BackendBehaviors
     }
 
     /**
-     * Add button to go to module translation
+     * Add button to go to module translation.
      *
-     * @param   ModulesList     $list   ModulesList instance
-     * @param   string          $id     Module id
-     * @param   array           $prop   Module properties
+     * @param   ModulesList             $list   ModulesList instance
+     * @param   string                  $id     Module id
+     * @param   array<string, mixed>    $prop   Module properties
      *
-     * @return  string                       HTML submit button
+     * @return  ?string     HTML submit button
      */
     public static function adminModulesGetActions(ModulesList $list, string $id, array $prop): ?string
     {
+        if (!is_string($prop['type'])) {
+            return null;
+        }
         if ($list->getList() != $prop['type'] . '-activate'
             || !self::translater()->getSetting($prop['type'] . '_menu')
-            || !dcCore::app()->auth?->isSuperAdmin()
+            || !App::auth()->isSuperAdmin()
         ) {
             return null;
         }
@@ -61,15 +65,15 @@ class BackendBehaviors
             return null;
         }
 
-        return (new Submit(['translater[' . Html::escapeHTML($id) . ']', null]))->value(__('Translate'))->render();
+        return (new Submit(['translater[' . Html::escapeHTML($id) . ']']))->value(__('Translate'))->render();
     }
 
     /**
-     * Redirect to module translation
+     * Redirect to module translation.
      *
-     * @param   ModulesList     $list       ModulesList instance
-     * @param   array           $modules    Selected modules ids
-     * @param   string          $type       List type (plugin|theme)
+     * @param   ModulesList         $list       ModulesList instance
+     * @param   array<int, string>  $modules    Selected modules ids
+     * @param   string              $type       List type (plugin|theme)
      */
     public static function adminModulesDoActions(ModulesList $list, array $modules, string $type): void
     {

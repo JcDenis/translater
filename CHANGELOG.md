@@ -1,3 +1,10 @@
+translater 2023.10.21
+===========================================================
+* Require Dotclear 2.28
+* Require PHP 8.1
+* Upgrade to Dotclear 2.28
+* Code review (phpstan)
+
 translater 2023.08.15
 ===========================================================
 * Require Dotclear 2.27

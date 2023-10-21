@@ -1,30 +1,26 @@
 <?php
 /**
- * @brief translater, a plugin for Dotclear 2
+ * @file
+ * @brief       The plugin translater definition
+ * @ingroup     translater
  *
- * @package Dotclear
- * @subpackage Plugin
+ * @defgroup    translater Plugin translater.
  *
- * @author Jean-Christian Denis & contributors
+ * Translate your Dotclear plugins and themes.
  *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return;
-}
+declare(strict_types=1);
 
 $this->registerModule(
     'Translater',
     'Translate your Dotclear plugins and themes',
     'Jean-Christian Denis & contributors',
-    '2023.08.15',
+    '2023.10.21',
     [
-        'requires' => [
-            ['php', '8.1'],
-            ['core', '2.27'],
-        ],
-        'permissions' => null,
+        'requires'    => [['core', '2.28']],
+        'permissions' => 'My',
         'type'        => 'plugin',
         'support'     => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/issues',
         'details'     => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/src/branch/master/README.md',

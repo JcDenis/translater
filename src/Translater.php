@@ -1,40 +1,37 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
-use dcModuleDefine;
-use dcThemes;
+use Dotclear\App;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\File\Path;
 use Dotclear\Helper\L10n;
 use Dotclear\Helper\Text;
+use Dotclear\Module\ModuleDefine;
 use Exception;
 
 /**
- * Translater tools.
+ * @brief       translater main tools class.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Translater extends Settings
 {
-    /** @var array $modules List of modules we could work on */
+    /**
+     * List of modules we could work on.
+     *
+     * @var     array<string, array<string, TranslaterModule>>  $modules
+     */
     private $modules = [];
 
     /**
-     * translater instance
+     * Construct translater instance.
      *
-     * @param boolean $full Also load modules
+     * @param   bool    $full   Also load modules
      */
     public function __construct(bool $full = true)
     {
@@ -48,33 +45,32 @@ class Translater extends Settings
     /// @name modules methods
     //@{
     /**
-     * Load array of modules infos by type of modules
+     * Load array of modules infos by type of modules.
      */
     private function loadModules(): void
     {
         $this->modules = ['theme' => [], 'plugin' => []];
 
-        if (!(dcCore::app()->themes instanceof dcThemes)) {
-            dcCore::app()->themes = new dcThemes();
-            dcCore::app()->themes->loadModules((string) dcCore::app()->blog?->themes_path, null);
+        if (App::themes()->isEmpty()) {
+            App::themes()->loadModules(App::blog()->themesPath(), null);
         }
 
         foreach ([
-            dcCore::app()->themes->getDefines(['state' => dcModuleDefine::STATE_ENABLED]),
-            dcCore::app()->plugins->getDefines(['state' => dcModuleDefine::STATE_ENABLED]),
+            App::themes()->getDefines(['state' => ModuleDefine::STATE_ENABLED]),
+            App::plugins()->getDefines(['state' => ModuleDefine::STATE_ENABLED]),
         ] as $modules) {
             foreach ($modules as $define) {
-                $this->modules[$define->get('type')][$define->get('id')] = new TranslaterModule($this, $define);
+                $this->modules[(string) $define->get('type')][(string) $define->get('id')] = new TranslaterModule($this, $define);
             }
         }
     }
 
     /**
-     * Return array of modules infos by type of modules
+     * Return array of modules infos by type of modules.
      *
-     * @param  string $type The modules type
+     * @param   string  $type   The modules type
      *
-     * @return array        The list of modules infos
+     * @return  array<string, TranslaterModule>  The list of modules infos
      */
     public function getModules(string $type = ''): array
     {
@@ -84,12 +80,12 @@ class Translater extends Settings
     }
 
     /**
-     * Return module class of a particular module for a given type of module
+     * Return module class of a particular module for a given type of module.
      *
-     * @param  string   $type       The module type
-     * @param  string   $id         The module id
+     * @param   string  $type   The module type
+     * @param   string  $id     The module id
      *
-     * @return TranslaterModule   The TranslaterModule instance
+     * @return  TranslaterModule    The TranslaterModule instance
      */
     public function getModule(string $type, string $id): TranslaterModule
     {
@@ -103,12 +99,12 @@ class Translater extends Settings
     }
 
     /**
-     * Return module class of a particular module for a given type of module
+     * Return module class of a particular module for a given type of module.
      *
-     * @param  TranslaterModule   $module     TranslaterModule instance
-     * @param  string               $lang       The lang iso code
+     * @param   TranslaterModule    $module     TranslaterModule instance
+     * @param   string              $lang       The lang iso code
      *
-     * @return TranslaterLang                 TranslaterLang instance or false
+     * @return  TranslaterLang  TranslaterLang instance or false
      */
     public function getLang(TranslaterModule $module, string $lang): TranslaterLang
     {
@@ -125,12 +121,13 @@ class Translater extends Settings
     /// @name helper methods
     //@{
     /**
-     * Scan recursively a folder and return files and folders names
+     * Scan recursively a folder and return files and folders names.
      *
-     * @param  string $path The path to scan
-     * @param  string $dir  Internal recursion
-     * @param  array  $res  Internal recursion
-     * @return array        List of path
+     * @param   string              $path   The path to scan
+     * @param   string              $dir    Internal recursion
+     * @param   array<int, string>  $res    Internal recursion
+     *
+     * @return  array<int, string>  List of path
      */
     public static function scandir(string $path, string $dir = '', array $res = []): array
     {
@@ -157,10 +154,11 @@ class Translater extends Settings
     }
 
     /**
-     * Encode a string
+     * Encode a string.
      *
-     * @param  string $str The string to encode
-     * @return string      The encoded string
+     * @param   string  $str    The string to encode
+     *
+     * @return  string  The encoded string
      */
     public static function encodeMsg(string $str): string
     {
@@ -168,11 +166,12 @@ class Translater extends Settings
     }
 
     /**
-     * Clean a po string
+     * Clean a po string.
      *
-     * @param  string  $string  The string to clean
-     * @param  boolean $reverse Un/escape string
-     * @return string           The cleaned string
+     * @param   string  $string     The string to clean
+     * @param   bool    $reverse    Un/escape string
+     *
+     * @return  string  The cleaned string
      */
     public static function poString(string $string, bool $reverse = false): string
     {
@@ -189,10 +188,11 @@ class Translater extends Settings
     }
 
     /**
-     * Try if a file is a .po file
+     * Try if a file is a po file.
      *
-     * @param  string  $file The path to test
-     * @return boolean       Success
+     * @param   string  $file The path to test
+     *
+     * @return  bool    Success
      */
     public static function isPoFile(string $file): bool
     {
@@ -200,10 +200,11 @@ class Translater extends Settings
     }
 
     /**
-     * Try if a file is a .lang.php file
+     * Try if a file is a .lang.php file.
      *
-     * @param  string  $file The path to test
-     * @return boolean       Success
+     * @param   string  $file   The path to test
+     *
+     * @return  bool    Success
      */
     public static function isLangphpFile(string $file): bool
     {
@@ -211,13 +212,14 @@ class Translater extends Settings
     }
 
     /**
-     * Check limit number of backup for a module
+     * Check limit number of backup for a module.
      *
-     * @param  string  $id     The module id
-     * @param  string  $root   The backups root
-     * @param  integer $limit  The backups limit
-     * @param  boolean $throw  Silently failed
-     * @return boolean         True if limit is riched
+     * @param   string  $id     The module id
+     * @param   string  $root   The backups root
+     * @param   int     $limit  The backups limit
+     * @param   bool    $throw  Silently failed
+     *
+     * @return  bool    True if limit is riched
      */
     public static function isBackupLimit(string $id, string $root, int $limit = 10, bool $throw = false): bool
     {
@@ -249,13 +251,14 @@ class Translater extends Settings
     }
 
     /**
-     * Extract messages from a php contents
+     * Extract messages from a php contents.
      *
      * support plurals
      *
-     * @param  string $content The contents
-     * @param  string $func    The function name
-     * @return array           The messages
+     * @param   string  $content    The contents
+     * @param   string  $func       The function name
+     *
+     * @return  array<int<0, max>, array{0: array<int,string>, 1: int}> The messages
      */
     public static function extractPhpMsgs(string $content, string $func = '__'): array
     {
@@ -308,11 +311,12 @@ class Translater extends Settings
     }
 
     /**
-     * Extract messages from a tpl contents
+     * Extract messages from a tpl contents.
      *
-     * @param  string $content The contents
-     * @param  string $func    The function name
-     * @return array           The messages
+     * @param   string  $content    The contents
+     * @param   string  $func       The function name
+     *
+     * @return  array<int<0, max>, array{0: array<int,string>, 1: int}> The messages
      */
     public static function extractTplMsgs(string $content, string $func = 'tpl:lang'): array
     {

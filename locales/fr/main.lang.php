@@ -1,10 +1,11 @@
 <?php
-/**
- * @package Dotclear
- *
- * @copyright Olivier Meunier & Association Dotclear
- * @copyright GPL-2.0-only
- */
+
+// Language: Français
+// Module: translater - 2023.10.21
+// Date: 2023-10-21 09:42:21
+// Author: , contact@jcdenis.fr
+// Translated with Translater - 2023.10.21
+
 #
 # DOT NOT MODIFY THIS FILE !
 #
@@ -46,7 +47,6 @@ L10n::$locales['Language successfully added']                       = 'Langue cr
 L10n::$locales['Language successfully deleted']                     = 'Langue effacée avec succès';
 L10n::$locales['Nothing to update']                                 = 'Rien à mettre à jour';
 L10n::$locales['Language successfully updated']                     = 'Langue mise à jour avec succès';
-L10n::$locales['Themes']                                            = 'Thèmes';
 L10n::$locales['%s language edition']                               = 'Edition de la langue %s';
 L10n::$locales['Use this text']                                     = 'Utiliser ce texte';
 L10n::$locales['Translate module %s']                               = 'Traduire le module %s';

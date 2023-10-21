@@ -1,35 +1,66 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
+use Dotclear\App;
 use Exception;
 
+/**
+ * @brief       translater vars helper.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class ManageVars
 {
     /**
-     * @var ManageVars self instance
+     * self instance.
+     *
+     * @var     ManageVars  $instance
      */
-    private static $container;
+    private static $instance;
 
+    /**
+     * translater instance.
+     *
+     * @var     Translater  $translater
+     */
     public readonly Translater $translater;
+
+    /**
+     * Module instance.
+     *
+     * @var     TranslaterModule    $module
+     */
     public readonly ?TranslaterModule $module;
+
+    /**
+     * Lang instance.
+     *
+     * @var     TranslaterLang  $lang
+     */
     public readonly ?TranslaterLang $lang;
+
+    /**
+     * The module type.
+     *
+     * @var     string  $type
+     */
     public readonly string $type;
+
+    /**
+     * The action.
+     *
+     * @var     string  $action
+     */
     public readonly string $action;
 
+    /**
+     * Constructor.
+     */
     protected function __construct()
     {
         $this->translater = new Translater();
@@ -48,7 +79,7 @@ class ManageVars
             try {
                 $module = $this->translater->getModule($type, $module);
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
                 $module = null;
             }
         }
@@ -57,7 +88,7 @@ class ManageVars
             try {
                 $lang = $this->translater->getLang($module, $lang);
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
                 $lang = null;
             }
         }
@@ -68,12 +99,17 @@ class ManageVars
         $this->action = $action;
     }
 
+    /**
+     * Get self instance.
+     *
+     * @return  ManageVars  self instance
+     */
     public static function init(): ManageVars
     {
-        if (!(self::$container instanceof self)) {
-            self::$container = new self();
+        if (!(self::$instance instanceof self)) {
+            self::$instance = new self();
         }
 
-        return self::$container;
+        return self::$instance;
     }
 }

@@ -1,394 +1,389 @@
 # Language: Français
-# Module: translater - 2023.03.17
-# Date: 2023-03-17 23:23:46
+# Module: translater - 2023.10.21
+# Date: 2023-10-21 09:42:21
 # Author: , contact@jcdenis.fr
-# Translated with translater 2023.03.17
+# Translated with translater 2023.10.21
 
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: translater 2023.03.17\n"
+"Project-Id-Version: translater 2023.10.21\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2023-03-17T23:23:46+00:00\n"
+"PO-Revision-Date: 2023-10-21T09:42:21+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/BackendBehaviors.php:64
+#: src/BackendBehaviors.php:68
 msgid "Translate"
 msgstr "Traduire"
 
-#: src/Config.php:90
-#: src/Manage.php:446
+#: src/Config.php:89
+#: src/Manage.php:473
 msgid "Translation"
 msgstr "Traduction"
 
-#: src/Config.php:94
+#: src/Config.php:93
 msgid "Write .lang.php files"
 msgstr "Ecrire le fichier .lang.php"
 
-#: src/Config.php:99
+#: src/Config.php:98
 msgid "Translate also strings of template files"
 msgstr "Traduire également les chaines des fichiers de template"
 
-#: src/Config.php:104
+#: src/Config.php:103
 msgid "Translate only unknow strings"
 msgstr "Traduire uniquement les chaines inconnues"
 
-#: src/Config.php:109
+#: src/Config.php:108
 msgid "Hide default modules of Dotclear"
 msgstr "Cacher les modules de la distribution de Dotclear"
 
-#: src/Config.php:114
+#: src/Config.php:113
 msgid "Write comments in files"
 msgstr "Ecrire les commentaires dans les fichiers"
 
-#: src/Config.php:119
+#: src/Config.php:118
 msgid "Write informations about author in files"
 msgstr "Ecrire les informations à propos de l'auteur"
 
-#: src/Config.php:123
+#: src/Config.php:122
 msgid "User info:"
 msgstr "Information à propos de l'auteur :"
 
-#: src/Config.php:127
+#: src/Config.php:126
 msgid "Following informations can be used: %s"
 msgstr "Les informations suivantes peuvent être utilisées : %s"
 
-#: src/Config.php:135
+#: src/Config.php:134
 msgid "Overwrite existing languages"
 msgstr "Ecraser les langues existantes"
 
-#: src/Config.php:139
+#: src/Config.php:138
 msgid "Name of exported package:"
 msgstr "Nom du paquetage exporté :"
 
-#: src/Config.php:143
-#: src/Manage.php:262
+#: src/Config.php:142
+#: src/Manage.php:274
 msgid "Backups"
 msgstr "Sauvegardes"
 
-#: src/Config.php:147
+#: src/Config.php:146
 msgid "Make backups when changes are made"
 msgstr "Faire une sauvegarde quand des changements sont effectués"
 
-#: src/Config.php:151
+#: src/Config.php:150
 msgid "Limit backups per module to:"
 msgstr "Limiter les sauvegardes par module à :"
 
-#: src/Config.php:154
+#: src/Config.php:153
 msgid "Set to 0 for no limit."
 msgstr "Mettre à 0 pour aucune limite."
 
-#: src/Config.php:157
+#: src/Config.php:156
 msgid "Store backups in:"
 msgstr "Enregistrer les sauvegardes dans :"
 
-#: src/Config.php:161
+#: src/Config.php:160
 msgid "Behaviors"
 msgstr "Comportements"
 
-#: src/Config.php:164
+#: src/Config.php:163
 msgid "Default start menu:"
 msgstr "Menu de départ par défaut :"
 
-#: src/Config.php:170
+#: src/Config.php:169
 msgid "Enable menu on plugins page"
 msgstr "Activer le menu sur la page des plugins"
 
-#: src/Config.php:175
+#: src/Config.php:174
 msgid "Enable menu on themes page"
 msgstr "Activer le menu sur la page des thèmes"
 
-#: src/Manage.php:48
+#: src/Manage.php:57
 msgid "Nothing to backup"
 msgstr "Rien à sauvegarder"
 
-#: src/Manage.php:56
+#: src/Manage.php:65
 msgid "Backup successfully created"
 msgstr "Sauvegarde créée avec succès"
 
-#: src/Manage.php:61
+#: src/Manage.php:70
 msgid "Nothing to restore"
 msgstr "Rien à restaurer"
 
-#: src/Manage.php:69
+#: src/Manage.php:78
 msgid "Backup successfully restored"
 msgstr "Sauvegarde restaurée avec succès"
 
-#: src/Manage.php:74
+#: src/Manage.php:83
 msgid "Nothing to delete"
 msgstr "Rien à effacer"
 
-#: src/Manage.php:82
+#: src/Manage.php:91
 msgid "Backup successfully deleted"
 msgstr "Sauvegarde effacée avec succès"
 
-#: src/Manage.php:87
-#: src/TranslaterModule.php:359
+#: src/Manage.php:96
+#: src/TranslaterModule.php:435
 msgid "Nothing to export"
 msgstr "Rien à exporter"
 
-#: src/Manage.php:91
+#: src/Manage.php:100
 msgid "Language successfully exported"
 msgstr "Langue exportée avec succès"
 
-#: src/Manage.php:100
+#: src/Manage.php:109
 msgid "Language successfully imported"
 msgstr "Langue importée avec succès"
 
-#: src/Manage.php:105
+#: src/Manage.php:114
 msgid "Nothing to create"
 msgstr "Rien à créer"
 
-#: src/Manage.php:109
+#: src/Manage.php:118
 msgid "Language successfully added"
 msgstr "Langue créée avec succès"
 
-#: src/Manage.php:122
+#: src/Manage.php:131
 msgid "Language successfully deleted"
 msgstr "Langue effacée avec succès"
 
-#: src/Manage.php:127
+#: src/Manage.php:136
 msgid "Nothing to update"
 msgstr "Rien à mettre à jour"
 
-#: src/Manage.php:138
+#: src/Manage.php:147
 msgid "Language successfully updated"
 msgstr "Langue mise à jour avec succès"
 
-#: src/Manage.php:159
-#: src/My.php:64
-msgid "Themes"
-msgstr "Thèmes"
-
-#: src/Manage.php:166
+#: src/Manage.php:175
 msgid "%s language edition"
 msgstr "Edition de la langue %s"
 
-#: src/Manage.php:174
+#: src/Manage.php:183
 msgid "Use this text"
 msgstr "Utiliser ce texte"
 
-#: src/Manage.php:203
+#: src/Manage.php:212
 msgid "Translate module %s"
 msgstr "Traduire le module %s"
 
-#: src/Manage.php:217
+#: src/Manage.php:229
 msgid "Edit language %s of module %s"
 msgstr "Modifier la langue %s du module %s"
 
-#: src/Manage.php:237
+#: src/Manage.php:249
 msgid "Modules list of type \"%s\""
 msgstr "Listes de modules de type \"%s\""
 
-#: src/Manage.php:247
+#: src/Manage.php:259
 msgid "There is no editable modules"
 msgstr "Il n'y a pas de module modifiable"
 
-#: src/Manage.php:258
+#: src/Manage.php:270
 msgid "Module %s %s by %s"
 msgstr "Module %s %s par %s"
 
-#: src/Manage.php:260
+#: src/Manage.php:272
 msgid "Root"
 msgstr "Racine"
 
-#: src/Manage.php:272
+#: src/Manage.php:284
 msgid "Existing languages translations"
 msgstr "Traductions existantes"
 
-#: src/Manage.php:277
+#: src/Manage.php:289
 msgid "Last backup"
 msgstr "Dernière sauvegarde"
 
-#: src/Manage.php:287
+#: src/Manage.php:299
 msgid "Edit %s language"
 msgstr "Modifier la langue %s"
 
-#: src/Manage.php:303
+#: src/Manage.php:315
 msgid "no backups"
 msgstr "aucune sauvegarde"
 
-#: src/Manage.php:311
+#: src/Manage.php:324
 msgid "Selected languages action:"
 msgstr "Action sur les langues sélectionnées :"
 
-#: src/Manage.php:313
+#: src/Manage.php:326
 msgid "Backup languages"
 msgstr "Sauvegarder les langues"
 
-#: src/Manage.php:314
+#: src/Manage.php:327
 msgid "Delete languages"
 msgstr "Effacer les langues"
 
-#: src/Manage.php:315
+#: src/Manage.php:328
 msgid "Export languages"
 msgstr "Exporter les langues"
 
-#: src/Manage.php:333
+#: src/Manage.php:346
 msgid "Existing languages backups"
 msgstr "Sauvegardes existantes"
 
-#: src/Manage.php:377
+#: src/Manage.php:391
 msgid "Selected backups action:"
 msgstr "Action sur les sauvegardes sélectionnées :"
 
-#: src/Manage.php:379
+#: src/Manage.php:393
 msgid "Restore backups"
 msgstr "Restaurer des sauvegardes"
 
-#: src/Manage.php:380
+#: src/Manage.php:394
 msgid "Delete backups"
 msgstr "Effacer des sauvegardes"
 
-#: src/Manage.php:396
+#: src/Manage.php:410
 msgid "Add language"
 msgstr "Ajouter une langue"
 
-#: src/Manage.php:404
+#: src/Manage.php:422
 msgid "Copy from language:"
 msgstr "Copier depuis la langue :"
 
-#: src/Manage.php:405
+#: src/Manage.php:424
 msgid "optionnal"
 msgstr "optionnel"
 
-#: src/Manage.php:420
+#: src/Manage.php:443
 msgid "Select languages package to import:"
 msgstr "Sélectionner le paquetage de langues à importer :"
 
-#: src/Manage.php:442
+#: src/Manage.php:469
 msgid "List of %s localized strings"
 msgstr "Liste des %s chaines de traduction"
 
-#: src/Manage.php:444
+#: src/Manage.php:471
 msgid "Group"
 msgstr "Groupe"
 
-#: src/Manage.php:445
+#: src/Manage.php:472
 msgid "String"
 msgstr "Chaine"
 
-#: src/Manage.php:447
+#: src/Manage.php:474
 msgid "Existing"
 msgstr "Existant"
 
-#: src/Manage.php:489
+#: src/Manage.php:516
 msgid "%s occurrences"
 msgstr "%s occurences"
 
-#: src/Manage.php:529
+#: src/Manage.php:556
 msgid "Plural \"%s\""
 msgstr "Pluriel \"%s\""
 
-#: src/Manage.php:530
+#: src/Manage.php:557
 msgid "Plural form of \"%s\""
 msgstr "Forme plurielle de \"%s\""
 
-#: src/Manage.php:558
+#: src/Manage.php:586
 msgid "Change the group of the selected translations to:"
 msgstr "Changer le groupe des chaines sélectionnées vers :"
 
-#: src/Manage.php:577
+#: src/Manage.php:608
 msgid "Translate your Dotclear plugins and themes"
 msgstr "Traduire vos plugins et thèmes Dotclear"
 
-#: src/Manage.php:584
+#: src/Manage.php:615
 msgid "Translate plugins"
 msgstr "Traduire des plugins"
 
-#: src/Manage.php:590
+#: src/Manage.php:621
 msgid "Translate themes"
 msgstr "Traduire des thèmes"
 
-#: src/My.php:49
+#: src/My.php:39
 msgid "locales folders of each module"
 msgstr "le fichier locales de chaque module"
 
-#: src/My.php:50
+#: src/My.php:40
 msgid "plugins folder root"
 msgstr "la racine du dossier des plugins"
 
-#: src/My.php:51
+#: src/My.php:41
 msgid "public folder root"
 msgstr "la racine du dossier public"
 
-#: src/My.php:52
+#: src/My.php:42
 msgid "cache folder of Dotclear"
 msgstr "le dossier cache de Dotclear"
 
-#: src/My.php:53
+#: src/My.php:43
 msgid "locales folder of translater"
 msgstr "le dossier locales de Traducteur"
 
-#: src/Translater.php:97
+#: src/Translater.php:94
 msgid "Failed to find module %s"
 msgstr "Impossible de trouver le module %s"
 
-#: src/Translater.php:116
+#: src/Translater.php:113
 msgid "Failed find language %s"
 msgstr "Impossible de trouver la langue %s"
 
-#: src/Translater.php:240
+#: src/Translater.php:243
 msgid "Limit of %s backups for module %s exceed"
 msgstr "La limite de %s sauvegardes pour le module %s est atteinte"
 
-#: src/TranslaterModule.php:131
+#: src/TranslaterModule.php:177
 msgid "Failed to find backups folder for module %s"
 msgstr "Impossible de trouver le dossier de sauvegarde pour le module %s"
 
-#: src/TranslaterModule.php:192
+#: src/TranslaterModule.php:267
 msgid "Failed to find language %s"
 msgstr "Impossible de trouver la langue %s"
 
-#: src/TranslaterModule.php:238
+#: src/TranslaterModule.php:312
 msgid "Failed to find file %s"
 msgstr "Impossible de trouver le fichier %s"
 
-#: src/TranslaterModule.php:278
+#: src/TranslaterModule.php:353
 msgid "Failed to delete file %s"
 msgstr "Impossible d'effacer le fichier %s"
 
-#: src/TranslaterModule.php:337
+#: src/TranslaterModule.php:413
 msgid "Some languages has not been overwrited %s"
 msgstr "Des langues n'ont pas été écrasées : %s"
 
-#: src/TranslaterModule.php:342
+#: src/TranslaterModule.php:418
 msgid "Nothing to import from %s"
 msgstr "Rien à importer"
 
-#: src/TranslaterModule.php:366
+#: src/TranslaterModule.php:442
 msgid "Export mask is not set in plugin configuration"
 msgstr "Le masque d'export n'est pas renseigné dans la configuration du plugin"
 
-#: src/TranslaterModule.php:436
+#: src/TranslaterModule.php:512
 msgid "Zip file %s is not in translater format"
 msgstr "Le fichier zip n'est pas au format de traduction"
 
-#: src/TranslaterModule.php:518
+#: src/TranslaterModule.php:616
 msgid "Unknow language %s"
 msgstr "Langue %s inconnue"
 
-#: src/TranslaterModule.php:526
+#: src/TranslaterModule.php:624
 msgid "Language %s already exists"
 msgstr "La langue %s existe déjà"
 
-#: src/TranslaterModule.php:535
+#: src/TranslaterModule.php:633
 msgid "Failed to copy file from language %s"
 msgstr "Impossible de copier le fichier depuis la langue %s"
 
-#: src/TranslaterModule.php:616
+#: src/TranslaterModule.php:714
 msgid "No string to write, language %s deleted"
 msgstr "Rien à écrire, le fichiers de langue %s est effacé"
 
-#: src/TranslaterModule.php:744
+#: src/TranslaterModule.php:844
 msgid "Failed to grant write acces on file %s"
 msgstr "Impossible d'avoir les droits en écriture sur le fichier %s"
 
-#: src/TranslaterModule.php:751
+#: src/TranslaterModule.php:851
 msgid "Failed to write file %s"
 msgstr "Impossible d'écrire le fichier %s"
 

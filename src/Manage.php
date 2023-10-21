@@ -1,20 +1,10 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 use Dotclear\Core\Backend\{
     Notices,
@@ -38,6 +28,13 @@ use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Html;
 use Exception;
 
+/**
+ * @brief       translater manage class.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class Manage extends Process
 {
     public static function init(): bool
@@ -72,7 +69,7 @@ class Manage extends Process
                 if (empty($current->module) || empty($_POST['files'])) {
                     throw new Exception(__('Nothing to restore'));
                 }
-                foreach ($current->module->getBackups(true) as $backup_file) {
+                foreach ($current->module->getBackupsFilename() as $backup_file) {
                     if (in_array($backup_file, $_POST['files'])) {
                         $current->module->restoreBackup($backup_file);
                     }
@@ -85,7 +82,7 @@ class Manage extends Process
                 if (empty($current->module) || empty($_POST['files'])) {
                     throw new Exception(__('Nothing to delete'));
                 }
-                foreach ($current->module->getBackups(true) as $backup_file) {
+                foreach ($current->module->getBackupsFilename() as $backup_file) {
                     if (in_array($backup_file, $_POST['files'])) {
                         $current->module->deleteBackup($backup_file);
                     }
@@ -150,7 +147,7 @@ class Manage extends Process
                 self::redirect(__('Language successfully updated'), $_POST['code']);
             }
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
         }
 
         return true;
@@ -190,7 +187,7 @@ class Manage extends Process
             My::jsLoad('backend') .
 
             # --BEHAVIOR-- translaterAdminHeaders
-            dcCore::app()->callBehavior('translaterAdminHeaders')
+            App::behavior()->callBehavior('translaterAdminHeaders')
         );
 
         echo
@@ -223,6 +220,9 @@ class Manage extends Process
                 }
                 $codes = $module->getLangs();
                 foreach ($codes as $code_id => $code_name) {
+                    if (!is_string($code_name)) {
+                        continue;
+                    }
                     if ($module->root_writable) {
                         $codes[$code_id] = sprintf(
                             '<a class="wait maximal nowrap" title="%s" href="%s">%s (%s)</a>',
@@ -309,7 +309,7 @@ class Manage extends Process
                         echo
                         '<td class="nowrap">' . count($backups[$code_id]) . '</td>' .
                         '<td class="nowrap"> ' .
-                        Date::str('%Y-%m-%d %H:%M', (int) $time[$code_id], (string) dcCore::app()->blog?->settings->get('system')->get('blog_timezone')) .
+                        Date::str('%Y-%m-%d %H:%M', (int) $time[$code_id], (string) App::blog()->settings()->get('system')->get('blog_timezone')) .
                         '</td>';
                     } else {
                         echo '<td class="nowrap">' . __('no backups') . '</td><td class="maximal nowrap">-</td>';
@@ -365,20 +365,20 @@ class Manage extends Process
                     foreach ($backups as $backup_codes) {
                         foreach ($backup_codes as $backup_file => $backup_code) {
                             $i++;
-                            $form_id = 'form_file_' . $backup_code['code'] . $backup_code['time'];
+                            $form_id = 'form_file_' . (is_string($backup_code['code']) ? $backup_code['code'] : '') . (is_string($backup_code['time']) ? $backup_code['time'] : '');
                             echo sprintf(
                                 $table_line,
                                 (new Checkbox(['files[]', $form_id]))->value($backup_file)->render(),
                                 $form_id,
-                                $backup_code['name'],
-                                $backup_code['code'],
+                                is_string($backup_code['name']) ? $backup_code['name'] : 'unknown',
+                                is_string($backup_code['code']) ? $backup_code['code'] : 'unknown',
                                 Date::str(
-                                    dcCore::app()->blog?->settings->get('system')->get('date_format') . ' ' . dcCore::app()->blog?->settings->get('system')->get('time_format'),
+                                    App::blog()->settings()->get('system')->get('date_format') . ' ' . App::blog()->settings()->get('system')->get('time_format'),
                                     (int) $backup_code['time'],
-                                    dcCore::app()->blog?->settings->get('system')->get('blog_timezone')
+                                    App::blog()->settings()->get('system')->get('blog_timezone')
                                 ),
-                                $backup_code['path']['basename'],
-                                Files::size($backup_code['size'])
+                                is_array($backup_code['path']) ? $backup_code['path']['basename'] : '',
+                                Files::size((int) $backup_code['size'])
                             );
                         }
                     }
@@ -411,7 +411,7 @@ class Manage extends Process
                 <form id="module-code-create-form" method="post" action="' . My::manageUrl() . '">' .
                 (new Para())->class('field')->items([
                     (new Label(__('Select language:')))->for('code'),
-                    (new Select(['code']))->default((string) dcCore::app()->auth?->getInfo('user_lang'))->items(array_merge(['-' => '-'], $unused_codes)),
+                    (new Select(['code']))->default((string) App::auth()->getInfo('user_lang'))->items(array_merge(['-' => '-'], $unused_codes)),
                 ])->render();
 
                 if (empty($codes)) {
@@ -590,8 +590,8 @@ class Manage extends Process
             (new Para())->class('col right')->items([
                 (new Submit('do-action'))->value(__('Save') . ' (s)')->accesskey('s'),
                 ... My::hiddenFields([
-                    'type'   => $current->module->type,
-                    'module' => $current->module->id,
+                    'type'   => (string) $current->module?->type,
+                    'module' => (string) $current->module?->id,
                     'action' => 'module_update_code',
                     'lang'   => $current->lang->code,
                     'code'   => $current->lang->code, //?
@@ -634,7 +634,7 @@ class Manage extends Process
 
         $redir = [
             'type'   => $current->type,
-            'module' => $current->module?->id,
+            'module' => (string) $current->module?->id,
         ];
         if ($lang) {
             $redir['lang'] = $lang;

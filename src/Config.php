@@ -1,20 +1,10 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 use Dotclear\Core\Backend\{
     Notices,
@@ -34,6 +24,13 @@ use Dotclear\Helper\Html\Form\{
 };
 use Exception;
 
+/**
+ * @brief       translater backend config class.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class Config extends Process
 {
     public static function init(): bool
@@ -56,6 +53,9 @@ class Config extends Process
 
         try {
             foreach ($s->listSettings() as $key => $value) {
+                if (!is_string($key)) {
+                    continue;
+                }
                 if (is_bool($value)) {
                     $s->writeSetting($key, !empty($_POST[$key]));
                 } else {
@@ -66,12 +66,12 @@ class Config extends Process
             Notices::addSuccessNotice(
                 __('Configuration successfully updated.')
             );
-            dcCore::app()->admin->url->redirect(
+            App::backend()->url()->redirect(
                 'admin.plugins',
-                ['module' => My::id(), 'conf' => 1, 'redir' => dcCore::app()->admin->__get('list')->getRedir()]
+                ['module' => My::id(), 'conf' => 1, 'redir' => App::backend()->__get('list')->getRedir()]
             );
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
         }
 
         return true;

@@ -1,25 +1,22 @@
 # README
 
-[![Release](https://img.shields.io/badge/release-2023.08.15-a2cbe9.svg)](https://git.dotclear.watch/JcDenis/translater/releases)
-[![Date](https://img.shields.io/badge/date-2023.08.15-c44d58.svg)](https://git.dotclear.watch/JcDenis/translater/releases)
+[![Release](https://img.shields.io/badge/release-2023.10.21-a2cbe9.svg)](https://git.dotclear.watch/JcDenis/translater/releases)
+![Date](https://img.shields.io/badge/date-2023.10.21-c44d58.svg)
 [![Dotclear](https://img.shields.io/badge/dotclear-v2.27-137bbb.svg)](https://fr.dotclear.org/download)
 [![Dotaddict](https://img.shields.io/badge/dotaddict-official-9ac123.svg)](https://plugins.dotaddict.org/dc2/details/translater)
-[![License](https://img.shields.io/github/license/JcDenis/translater)](https://git.dotclear.watch/JcDenis/translater/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-GPL--2.0-ececec.svg)](https://git.dotclear.watch/JcDenis/translater/src/branch/master/LICENSE)
 
-## WHAT IS TRANSLATER ?
+## ABOUT
 
-_translater_ is a plugins for the open-source 
-web publishing software called Dotclear.
+_translater_ is a plugin for the open-source web publishing software called [Dotclear](https://www.dotclear.org).
 
-It helps dev to translate plugin and theme.
+> It helps dev to translate plugin and theme.
 
 ## REQUIREMENTS
 
-_translater_ requires: 
-
-* super admin permissions
-* Dotclear 2.27
+* Dotclear 2.28
 * PHP 8.1+
+* Dotclear super admin permissions
 
 ## USAGE
 
@@ -35,10 +32,11 @@ or direct from plugins / themes list with a ''Translate'' button.
 
 ## LINKS
 
-* License : [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html)
-* Source & contribution : [Gitea Page](https://git.dotclear.watch/JcDenis/translater) or [GitHub Page](https://github.com/JcDenis/translater)
-* Packages & details: [Gitea Page](https://git.dotclear.watch/JcDenis/translater/releases) or [Dotaddict Page](https://plugins.dotaddict.org/dc2/details/translater)
-* Discussion & Help: [Dotclear Forum](https://forum.dotclear.org/viewtopic.php?id=39220)
+* [License](https://git.dotclear.watch/JcDenis/translater/src/branch/master/LICENSE)
+* [Packages & details](https://git.dotclear.watch/JcDenis/translater/releases) (or on [Dotaddict](https://plugins.dotaddict.org/dc2/details/translater))
+* [Sources & contributions](https://git.dotclear.watch/JcDenis/translater) (or on [GitHub](https://github.com/JcDenis/translater))
+* [Issues & security](https://git.dotclear.watch/JcDenis/translater/issues) (or on [GitHub](https://github.com/JcDenis/translater/issues))
+* [Discussion & Help](https://forum.dotclear.org/viewtopic.php?id=39220)
 
 ## CONTRIBUTORS
 

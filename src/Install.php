@@ -1,24 +1,21 @@
 <?php
-/**
- * @brief translater, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Jean-Christian Denis & contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\translater;
 
-use dcCore;
-use dcNamespace;
+use Dotclear\App;
 use Dotclear\Core\Process;
+use Dotclear\Database\Statement\SelectStatement;
 use Exception;
 
+/**
+ * @brief       translater install class.
+ * @ingroup     translater
+ *
+ * @author      Jean-Christian Denis
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class Install extends Process
 {
     public static function init(): bool
@@ -37,7 +34,7 @@ class Install extends Process
 
             return true;
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
         }
 
         return true;
@@ -50,22 +47,29 @@ class Install extends Process
      */
     private static function growUp()
     {
-        $current = dcCore::app()->getVersion(My::id());
+        $current = App::version()->getVersion(My::id());
 
         // use short settings id
         if ($current && version_compare($current, '2022.12.22', '<')) {
-            $record = dcCore::app()->con->select(
-                'SELECT * FROM ' . dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME . ' ' .
-                "WHERE setting_ns = 'translater' "
-            );
+            $sql    = new SelectStatement();
+            $record = $sql
+                ->column('*')
+                ->from(App::con()->prefix() . App::blogWorkspace()::NS_TABLE_NAME)
+                ->where("setting_ns = 'translater' ")
+                ->select();
+
+            if (!$record) {
+                return true;
+            }
+
             while ($record->fetch()) {
                 if (preg_match('/^translater_(.*?)$/', $record->f('setting_id'), $match)) {
-                    $cur = dcCore::app()->con->openCursor(dcCore::app()->prefix . dcNamespace::NS_TABLE_NAME);
+                    $cur = App::blogWorkspace()->openBlogWorkspaceCursor();
                     $cur->setField('setting_id', $match[1]);
                     $cur->setField('setting_ns', My::id());
                     $cur->update(
                         "WHERE setting_id = '" . $record->f('setting_id') . "' and setting_ns = 'translater' " .
-                        'AND blog_id ' . (null === $record->f('blog_id') ? 'IS NULL ' : ("= '" . dcCore::app()->con->escapeStr((string) $record->f('blog_id')) . "' "))
+                        'AND blog_id ' . (null === $record->f('blog_id') ? 'IS NULL ' : ("= '" . App::con()->escapeStr((string) $record->f('blog_id')) . "' "))
                     );
                 }
             }

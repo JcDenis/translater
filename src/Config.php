@@ -120,7 +120,7 @@ class Config extends Process
                 // parse_userinfo
                 (new Para())->items([
                     (new Label(__('User info:')))->for('parse_userinfo'),
-                    (new Input('parse_userinfo'))->size(65)->maxlenght(255)->value($s->parse_userinfo),
+                    (new Input('parse_userinfo'))->size(65)->maxlength(255)->value($s->parse_userinfo),
                 ]),
                 (new Note())->text(sprintf(
                     __('Following informations can be used: %s'),
@@ -136,7 +136,7 @@ class Config extends Process
                 // export_filename
                 (new Para())->items([
                     (new Label(__('Name of exported package:')))->for('export_filename'),
-                    (new Input('export_filename'))->size(65)->maxlenght(255)->value($s->export_filename),
+                    (new Input('export_filename'))->size(65)->maxlength(255)->value($s->export_filename),
                 ]),
             ]),
             (new Fieldset())->class('fieldset')->legend((new Legend(__('Backups'))))->fields([

@@ -525,7 +525,7 @@ class Manage extends Process
                     (new Select(['entries[' . $i . '][group]']))->default($rs['group'])->items(My::l10nGroupsCombo())->disabled($in_dc)->render(),
                     Html::escapeHTML($msgid),
                     (new Hidden(['entries[' . $i . '][msgid]'], Html::escapeHTML($msgid)))->render() .
-                    (new Input(['entries[' . $i . '][msgstr][0]']))->size(48)->maxlenght(255)->value(Html::escapeHTML($rs['msgstr'][0]))->disabled($in_dc)->render(),
+                    (new Input(['entries[' . $i . '][msgstr][0]']))->size(48)->maxlength(255)->value(Html::escapeHTML($rs['msgstr'][0]))->disabled($in_dc)->render(),
                     implode('', $t_msgstr),
                     implode('', $t_files)
                 );
@@ -556,7 +556,7 @@ class Manage extends Process
                             sprintf(__('Plural "%s"'), $plural),
                             sprintf(__('Plural form of "%s"'), $rs['plural']),
                             (new Hidden(['entries[' . $i . '][msgid_plural]'], Html::escapeHTML($rs['plural'])))->render() .
-                            (new Input(['entries[' . $i . '][msgstr][' . ($j + 1) . ']']))->size(48)->maxlenght(255)->value(Html::escapeHTML($rs['msgstr'][$j + 1] ?? ''))->disbaled($in_dc)->render(),
+                            (new Input(['entries[' . $i . '][msgstr][' . ($j + 1) . ']']))->size(48)->maxlength(255)->value(Html::escapeHTML($rs['msgstr'][$j + 1] ?? ''))->disabled($in_dc)->render(),
                             implode('', $t_msgstr),
                             ''
                         );
@@ -569,8 +569,8 @@ class Manage extends Process
                 ' offline',
                 (new Checkbox(['entries[' . $i . '][check]']))->value(1)->render(),
                 (new Select(['entries[' . $i . '][group]']))->items(My::l10nGroupsCombo())->default('main')->render(),
-                (new Input(['entries[' . $i . '][msgid]']))->size(48)->maxlenght(255)->render(),
-                (new Input(['entries[' . $i . '][msgstr][0]']))->size(48)->maxlenght(255)->render(),
+                (new Input(['entries[' . $i . '][msgid]']))->size(48)->maxlength(255)->render(),
+                (new Input(['entries[' . $i . '][msgstr][0]']))->size(48)->maxlength(255)->render(),
                 '',
                 ''
             );

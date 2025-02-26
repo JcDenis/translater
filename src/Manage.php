@@ -595,7 +595,7 @@ class Manage extends Process
                     'action' => 'module_update_code',
                     'lang'   => $current->lang->code,
                     'code'   => $current->lang->code, //?
-                ]),
+                ])
             ])->render() .
             '</div>' .
             '</form>' .

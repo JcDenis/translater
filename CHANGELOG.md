@@ -1,3 +1,9 @@
+translater 2025.03.03
+===========================================================
+* Require Dotclear 2.28
+* Require PHP 8.1
+* Fix repository URLs
+
 translater 2023.11.04
 ===========================================================
 * Require Dotclear 2.28

@@ -2,10 +2,10 @@
 <modules xmlns:da="http://dotaddict.org/da/">
   <module id="translater">
     <name>Translater</name>
-    <version>2023.11.04</version>
+    <version>2025.03.03</version>
     <author>Jean-Christian Denis &amp; contributors</author>
     <desc>Translate your Dotclear plugins and themes</desc>
-    <file>https://github.com/JcDenis/translater/releases/download/v2023.11.04/plugin-translater.zip</file>
+    <file>https://github.com/JcDenis/translater/releases/download/v2025.03.03/plugin-translater.zip</file>
     <da:dcmin>2.28</da:dcmin>
     <da:details>https://github.com/JcDenis/translater/src/branch/master/README.md</da:details>
     <da:support>https://github.com/JcDenis/translater/issues</da:support>

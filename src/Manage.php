@@ -5,25 +5,21 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\translater;
 
 use Dotclear\App;
-use Dotclear\Core\Process;
-use Dotclear\Core\Backend\{
-    Notices,
-    Page
-};
+use Dotclear\Helper\Process\TraitProcess;
+use Dotclear\Core\Backend\Notices;
+use Dotclear\Core\Backend\Page;
 use Dotclear\Helper\File\Files;
-use Dotclear\Helper\Html\Form\{
-    Checkbox,
-    File,
-    Form,
-    Hidden,
-    Input,
-    Label,
-    Note,
-    Para,
-    Select,
-    Submit,
-    Text
-};
+use Dotclear\Helper\Html\Form\Checkbox;
+use Dotclear\Helper\Html\Form\File;
+use Dotclear\Helper\Html\Form\Form;
+use Dotclear\Helper\Html\Form\Hidden;
+use Dotclear\Helper\Html\Form\Input;
+use Dotclear\Helper\Html\Form\Label;
+use Dotclear\Helper\Html\Form\Note;
+use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Select;
+use Dotclear\Helper\Html\Form\Submit;
+use Dotclear\Helper\Html\Form\Text;
 use Dotclear\Helper\Date;
 use Dotclear\Helper\Html\Html;
 use Exception;
@@ -35,8 +31,10 @@ use Exception;
  * @author      Jean-Christian Denis
  * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class Manage extends Process
+class Manage
 {
+    use TraitProcess;
+
     public static function init(): bool
     {
         return self::status(My::checkContext(My::MANAGE));
@@ -56,7 +54,7 @@ class Manage extends Process
                 if (empty($current->module) || empty($_POST['codes'])) {
                     throw new Exception(__('Nothing to backup'));
                 }
-                foreach ($current->module->getUsedlangs() as $code_id) {
+                foreach ($current->module->getUsedLangs() as $code_id) {
                     if (in_array($code_id, $_POST['codes'])) {
                         $current->module->createBackup($code_id);
                     }
@@ -122,7 +120,7 @@ class Manage extends Process
                 if (empty($current->module) || empty($_POST['codes'])) {
                     throw new Exception(__('Nothing to delete'));
                 }
-                foreach ($current->module->getUsedlangs() as $code_id) {
+                foreach ($current->module->getUsedLangs() as $code_id) {
                     if (in_array($code_id, $_POST['codes'])) {
                         $current->module->delLang($code_id);
                     }
@@ -220,7 +218,7 @@ class Manage extends Process
                 }
                 $codes = $module->getLangs();
                 foreach ($codes as $code_id => $code_name) {
-                    if (!is_string($code_name)) {
+                    if (!is_string($code_name)) { // @phpstan-ignore-line
                         continue;
                     }
                     if ($module->root_writable) {

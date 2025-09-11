@@ -5,23 +5,19 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\translater;
 
 use Dotclear\App;
-use Dotclear\Core\Process;
-use Dotclear\Core\Backend\{
-    Notices,
-    Page
-};
-use Dotclear\Helper\Html\Form\{
-    Checkbox,
-    Div,
-    Fieldset,
-    Input,
-    Label,
-    Legend,
-    Note,
-    Number,
-    Para,
-    Select
-};
+use Dotclear\Helper\Process\TraitProcess;
+use Dotclear\Core\Backend\Notices;
+use Dotclear\Core\Backend\Page;
+use Dotclear\Helper\Html\Form\Checkbox;
+use Dotclear\Helper\Html\Form\Div;
+use Dotclear\Helper\Html\Form\Fieldset;
+use Dotclear\Helper\Html\Form\Input;
+use Dotclear\Helper\Html\Form\Label;
+use Dotclear\Helper\Html\Form\Legend;
+use Dotclear\Helper\Html\Form\Note;
+use Dotclear\Helper\Html\Form\Number;
+use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Select;
 use Exception;
 
 /**
@@ -31,8 +27,10 @@ use Exception;
  * @author      Jean-Christian Denis
  * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class Config extends Process
+class Config
 {
+    use TraitProcess;
+
     public static function init(): bool
     {
         return self::status(My::checkContext(My::CONFIG));
@@ -53,9 +51,6 @@ class Config extends Process
 
         try {
             foreach ($s->listSettings() as $key => $value) {
-                if (!is_string($key)) {
-                    continue;
-                }
                 if (is_bool($value)) {
                     $s->writeSetting($key, !empty($_POST[$key]));
                 } else {

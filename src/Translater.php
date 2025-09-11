@@ -144,7 +144,7 @@ class Translater extends Settings
 
             if (is_dir($path . '/' . $file)) {
                 $res[] = $file;
-                $res   = self::scanDir($path . '/' . $file, $dir . '/' . $file, $res);
+                $res   = self::scandir($path . '/' . $file, $dir . '/' . $file, $res);
             } else {
                 $res[] = empty($dir) ? $file : $dir . '/' . $file;
             }
@@ -333,7 +333,7 @@ class Translater extends Settings
             }
         }
         // split content by translation function
-        if (!preg_match_all('/\{\{' . preg_quote($func) . '\s([^}]+)\}\}/', $content, $parts)) {
+        if (!preg_match_all('/\{\{' . preg_quote($func, '/') . '\s([^}]+)\}\}/', $content, $parts)) {
             return $final_strings;
         }
         // walk through parts

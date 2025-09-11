@@ -21,7 +21,7 @@ class ManageVars
      *
      * @var     ManageVars  $instance
      */
-    private static $instance;
+    private static ManageVars $instance;
 
     /**
      * translater instance.
@@ -106,7 +106,7 @@ class ManageVars
      */
     public static function init(): ManageVars
     {
-        if (!(self::$instance instanceof self)) {
+        if (!isset(self::$instance)) {
             self::$instance = new self();
         }
 

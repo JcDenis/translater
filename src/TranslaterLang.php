@@ -60,7 +60,7 @@ class TranslaterLang
 
         foreach ($this->module->translater->getModules() as $module) {
             if ($module->id != $this->module->id) {
-                $m_o_msgstrs[$module->id] = $this->module->translater->getlang($module, $this->code)->getMsgStrs();
+                $m_o_msgstrs[$module->id] = $this->module->translater->getLang($module, $this->code)->getMsgStrs();
             }
         }
 

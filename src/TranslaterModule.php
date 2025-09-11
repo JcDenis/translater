@@ -147,7 +147,7 @@ class TranslaterModule
             case 'cache':
                 $tmp = Path::real(App::config()->cacheRoot());
                 if ($tmp !== false && is_writable($tmp)) {
-                    @mkDir($tmp . '/l10n');
+                    @mkdir($tmp . '/l10n');
                     $dir = $tmp . '/l10n';
                 }
 
@@ -156,7 +156,7 @@ class TranslaterModule
             case 'translater':
                 $tmp = Path::real(My::path());
                 if ($tmp !== false && is_writable($tmp)) {
-                    @mkDir($tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER);
+                    @mkdir($tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER);
                     $dir = $tmp . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;
                 }
 
@@ -359,7 +359,7 @@ class TranslaterModule
      */
     public function importPack(array $zip_file): bool
     {
-        Files::uploadStatus($zip_file);
+        Files::uploadStatus($zip_file); // @phpstan-ignore-line
 
         $imported       = false;
         $not_overwrited = [];
@@ -466,7 +466,7 @@ class TranslaterModule
 
         $filename = Files::tidyFileName(Date::str(str_replace(
             ['timestamp', 'module', 'type', 'version'],
-            [time(), $this->id, $this->type, $this->version],
+            [(string) time(), $this->id, $this->type, $this->version],
             $this->translater->export_filename
         )));
 
@@ -487,7 +487,7 @@ class TranslaterModule
      */
     public function parseZipFilename(string $file = '', bool $throw = false): array
     {
-        $is_file = preg_match('/^(.*?)\/' . preg_quote(My::LOCALES_FOLDER) . '\/(.*?)\/(.*?)(.po|.lang.php)$/', $file, $f);
+        $is_file = preg_match('/^(.*?)\/' . preg_quote(My::LOCALES_FOLDER, '/') . '\/(.*?)\/(.*?)(.po|.lang.php)$/', $file, $f);
 
         if ($is_file) {
             $module = $f[1] == $this->id ? $f[1] : false;
@@ -527,11 +527,11 @@ class TranslaterModule
     {
         $res = [];
 
-        $prefix = preg_match('/(' . preg_quote(My::LOCALES_FOLDER) . '(.*))$/', $this->locales) ? My::LOCALES_FOLDER : '';
+        $prefix = preg_match('/(' . preg_quote(My::LOCALES_FOLDER, '/') . '(.*))$/', $this->locales) ? My::LOCALES_FOLDER : '';
 
         $files = Translater::scandir($this->locales);
         foreach ($files as $file) {
-            if (!preg_match('/.*?' . preg_quote(My::LOCALES_FOLDER) . '\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
+            if (!preg_match('/.*?' . preg_quote(My::LOCALES_FOLDER, '/') . '\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
                 continue;
             }
 
@@ -553,11 +553,11 @@ class TranslaterModule
     {
         $res = [];
 
-        $prefix = preg_match('/(' . preg_quote(My::LOCALES_FOLDER) . '(.*))$/', $this->locales) ? My::LOCALES_FOLDER : '';
+        $prefix = preg_match('/(' . preg_quote(My::LOCALES_FOLDER, '/') . '(.*))$/', $this->locales) ? My::LOCALES_FOLDER : '';
 
         $files = Translater::scandir($this->locales);
         foreach ($files as $file) {
-            if (!preg_match('/.*?' . preg_quote(My::LOCALES_FOLDER) . '\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
+            if (!preg_match('/.*?' . preg_quote(My::LOCALES_FOLDER, '/') . '\/([^\/]*?)\/([^\/]*?)(.lang.php|.po)$/', $prefix . $file, $m)) {
                 continue;
             }
 
@@ -800,7 +800,7 @@ class TranslaterModule
 
         $comments = [];
         if ($this->translater->parse_comment) {
-            $msgids = $lang->getMsgids();
+            $msgids = $lang->getMsgIds();
             foreach ($msgids as $msg) {
                 $comments[$msg['msgid']] = ($comments[$msg['msgid']] ?? '') .
                     '#: ' . trim($msg['file'], '/') . ':' . $msg['line'] . "\n";

@@ -82,7 +82,7 @@ class TranslaterLang
 
         # From str list
         foreach ($m_msgstrs as $rs) {
-            if (!is_string($rs['msgid']) || !isset($res[$rs['msgid']])) {
+            if (is_string($rs['msgid']) && !isset($res[$rs['msgid']])) {
                 $res[$rs['msgid']]['files'][]   = [];
                 $res[$rs['msgid']]['in_dc']     = false;
                 $res[$rs['msgid']]['o_msgstrs'] = [];

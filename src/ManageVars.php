@@ -65,37 +65,36 @@ class ManageVars
     {
         $this->translater = new Translater();
 
-        $type   = $_REQUEST['type']   ?? $this->translater->start_page ?: '';
-        $module = $_REQUEST['module'] ?? null;
-        $lang   = $_REQUEST['lang']   ?? null;
-        $action = $_POST['action']    ?? '';
+        $type    = is_string($_REQUEST['type'] ?? null) ? $_REQUEST['type'] : $this->translater->start_page;
+        $module  = is_string($_REQUEST['module'] ?? null) ? $_REQUEST['module'] : '';
+        $lang    = is_string($_REQUEST['lang'] ?? null) ? $_REQUEST['lang'] : '';
+        $action  = is_string($_POST['action'] ?? null) ? $_POST['action'] : '';
+        $tmodule = $tlang = null;
 
         // check module type
         if (!in_array($type, ['plugin', 'theme'])) {
             $type = '';
         }
         // check if module exists
-        if (!empty($type) && !empty($module)) {
+        if ($type !== '' && $module !== '') {
             try {
-                $module = $this->translater->getModule($type, $module);
+                $tmodule = $this->translater->getModule($type, $module);
             } catch (Exception $e) {
                 App::error()->add($e->getMessage());
-                $module = null;
             }
         }
         //check if module lang exists
-        if (!empty($module) && !empty($lang)) {
+        if ($tmodule instanceof TranslaterModule && $lang !== '') {
             try {
-                $lang = $this->translater->getLang($module, $lang);
+                $tlang = $this->translater->getLang($tmodule, $lang);
             } catch (Exception $e) {
                 App::error()->add($e->getMessage());
-                $lang = null;
             }
         }
 
         $this->type   = $type;
-        $this->module = $module;
-        $this->lang   = $lang;
+        $this->module = $tmodule;
+        $this->lang   = $tlang;
         $this->action = $action;
     }
 

@@ -6,6 +6,7 @@ namespace Dotclear\Plugin\translater;
 
 use Dotclear\App;
 use Dotclear\Helper\Process\TraitProcess;
+use Dotclear\Core\Backend\ModulesList;
 use Dotclear\Core\Backend\Notices;
 use Dotclear\Core\Backend\Page;
 use Dotclear\Helper\Html\Form\Checkbox;
@@ -63,7 +64,7 @@ class Config
             );
             App::backend()->url()->redirect(
                 'admin.plugins',
-                ['module' => My::id(), 'conf' => 1, 'redir' => App::backend()->__get('list')->getRedir()]
+                ['module' => My::id(), 'conf' => 1, 'redir' => ($list = App::backend()->__get('list')) instanceof ModulesList ? $list->getRedir() : '']
             );
         } catch (Exception $e) {
             App::error()->add($e->getMessage());

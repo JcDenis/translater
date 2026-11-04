@@ -16,6 +16,11 @@ use Dotclear\Module\ModuleDefine;
  *
  * @author      Jean-Christian Denis
  * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ *
+ * @phpstan-type TranslaterMsgId array{msgid: string, msgid_plural: string, file: string, line: int}
+ * @phpstan-type TranslaterMsgStr array{msgid: string, msgid_plural: string, msgstr: array<int, string>, lang: string, type: string, path: string, file: string, group: string}
+ * @phpstan-type TranslaterOtherMsgStr array{msgstr: array<int, string>, module: string, file: string}
+ * @phpstan-type TranslaterMessage array{files: array<int, array{0?: string, 1?: int}>, group: string, plural: string, msgstr: array<int, string>, in_dc: bool, o_msgstrs: array<int, TranslaterOtherMsgStr>}
  */
 class TranslaterLang
 {
@@ -50,13 +55,14 @@ class TranslaterLang
     /**
      * Get a lang messages.
      *
-     * @return  array<string, array<string, mixed>>   The messages ids and translations
+     * @return  array<string, TranslaterMessage>   The messages ids and translations
      */
     public function getMessages(): array
     {
-        $res       = [];
-        $m_msgids  = $this->getMsgIds();
-        $m_msgstrs = $this->getMsgStrs();
+        $res         = [];
+        $m_msgids    = $this->getMsgIds();
+        $m_msgstrs   = $this->getMsgStrs();
+        $m_o_msgstrs = [];
 
         foreach ($this->module->translater->getModules() as $module) {
             if ($module->id != $this->module->id) {
@@ -72,40 +78,50 @@ class TranslaterLang
 
         # From id list
         foreach ($m_msgids as $rs) {
-            $res[$rs['msgid']]['files'][]   = [trim($rs['file'], '/'), $rs['line']];
-            $res[$rs['msgid']]['group']     = 'main';
-            $res[$rs['msgid']]['plural']    = $rs['msgid_plural'];
-            $res[$rs['msgid']]['msgstr']    = [''];
-            $res[$rs['msgid']]['in_dc']     = false;
-            $res[$rs['msgid']]['o_msgstrs'] = [];
+            if (!isset($res[$rs['msgid']])) {
+                $res[$rs['msgid']] = [
+                    'files'     => [],
+                    'group'     => 'main',
+                    'plural'    => $rs['msgid_plural'],
+                    'msgstr'    => [''],
+                    'in_dc'     => false,
+                    'o_msgstrs' => [],
+                ];
+            }
+            $res[$rs['msgid']]['files'][] = [trim($rs['file'], '/'), $rs['line']];
         }
 
         # From str list
         foreach ($m_msgstrs as $rs) {
-            if (is_string($rs['msgid']) && !isset($res[$rs['msgid']])) {
-                $res[$rs['msgid']]['files'][]   = [];
-                $res[$rs['msgid']]['in_dc']     = false;
-                $res[$rs['msgid']]['o_msgstrs'] = [];
+            if (!isset($res[$rs['msgid']])) {
+                $res[$rs['msgid']] = [
+                    'files'     => [[]],
+                    'group'     => $rs['group'],
+                    'plural'    => $rs['msgid_plural'],
+                    'msgstr'    => $rs['msgstr'],
+                    'in_dc'     => false,
+                    'o_msgstrs' => [],
+                ];
+            } else {
+                $res[$rs['msgid']]['group']  = $rs['group'];
+                $res[$rs['msgid']]['plural'] = $rs['msgid_plural'];
+                $res[$rs['msgid']]['msgstr'] = $rs['msgstr'];
             }
-            $res[$rs['msgid']]['group']  = $rs['group'];
-            $res[$rs['msgid']]['plural'] = $rs['msgid_plural'];
-            $res[$rs['msgid']]['msgstr'] = is_array($rs['msgstr']) ? $rs['msgstr'] : [$rs['msgstr']];
-            $res[$rs['msgid']]['in_dc']  = false;
         }
 
         # From others str list
         foreach ($m_o_msgstrs as $o_module => $o_msgstrs) {
             foreach ($o_msgstrs as $rs) {
-                if (!is_string($rs['msgid']) || !isset($res[$rs['msgid']])) {
+                if (!isset($res[$rs['msgid']])) {
                     continue;
                 }
 
                 $res[$rs['msgid']]['o_msgstrs'][] = [
-                    'msgstr' => is_array($rs['msgstr']) ? $rs['msgstr'] : [$rs['msgstr']],
-                    'module' => $o_module,
+                    'msgstr' => $rs['msgstr'],
+                    'module' => (string) $o_module,
                     'file'   => $rs['file'],
                 ];
-                if ($o_module == 'dotclear') {
+                if ($o_module === 'dotclear') {
                     $res[$rs['msgid']]['in_dc'] = true;
                 }
             }
@@ -117,7 +133,7 @@ class TranslaterLang
     /**
      * Get messages ids.
      *
-     * @return array<int, array<string, mixed>>     The messages ids
+     * @return array<int, TranslaterMsgId>     The messages ids
      */
     public function getMsgIds(): array
     {
@@ -138,7 +154,7 @@ class TranslaterLang
             if ($extension == 'php') {
                 # php files
                 $msgs = Translater::extractPhpMsgs((string) $contents);
-            } elseif ($extension == 'html') {
+            } else {
                 # tpl files
                 $msgs = Translater::extractTplMsgs((string) $contents);
             }
@@ -160,11 +176,11 @@ class TranslaterLang
     /**
      * Get messages translations.
      *
-     * @return  array<int, array<string, string|array<int, string>>>   The messages translations
+     * @return  array<int, TranslaterMsgStr>   The messages translations
      */
     public function getMsgStrs(): array
     {
-        $res = $exists = $scanned = [];
+        $res = $scanned = [];
 
         $langs = $this->module->getLangsPath();
         if (!isset($langs[$this->code])) {
@@ -185,17 +201,19 @@ class TranslaterLang
                 }
                 $entries = $po[1];
                 foreach ($entries as $entry) {
+                    if (!isset($entry['msgid']) || !is_string($entry['msgid'])) {
+                        continue;
+                    }
                     $res[] = [
                         'msgid'        => $entry['msgid'],
-                        'msgid_plural' => $entry['msgid_plural'] ?? '',
-                        'msgstr'       => is_array($entry['msgstr']) ? $entry['msgstr'] : [$entry['msgstr']],
+                        'msgid_plural' => is_string($entry['msgid_plural'] ?? null) ? $entry['msgid_plural'] : '',
+                        'msgstr'       => array_values(is_array($entry['msgstr']) ? $entry['msgstr'] : [$entry['msgstr']]),
                         'lang'         => $this->code,
                         'type'         => 'po',
                         'path'         => $path,
                         'file'         => basename($file),
                         'group'        => str_replace('.po', '', basename($file)),
                     ];
-                    $exists[] = $entry['msgid'];
                 }
             }
         }

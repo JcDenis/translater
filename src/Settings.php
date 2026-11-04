@@ -125,21 +125,21 @@ class Settings
     {
         $s = My::settings();
 
-        $this->plugin_menu      = (bool) ($s->get('plugin_menu') ?? false);
-        $this->theme_menu       = (bool) ($s->get('theme_menu') ?? false);
-        $this->backup_auto      = (bool) ($s->get('backup_auto') ?? false);
-        $this->backup_limit     = (int) ($s->get('backup_limit') ?? 20);
-        $this->backup_folder    = (string) ($s->get('backup_folder') ?? 'module');
-        $this->start_page       = (string) ($s->get('start_page') ?? '-');
-        $this->write_langphp    = (bool) ($s->get('write_langphp') ?? false);
-        $this->scan_tpl         = (bool) ($s->get('scan_tpl') ?? true);
-        $this->parse_nodc       = (bool) ($s->get('parse_nodc') ?? true);
-        $this->hide_default     = (bool) ($s->get('hide_default') ?? true);
-        $this->parse_comment    = (bool) ($s->get('parse_comment') ?? false);
-        $this->parse_user       = (bool) ($s->get('parse_user') ?? false);
-        $this->parse_userinfo   = (string) ($s->get('parse_userinfo') ?? 'displayname, email');
-        $this->import_overwrite = (bool) ($s->get('import_overwrite') ?? false);
-        $this->export_filename  = (string) ($s->get('export_filename') ?? 'type-module-l10n-timestamp');
+        $this->plugin_menu      = $s->getBool('plugin_menu') ?? false;
+        $this->theme_menu       = $s->getBool('theme_menu') ?? false;
+        $this->backup_auto      = $s->getBool('backup_auto') ?? false;
+        $this->backup_limit     = $s->getInt('backup_limit') ?? 20;
+        $this->backup_folder    = $s->getStr('backup_folder') ?? 'module';
+        $this->start_page       = $s->getStr('start_page') ?? '-';
+        $this->write_langphp    = $s->getBool('write_langphp') ?? false;
+        $this->scan_tpl         = $s->getBool('scan_tpl') ?? true;
+        $this->parse_nodc       = $s->getBool('parse_nodc') ?? true;
+        $this->hide_default     = $s->getBool('hide_default') ?? true;
+        $this->parse_comment    = $s->getBool('parse_comment') ?? false;
+        $this->parse_user       = $s->getBool('parse_user') ?? false;
+        $this->parse_userinfo   = $s->getStr('parse_userinfo') ?? 'displayname, email';
+        $this->import_overwrite = $s->getBool('import_overwrite') ?? false;
+        $this->export_filename  = $s->getStr('export_filename') ?? 'type-module-l10n-timestamp';
     }
 
     /**
@@ -147,9 +147,9 @@ class Settings
      *
      * @return  null|bool|int|string
      */
-    public function getSetting(string $key): mixed
+    public function getSetting(string $key): null|bool|int|string
     {
-        return $this->{$key} ?? null;
+        return $this->listSettings()[$key] ?? null;
     }
 
     /**
@@ -179,6 +179,13 @@ class Settings
      */
     public function listSettings(): array
     {
-        return get_object_vars($this);
+        $res = [];
+        foreach (get_object_vars($this) as $k => $v) {
+            if (is_bool($v) || is_int($v) || is_string($v)) {
+                $res[(string) $k] = $v;
+            }
+        }
+
+        return $res;
     }
 }

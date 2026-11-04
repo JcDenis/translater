@@ -97,13 +97,15 @@ class TranslaterModule
         public readonly Translater $translater,
         ModuleDefine $define
     ) {
-        $this->id            = $define->get('id');
-        $this->type          = $define->get('type');
-        $this->name          = $define->get('name');
-        $this->author        = $define->get('author');
-        $this->version       = $define->get('version');
-        $this->root_writable = $define->get('root_writable');
-        $this->root          = (string) Path::real($define->get('root'), false);
+        $str = fn (string $key): string => is_string($v = $define->get($key)) ? $v : '';
+
+        $this->id            = $define->getId();
+        $this->type          = $str('type');
+        $this->name          = $str('name');
+        $this->author        = $str('author');
+        $this->version       = $str('version');
+        $this->root_writable = (bool) $define->get('root_writable');
+        $this->root          = (string) Path::real($str('root'), false);
         $this->locales       = $this->root . DIRECTORY_SEPARATOR . My::LOCALES_FOLDER;
     }
 
@@ -175,7 +177,7 @@ class TranslaterModule
     /**
      * Get a list of available backups.
      *
-     * @return  array<string, array<string, array<string, string|array<string, string>>>>   The module backups info
+     * @return  array<string, array<string, array{code: string, name: string, path: array<string, string>, time: int, size: int, module: string}>>   The module backups info
      */
     public function getBackups(): array
     {
@@ -196,12 +198,14 @@ class TranslaterModule
                 continue;
             }
 
-            $res[$m[1]][$file]['code']   = $m[1];
-            $res[$m[1]][$file]['name']   = L10n::getLanguageName($m[1]);
-            $res[$m[1]][$file]['path']   = Path::info($backup . '/' . $file);
-            $res[$m[1]][$file]['time']   = (string) filemtime($backup . '/' . $file);
-            $res[$m[1]][$file]['size']   = (string) filesize($backup . '/' . $file);
-            $res[$m[1]][$file]['module'] = $this->id;
+            $res[$m[1]][$file] = [
+                'code'   => $m[1],
+                'name'   => L10n::getLanguageName($m[1]),
+                'path'   => Path::info($backup . '/' . $file),
+                'time'   => (int) filemtime($backup . '/' . $file),
+                'size'   => (int) filesize($backup . '/' . $file),
+                'module' => $this->id,
+            ];
         }
 
         return $res;
@@ -265,7 +269,7 @@ class TranslaterModule
             if (!is_dir($dir . DIRECTORY_SEPARATOR . $file)
                 && (Translater::isLangphpFile($file) || Translater::isPoFile($file))
             ) {
-                $res[$dir . DIRECTORY_SEPARATOR . $file] = implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file]);
+                $res[$dir . DIRECTORY_SEPARATOR . $file] = implode('/', [$this->id, My::LOCALES_FOLDER, $lang, $file]);
             }
         }
 
@@ -273,12 +277,18 @@ class TranslaterModule
             Translater::isBackupLimit($this->id, $backup, $this->translater->backup_limit, true);
 
             @set_time_limit(300);
-            $zip = new Zip($backup . '/l10n-' . $this->id . '-' . $lang . '-' . time() . '.bck.zip');
+            $fp = fopen($backup . '/l10n-' . $this->id . '-' . $lang . '-' . time() . '.bck.zip', 'wb');
+            if ($fp === false) {
+                throw new Exception(__('Failed to create backup file'));
+            }
+            $zip = new Zip($fp);
             foreach ($res as $from => $to) {
                 $zip->addFile($from, $to);
             }
+            $zip->write();
             $zip->close();
             unset($zip);
+            fclose($fp);
 
             return true;
         }
@@ -353,20 +363,25 @@ class TranslaterModule
     /**
      * Import a language pack.
      *
-     * @param   array<string, mixed>    $zip_file   The uploaded file info
+     * @param   array<mixed, mixed>     $zip_file   The uploaded file info
      *
      * @return  bool    True on success
      */
     public function importPack(array $zip_file): bool
     {
-        Files::uploadStatus($zip_file); // @phpstan-ignore-line
+        $tmp_name = is_string($zip_file['tmp_name'] ?? null) ? $zip_file['tmp_name'] : '';
+        $name     = is_string($zip_file['name'] ?? null) ? $zip_file['name'] : '';
+        $error    = is_numeric($zip_file['error'] ?? null) ? (int) $zip_file['error'] : UPLOAD_ERR_NO_FILE;
+        $size     = is_numeric($zip_file['size'] ?? null) ? (int) $zip_file['size'] : 0;
+
+        Files::uploadStatus(['name' => $name, 'type' => '', 'tmp_name' => $tmp_name, 'error' => $error, 'size' => $size, 'full_path' => $name]);
 
         $imported       = false;
         $not_overwrited = [];
         $res            = [];
 
         # Load Unzip object
-        $zip   = new Unzip($zip_file['tmp_name']);
+        $zip   = new Unzip($tmp_name);
         $files = $zip->getFilesList();
 
         foreach ($files as $file) {
@@ -396,7 +411,7 @@ class TranslaterModule
             $imported = true;
         }
         $zip->close();
-        unlink($zip_file['tmp_name']);
+        unlink($tmp_name);
 
         if (!empty($not_overwrited)) {
             throw new Exception(sprintf(
@@ -406,7 +421,7 @@ class TranslaterModule
         } elseif (!$imported) {
             throw new Exception(sprintf(
                 __('Nothing to import from %s'),
-                $zip_file['name']
+                $name
             ));
         }
 
@@ -448,7 +463,7 @@ class TranslaterModule
                     continue;
                 }
 
-                $res[implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file])] = implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file]);
+                $res[implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $file])] = implode('/', [$this->id, My::LOCALES_FOLDER, $lang, $file]);
             }
         }
 
@@ -459,7 +474,11 @@ class TranslaterModule
         }
 
         @set_time_limit(300);
-        $zip = new Zip('php://output');
+        $fp = fopen('php://output', 'wb');
+        if ($fp === false) {
+            throw new Exception(__('Failed to export language'));
+        }
+        $zip = new Zip($fp);
         foreach ($res as $from => $to) {
             $zip->addFile($from, $to);
         }
@@ -472,6 +491,7 @@ class TranslaterModule
 
         header('Content-Disposition: attachment;filename=' . $filename . '.zip');
         header('Content-Type: application/x-zip');
+        $zip->write();
         $zip->close();
         unset($zip);
         exit;
@@ -616,8 +636,6 @@ class TranslaterModule
             ));
         }
 
-        Files::makeDir($this->locales . DIRECTORY_SEPARATOR . $lang, true);
-
         if (!empty($from_lang) && !isset($langs[$from_lang])) {
             throw new Exception(sprintf(
                 __('Failed to copy file from language %s'),
@@ -625,7 +643,9 @@ class TranslaterModule
             ));
         }
 
-        if (!empty($from_lang) && isset($langs[$from_lang])) {
+        Files::makeDir($this->locales . DIRECTORY_SEPARATOR . $lang, true);
+
+        if (!empty($from_lang)) {
             $files = Translater::scandir($this->locales . DIRECTORY_SEPARATOR . $from_lang);
             foreach ($files as $file) {
                 if (is_dir(implode(DIRECTORY_SEPARATOR, [$this->locales, $from_lang, $file]))
@@ -651,8 +671,8 @@ class TranslaterModule
     /**
      * Update an existing lang.
      *
-     * @param   string                  $lang   The lang
-     * @param   array<string, mixed>    $msgs   The messages
+     * @param   string                                                                                          $lang   The lang
+     * @param   array<int, array{msgid: string, msgid_plural: string, msgstr: array<int, string>, group: string}>   $msgs   The messages
      */
     public function updLang(string $lang, array $msgs): void
     {
@@ -759,9 +779,9 @@ class TranslaterModule
     /**
      * Construct and parse a po file.
      *
-     * @param   string              $lang   The lang code
-     * @param   string              $group  The lang group
-     * @param   array<int, mixed>   $msgs   The strings
+     * @param   string                                                                                          $lang   The lang code
+     * @param   string                                                                                          $group  The lang group
+     * @param   array<int, array{msgid: string, msgid_plural: string, msgstr: array<int, string>, group: string}>   $msgs   The strings
      */
     private function setPoContent(string $lang, string $group, array $msgs): void
     {
@@ -777,14 +797,14 @@ class TranslaterModule
                 $search  = My::defaultUserInformations();
                 $replace = [];
                 foreach ($search as $n) {
-                    $replace[] = App::auth()->getInfo('user_' . $n);
+                    $replace[] = is_string($v = App::auth()->getInfo('user_' . $n)) ? $v : '';
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
                     $content .= '# Author: ' . Html::escapeHTML($info) . "\n";
                 }
             }
-            $content .= '# Translated with translater ' . App::plugins()->moduleInfo(My::id(), 'version') . "\n\n";
+            $content .= '# Translated with translater ' . (is_string($v = App::plugins()->moduleInfo(My::id(), 'version')) ? $v : '') . "\n\n";
         }
         $content .= "msgid \"\"\n" .
         "msgstr \"\"\n" .
@@ -792,7 +812,7 @@ class TranslaterModule
         '"Project-Id-Version: ' . $this->id . ' ' . $this->version . '\n"' . "\n" .
         '"POT-Creation-Date: \n"' . "\n" .
         '"PO-Revision-Date: ' . date('c') . '\n"' . "\n" .
-        '"Last-Translator: ' . App::auth()->getInfo('user_cn') . '\n"' . "\n" .
+        '"Last-Translator: ' . (is_string($v = App::auth()->getInfo('user_cn')) ? $v : '') . '\n"' . "\n" .
         '"Language-Team: \n"' . "\n" .
         '"MIME-Version: 1.0\n"' . "\n" .
         '"Content-Transfer-Encoding: 8bit\n"' . "\n" .
@@ -820,7 +840,7 @@ class TranslaterModule
             } else {
                 $content .= 'msgid_plural "' . Translater::poString($msg['msgid_plural'], true) . '"' . "\n";
                 foreach ($msg['msgstr'] as $i => $plural) {
-                    $content .= 'msgstr[' . $i . '] "' . Translater::poString(($msg['msgstr'][$i] ?: ''), true) . '"' . "\n";
+                    $content .= 'msgstr[' . $i . '] "' . Translater::poString($plural, true) . '"' . "\n";
                 }
             }
             $content .= "\n";
@@ -847,9 +867,9 @@ class TranslaterModule
     /**
      * Construct and write a .lang.php file.
      *
-     * @param   string              $lang   The lang code
-     * @param   string              $group  The lang group
-     * @param   array<int, mixed>   $msgs   The strings
+     * @param   string                                                                                          $lang   The lang code
+     * @param   string                                                                                          $group  The lang group
+     * @param   array<int, array{msgid: string, msgid_plural: string, msgstr: array<int, string>, group: string}>   $msgs   The strings
      */
     private function setLangphpContent(string $lang, string $group, array $msgs): void
     {
@@ -869,14 +889,14 @@ class TranslaterModule
                 $search  = My::defaultUserInformations();
                 $replace = [];
                 foreach ($search as $n) {
-                    $replace[] = App::auth()->getInfo('user_' . $n);
+                    $replace[] = is_string($v = App::auth()->getInfo('user_' . $n)) ? $v : '';
                 }
                 $info = trim(str_replace($search, $replace, $this->translater->parse_userinfo));
                 if (!empty($info)) {
                     $content .= '// Author: ' . Html::escapeHTML($info) . "\n";
                 }
             }
-            $content .= '// Translated with Translater - ' . App::plugins()->moduleInfo(My::id(), 'version') . "\n\n";
+            $content .= '// Translated with Translater - ' . (is_string($v = App::plugins()->moduleInfo(My::id(), 'version')) ? $v : '') . "\n\n";
         }
 
         L10n::generatePhpFileFromPo(implode(DIRECTORY_SEPARATOR, [$this->locales, $lang->code, $group]), $content);

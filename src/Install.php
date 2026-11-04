@@ -65,13 +65,13 @@ class Install
             }
 
             while ($record->fetch()) {
-                if (preg_match('/^translater_(.*?)$/', $record->f('setting_id'), $match)) {
+                if (preg_match('/^translater_(.*?)$/', $record->strField('setting_id'), $match)) {
                     $cur = App::blogWorkspace()->openBlogWorkspaceCursor();
                     $cur->setField('setting_id', $match[1]);
                     $cur->setField('setting_ns', My::id());
                     $cur->update(
-                        "WHERE setting_id = '" . $record->f('setting_id') . "' and setting_ns = 'translater' " .
-                        'AND blog_id ' . (null === $record->f('blog_id') ? 'IS NULL ' : ("= '" . App::db()->con()->escapeStr((string) $record->f('blog_id')) . "' "))
+                        "WHERE setting_id = '" . App::db()->con()->escapeStr($record->strField('setting_id')) . "' and setting_ns = 'translater' " .
+                        'AND blog_id ' . (null === $record->f('blog_id') ? 'IS NULL ' : ("= '" . App::db()->con()->escapeStr($record->strField('blog_id')) . "' "))
                     );
                 }
             }

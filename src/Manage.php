@@ -55,7 +55,7 @@ class Manage
                     throw new Exception(__('Nothing to backup'));
                 }
                 foreach ($current->module->getUsedLangs() as $code_id) {
-                    if (in_array($code_id, $_POST['codes'])) {
+                    if (in_array($code_id, self::postList('codes'), true)) {
                         $current->module->createBackup($code_id);
                     }
                 }
@@ -68,7 +68,7 @@ class Manage
                     throw new Exception(__('Nothing to restore'));
                 }
                 foreach ($current->module->getBackupsFilename() as $backup_file) {
-                    if (in_array($backup_file, $_POST['files'])) {
+                    if (in_array($backup_file, self::postList('files'), true)) {
                         $current->module->restoreBackup($backup_file);
                     }
                 }
@@ -81,7 +81,7 @@ class Manage
                     throw new Exception(__('Nothing to delete'));
                 }
                 foreach ($current->module->getBackupsFilename() as $backup_file) {
-                    if (in_array($backup_file, $_POST['files'])) {
+                    if (in_array($backup_file, self::postList('files'), true)) {
                         $current->module->deleteBackup($backup_file);
                     }
                 }
@@ -93,16 +93,17 @@ class Manage
                 if (empty($current->module) || empty($_POST['codes'])) {
                     throw new Exception(__('Nothing to export'));
                 }
-                $current->module->exportPack($_POST['codes']);
+                $current->module->exportPack(self::postList('codes'));
 
                 self::redirect(__('Language successfully exported'));
             }
 
             if ($current->action == 'module_import_pack') {
-                if (empty($current->module) || empty($_FILES['packfile']['name'])) {
+                $file = $_FILES['packfile'] ?? null;
+                if (empty($current->module) || !is_array($file) || empty($file['name'])) {
                     throw new Exception(__('Nothing to import'));
                 }
-                $current->module->importPack($_FILES['packfile']);
+                $current->module->importPack($file);
 
                 self::redirect(__('Language successfully imported'));
             }
@@ -111,9 +112,9 @@ class Manage
                 if (empty($current->module) || empty($_POST['code'])) {
                     throw new Exception(__('Nothing to create'));
                 }
-                $current->module->addLang($_POST['code'], $_POST['from'] ?? '');
+                $current->module->addLang(self::postStr('code'), self::postStr('from'));
 
-                self::redirect(__('Language successfully added'), $_POST['code']);
+                self::redirect(__('Language successfully added'), self::postStr('code'));
             }
 
             if ($current->action == 'module_delete_codes') {
@@ -121,7 +122,7 @@ class Manage
                     throw new Exception(__('Nothing to delete'));
                 }
                 foreach ($current->module->getUsedLangs() as $code_id) {
-                    if (in_array($code_id, $_POST['codes'])) {
+                    if (in_array($code_id, self::postList('codes'), true)) {
                         $current->module->delLang($code_id);
                     }
                 }
@@ -133,16 +134,24 @@ class Manage
                 if (empty($current->module) || empty($_POST['code']) || empty($_POST['entries'])) {
                     throw new Exception(__('Nothing to update'));
                 }
-                if (!empty($_POST['update_group'])) {
-                    foreach ($_POST['entries'] as $i => $entry) {
-                        if (isset($entry['check']) && isset($_POST['multigroup'])) {
-                            $_POST['entries'][$i]['group'] = $_POST['multigroup'];
-                        }
+                $multigroup = !empty($_POST['update_group']) ? self::postStr('multigroup') : '';
+                $entries    = [];
+                foreach (is_array($_POST['entries']) ? $_POST['entries'] : [] as $entry) {
+                    if (!is_array($entry) || !is_string($entry['msgid'] ?? null)) {
+                        continue;
                     }
-                }
-                $current->module->updLang($_POST['code'], $_POST['entries']);
+                    $msgstr = is_array($entry['msgstr'] ?? null) ? $entry['msgstr'] : [$entry['msgstr'] ?? ''];
 
-                self::redirect(__('Language successfully updated'), $_POST['code']);
+                    $entries[] = [
+                        'msgid'        => $entry['msgid'],
+                        'msgid_plural' => is_string($entry['msgid_plural'] ?? null) ? $entry['msgid_plural'] : '',
+                        'msgstr'       => array_values(array_map(fn ($v): string => is_string($v) ? $v : '', $msgstr)),
+                        'group'        => $multigroup !== '' && isset($entry['check']) ? $multigroup : (is_string($entry['group'] ?? null) ? $entry['group'] : 'main'),
+                    ];
+                }
+                $current->module->updLang(self::postStr('code'), $entries);
+
+                self::redirect(__('Language successfully updated'), self::postStr('code'));
             }
         } catch (Exception $e) {
             App::error()->add($e->getMessage());
@@ -300,14 +309,13 @@ class Manage
 
                     if (isset($backups[$code_id])) {
                         $time[$code_id] = 0;
-                        foreach ($backups[$code_id] as $file => $info) {
-                            $time[$code_id] = isset($time[$code_id]) && $time[$code_id] > $info['time'] ?
-                                $time[$code_id] : $info['time'];
+                        foreach ($backups[$code_id] as $info) {
+                            $time[$code_id] = max($time[$code_id], $info['time']);
                         }
                         echo
                         '<td class="nowrap">' . count($backups[$code_id]) . '</td>' .
                         '<td class="nowrap"> ' .
-                        Date::str('%Y-%m-%d %H:%M', (int) $time[$code_id], (string) App::blog()->settings()->get('system')->get('blog_timezone')) .
+                        Date::str('%Y-%m-%d %H:%M', $time[$code_id], App::blog()->settings()->get('system')->getStr('blog_timezone', false)) .
                         '</td>';
                     } else {
                         echo '<td class="nowrap">' . __('no backups') . '</td><td class="maximal nowrap">-</td>';
@@ -363,20 +371,20 @@ class Manage
                     foreach ($backups as $backup_codes) {
                         foreach ($backup_codes as $backup_file => $backup_code) {
                             $i++;
-                            $form_id = 'form_file_' . (is_string($backup_code['code']) ? $backup_code['code'] : '') . (is_string($backup_code['time']) ? $backup_code['time'] : '');
+                            $form_id = 'form_file_' . $backup_code['code'] . $backup_code['time'];
                             echo sprintf(
                                 $table_line,
                                 (new Checkbox(['files[]', $form_id]))->value($backup_file)->render(),
                                 $form_id,
-                                is_string($backup_code['name']) ? $backup_code['name'] : 'unknown',
-                                is_string($backup_code['code']) ? $backup_code['code'] : 'unknown',
+                                $backup_code['name'],
+                                $backup_code['code'],
                                 Date::str(
-                                    App::blog()->settings()->get('system')->get('date_format') . ' ' . App::blog()->settings()->get('system')->get('time_format'),
-                                    (int) $backup_code['time'],
-                                    App::blog()->settings()->get('system')->get('blog_timezone')
+                                    App::blog()->settings()->get('system')->getStr('date_format', false) . ' ' . App::blog()->settings()->get('system')->getStr('time_format', false),
+                                    $backup_code['time'],
+                                    App::blog()->settings()->get('system')->getStr('blog_timezone', false)
                                 ),
-                                is_array($backup_code['path']) ? $backup_code['path']['basename'] : '',
-                                Files::size((int) $backup_code['size'])
+                                $backup_code['path']['basename'] ?? '',
+                                Files::size($backup_code['size'])
                             );
                         }
                     }
@@ -409,7 +417,7 @@ class Manage
                 <form id="module-code-create-form" method="post" action="' . My::manageUrl() . '">' .
                 (new Para())->class('field')->items([
                     (new Label(__('Select language:')))->for('code'),
-                    (new Select(['code']))->default((string) App::auth()->getInfo('user_lang'))->items(array_merge(['-' => '-'], $unused_codes)),
+                    (new Select(['code']))->default(is_string($user_lang = App::auth()->getInfo('user_lang')) ? $user_lang : '')->items(array_merge(['-' => '-'], $unused_codes)),
                 ])->render();
 
                 if (empty($codes)) {
@@ -505,7 +513,7 @@ class Manage
 
                 if (!empty($rs['files'][0])) {
                     if (count($rs['files']) == 1) {
-                        $t_files[] = $rs['files'][0][0] . ':' . $rs['files'][0][1];
+                        $t_files[] = implode(':', $rs['files'][0]);
                     } else {
                         $res = [];
                         foreach ($rs['files'] as $location) {
@@ -640,5 +648,23 @@ class Manage
 
         Notices::addSuccessNotice($msg);
         My::manageUrl($redir);
+    }
+
+    /**
+     * Get a string from POST.
+     */
+    private static function postStr(string $key): string
+    {
+        return isset($_POST[$key]) && is_string($_POST[$key]) ? $_POST[$key] : '';
+    }
+
+    /**
+     * Get a list of strings from POST.
+     *
+     * @return  array<int, string>
+     */
+    private static function postList(string $key): array
+    {
+        return isset($_POST[$key]) && is_array($_POST[$key]) ? array_values(array_filter($_POST[$key], is_string(...))) : [];
     }
 }

@@ -60,7 +60,10 @@ class Translater extends Settings
             App::plugins()->getDefines(['state' => ModuleDefine::STATE_ENABLED]),
         ] as $modules) {
             foreach ($modules as $define) {
-                $this->modules[(string) $define->get('type')][(string) $define->get('id')] = new TranslaterModule($this, $define);
+                $type = $define->get('type');
+                if (in_array($type, ['plugin', 'theme'], true)) {
+                    $this->modules[$type][$define->getId()] = new TranslaterModule($this, $define);
+                }
             }
         }
     }

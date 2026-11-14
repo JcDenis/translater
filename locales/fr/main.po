@@ -390,3 +390,5 @@ msgstr "Impossible d'écrire le fichier %s"
 msgid "Translater"
 msgstr "Traducteur"
 
+msgid "File"
+msgstr "Fichier"

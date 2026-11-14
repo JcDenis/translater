@@ -647,7 +647,7 @@ class Manage
         }
 
         Notices::addSuccessNotice($msg);
-        My::manageUrl($redir);
+        My::redirect($redir);
     }
 
     /**

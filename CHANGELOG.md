@@ -1,3 +1,13 @@
+translater 2026.11.14
+===========================================================
+* Fix DA URLs
+* Add Claude to contributors
+* [fix] Redirect after actions
+* [fix] Keep an existing .lang.php file up to date
+* [lang] Translate File label
+* [docs] Add a user guide in French, with screenshots
+* [docs] Rewrite admin help in English and French, one block per page
+
 translater 2026.11.05
 ===========================================================
 * Bump Dotclear from 2.36 to 2.39

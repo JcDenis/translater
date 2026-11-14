@@ -1,7 +1,5 @@
 translater 2026.11.14
 ===========================================================
-* Fix DA URLs
-* Add Claude to contributors
 * [fix] Redirect after actions
 * [fix] Keep an existing .lang.php file up to date
 * [lang] Translate File label

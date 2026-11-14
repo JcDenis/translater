@@ -267,7 +267,7 @@ class Manage
             }
             echo '</form>';
 
-            Page::helpBlock('translater.type');
+            Page::helpBlock(My::id() . '-type');
         } elseif (!empty($current->module) && empty($current->lang)) {
             $codes        = $current->module->getUsedLangs();
             $backups      = $current->module->getBackups();
@@ -463,7 +463,7 @@ class Manage
 
             echo '</div>';
 
-            Page::helpBlock('translater.module');
+            Page::helpBlock(My::id() . '-module');
         } elseif (!empty($current->lang)) {
             $lines               = $current->lang->getMessages();
             $allowed_l10n_groups = [];
@@ -608,7 +608,7 @@ class Manage
             '<p>&nbsp;</p>' .
             '</div>';
 
-            Page::helpBlock('translater.lang');
+            Page::helpBlock(My::id() . '-lang');
         } else {
             $line = '<li><a href="%s"%s>%s</a></li>';
             echo '<h4><i>' . __('Translate your Dotclear plugins and themes') . '</i></h4>' .
@@ -628,7 +628,7 @@ class Manage
                     )
                 );
 
-            Page::helpBlock('translater.index');
+            Page::helpBlock(My::id() . '-index');
         }
 
         Page::closeModule();

@@ -173,6 +173,6 @@ class Config
             ]),
         ])->render();
 
-        Page::helpBlock('translater.config');
+        Page::helpBlock(My::id() . '-config');
     }
 }

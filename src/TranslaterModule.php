@@ -873,7 +873,10 @@ class TranslaterModule
      */
     private function setLangphpContent(string $lang, string $group, array $msgs): void
     {
-        if (!$this->translater->write_langphp) {
+        // Also update an existing .lang.php file: Dotclear loads it before the .po file
+        if (!$this->translater->write_langphp
+            && !file_exists(implode(DIRECTORY_SEPARATOR, [$this->locales, $lang, $group . '.lang.php']))
+        ) {
             return;
         }
 

@@ -7,11 +7,12 @@
 [![License](https://img.shields.io/github/license/jcdenis/translater?color=white)](https://github.com/JcDenis/translater/blob/master/LICENSE)
 
 ## ABOUT
-## ABOUT
 
 _translater_ is a plugin for the open-source web publishing software called [Dotclear](https://www.dotclear.org).
 
 > Help dev to translate plugin and theme.
+
+A [user guide in French](https://github.com/JcDenis/translater/blob/master/docs/fr/utilisation.md) is available.
 
 ## REQUIREMENTS
 
@@ -33,6 +34,7 @@ or direct from plugins / themes list with a ''Translate'' button.
 
 ## LINKS
 
+* [User guide (in French)](https://github.com/JcDenis/translater/blob/master/docs/fr/utilisation.md)
 * [License](https://github.com/JcDenis/translater/blob/master/LICENSE)
 * [Packages & details](https://github.com/JcDenis/translater/releases) (or on [Repository](https://dotclear.org/plugin/detail/translater))
 * [Sources & contributions](https://github.com/JcDenis/translater)
